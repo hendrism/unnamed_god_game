@@ -1,6 +1,6 @@
 export type StrainLevel = 'Low' | 'Medium' | 'High' | 'Critical';
-export type GamePhase = 'menu' | 'encounter' | 'upgrade';
-export type AbilityId = 'smite' | 'manifest' | 'twist';
+export type GamePhase = 'menu' | 'draft' | 'encounter' | 'upgrade';
+export type AbilityId = 'smite' | 'manifest' | 'twist' | 'condemn' | 'witness' | 'absolve' | 'stifle';
 export type DoctrineId = 'dominion' | 'revelation';
 export type UpgradeCategory = 'strength' | 'world';
 
@@ -118,7 +118,9 @@ export interface GameState {
     strengthBonuses: StrengthBonuses;
     worldWeights: Record<string, number>;
     upgradeOptions: Upgrade[];
+    draftOptions: Ability[];
     startRun: (doctrineId: DoctrineId) => void;
+    selectDraftAbility: (abilityId: AbilityId) => void;
     castAbility: (abilityId: AbilityId) => void;
     getAbilityPreview: (abilityId: AbilityId) => AbilityPreview | null;
     selectUpgrade: (upgradeId: string) => void;

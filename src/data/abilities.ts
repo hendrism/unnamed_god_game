@@ -32,3 +32,46 @@ export const CORE_ABILITIES: Ability[] = [
         baseConsequence: 0,
     }
 ];
+
+export const DRAFT_POOL: Ability[] = [
+    {
+        id: 'condemn',
+        name: 'Condemn',
+        description: 'Overwhelming judgment. High pressure, high strain.',
+        flavorText: 'Subtlety was never your strong suit.',
+        baseStrainCost: 3,
+        basePressure: 4,
+        baseEssence: 0,
+        baseConsequence: 2,
+    },
+    {
+        id: 'witness',
+        name: 'Witness',
+        description: 'Observe the chaos. Generates Essence without applying Pressure.',
+        flavorText: 'You are merely an observer. For now.',
+        baseStrainCost: 1,
+        basePressure: 0,
+        baseEssence: 2,
+        baseConsequence: 0,
+    },
+    {
+        id: 'absolve',
+        name: 'Absolve',
+        description: 'Forgive their transgressions. Reduces Consequence meter.',
+        flavorText: 'Mercy is a luxury you can afford.',
+        baseStrainCost: 2,
+        basePressure: 0,
+        baseEssence: 0,
+        baseConsequence: -2,
+    },
+    {
+        id: 'stifle',
+        name: 'Stifle',
+        description: 'Silence the outcry. Applies minor pressure and reduces Consequence.',
+        flavorText: 'Hush now. The grownups are talking.',
+        baseStrainCost: 1,
+        basePressure: 1,
+        baseEssence: 0,
+        baseConsequence: -1,
+    }
+];

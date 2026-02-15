@@ -28,7 +28,7 @@ export const AbilityBar = ({ abilities, onChoose }: AbilityBarProps) => {
                                     {headlineNote}
                                 </div>
                             )}
-                            <span className="font-display text-lg text-gray-200 group-hover:text-mythic-gold mb-1">
+                            <span className="font-display text-lg text-gray-200 mb-1">
                                 {ability.name}
                             </span>
                             <p className="text-xs text-gray-400 mb-2">{ability.description}</p>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { CORE_ABILITIES } from '../data/abilities';
+import { CORE_ABILITIES, DRAFT_POOL } from '../data/abilities';
 import { DOCTRINES } from '../data/doctrines';
 import { ENCOUNTER_MODIFIERS, ENCOUNTER_TEMPLATES } from '../data/encounters';
 import { STRENGTH_UPGRADES, WORLD_UPGRADES } from '../data/upgrades';
@@ -38,6 +38,10 @@ const EMPTY_ABILITY_USAGE: Record<AbilityId, number> = {
     smite: 0,
     manifest: 0,
     twist: 0,
+    condemn: 0,
+    witness: 0,
+    absolve: 0,
+    stifle: 0,
 };
 
 const randomInt = (min: number, max: number) =>
@@ -245,6 +249,7 @@ const INITIAL_STATE: Omit<
     | 'selectUpgrade'
     | 'skipUpgrade'
     | 'endRun'
+    | 'selectDraftAbility'
     | 'resetProgress'
 > = {
     essence: 0,
@@ -269,6 +274,7 @@ const INITIAL_STATE: Omit<
     strengthBonuses: { ...DEFAULT_STRENGTH_BONUSES },
     worldWeights: { ...DEFAULT_WORLD_WEIGHTS },
     upgradeOptions: [],
+    draftOptions: [],
 };
 
 export const useGameStore = create<GameState>()(
@@ -284,15 +290,19 @@ export const useGameStore = create<GameState>()(
                     const encountersTarget = randomInt(3, 5);
                     const maxStrain = BASE_MAX_STRAIN + state.strengthBonuses.maxStrainBonus;
 
+                    // Draft Phase Logic
+                    const shuffledDraft = [...DRAFT_POOL].sort(() => 0.5 - Math.random());
+                    const draftOptions = shuffledDraft.slice(0, 3);
+
                     set({
-                        phase: 'encounter',
+                        phase: 'draft',
                         doctrine,
                         abilities: orderedAbilities,
                         abilityUsage: { ...EMPTY_ABILITY_USAGE },
                         history: [],
                         encountersCompleted: 0,
                         encountersTarget,
-                        currentEncounter: createEncounter(0, state.worldWeights),
+                        currentEncounter: null, // Don't start encounter yet
                         castsThisEncounter: 0,
                         doctrinePassiveUsed: false,
                         nextCastFree: false,
@@ -302,7 +312,24 @@ export const useGameStore = create<GameState>()(
                         maxStrain,
                         strainLevel: 'Low',
                         upgradeOptions: [],
-                        lastResolution: `${doctrine.name} chosen. The realm will understand eventually.`,
+                        draftOptions,
+                        lastResolution: `${doctrine.name} chosen. Now, a minor addition to your arsenal.`,
+                    });
+                },
+
+                selectDraftAbility: (abilityId) => {
+                    const state = get();
+                    if (state.phase !== 'draft') return;
+
+                    const newAbility = state.draftOptions.find((a) => a.id === abilityId);
+                    if (!newAbility) return;
+
+                    set({
+                        phase: 'encounter',
+                        abilities: [...state.abilities, newAbility],
+                        draftOptions: [],
+                        currentEncounter: createEncounter(0, state.worldWeights),
+                        lastResolution: `${newAbility.name} accepted. The intervention begins.`,
                     });
                 },
 

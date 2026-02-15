@@ -22,6 +22,7 @@ export const GameView = () => {
         castAbility,
         selectUpgrade,
         skipUpgrade,
+        selectDraftAbility,
         endRun,
     } = useGameStore();
 
@@ -69,6 +70,55 @@ export const GameView = () => {
         );
     }
 
+    if (phase === 'draft') {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-8">
+                <h2 className="text-3xl font-display text-mythic-gold text-center">
+                    A Fragment of Power Resurfaces
+                </h2>
+                <p className="text-gray-400 italic text-center max-w-xl">
+                    As you reassert your will, forgotten capabilities return to your hand.
+                    Choose one to shape the coming intervention.
+                </p>
+
+                <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {useGameStore.getState().draftOptions.map((ability) => (
+                        <button
+                            key={ability.id}
+                            //@ts-ignore - ability.id is verified to be AbilityId
+                            onClick={() => selectDraftAbility(ability.id)}
+                            className="group flex flex-col items-center p-6 bg-gray-900 border border-gray-700 rounded-lg hover:border-mythic-gold hover:bg-gray-800 transition-all text-left"
+                        >
+                            <span className="font-display text-xl text-gray-200 group-hover:text-mythic-gold mb-2">
+                                {ability.name}
+                            </span>
+                            <p className="text-sm text-gray-400 mb-4">{ability.description}</p>
+
+                            <div className="w-full space-y-1 mb-4 text-xs text-gray-500">
+                                <div className="flex justify-between">
+                                    <span>Pressure</span>
+                                    <span className="text-gray-300">{ability.basePressure}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Strain Cost</span>
+                                    <span className="text-gray-300">{ability.baseStrainCost}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Essence</span>
+                                    <span className="text-gray-300">+{ability.baseEssence}</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-auto pt-4 border-t border-gray-800 w-full">
+                                <p className="text-xs text-gray-600 italic">"{ability.flavorText}"</p>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     if (phase === 'upgrade') {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6">
@@ -98,11 +148,10 @@ export const GameView = () => {
                                     <button
                                         onClick={() => selectUpgrade(upgrade.id)}
                                         disabled={!canAfford}
-                                        className={`w-full px-4 py-2 rounded font-semibold transition-all ${
-                                            canAfford
-                                                ? 'bg-void-purple text-white hover:bg-void-purple-dark'
-                                                : 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                                        }`}
+                                        className={`w-full px-4 py-2 rounded font-semibold transition-all ${canAfford
+                                            ? 'bg-void-purple text-white hover:bg-void-purple-dark'
+                                            : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                                            }`}
                                     >
                                         {canAfford ? 'Purchase Upgrade' : 'Insufficient Essence'}
                                     </button>
