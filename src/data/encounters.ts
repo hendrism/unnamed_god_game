@@ -9,7 +9,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         rewardText: 'Recovered tribute from flooded vaults.',
         consequenceText: 'Salt-soaked fear lingers in nearby provinces.',
         basePressure: 8,
-        baseRewardPerTurn: 2,
+        baseRewardPerTurn: 1,
         baseConsequence: 1,
     },
     {
@@ -20,7 +20,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         rewardText: 'Seized offerings and public devotion.',
         consequenceText: 'Rumors spread to the next settlement.',
         basePressure: 9,
-        baseRewardPerTurn: 2,
+        baseRewardPerTurn: 1,
         baseConsequence: 2,
     },
     {
@@ -31,7 +31,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         rewardText: 'Stone relics and pledged repairs.',
         consequenceText: 'Unstable sanctuaries strain future interventions.',
         basePressure: 7,
-        baseRewardPerTurn: 3,
+        baseRewardPerTurn: 2,
         baseConsequence: 1,
     },
     {
@@ -42,7 +42,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         rewardText: 'Focused worship from those you answer.',
         consequenceText: 'Ignored pleas harden into resentment.',
         basePressure: 8,
-        baseRewardPerTurn: 2,
+        baseRewardPerTurn: 1,
         baseConsequence: 1,
     },
     {
@@ -53,7 +53,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         rewardText: 'Emergency rites yield concentrated Essence.',
         consequenceText: 'Famine panic spills into neighboring lands.',
         basePressure: 10,
-        baseRewardPerTurn: 2,
+        baseRewardPerTurn: 1,
         baseConsequence: 2,
     },
 ];

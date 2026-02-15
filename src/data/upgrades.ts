@@ -1,6 +1,6 @@
 import type { Upgrade } from '../types';
 
-export const UPGRADE_COST = 12;
+export const UPGRADE_COST = 18;
 
 export const STRENGTH_UPGRADES: Upgrade[] = [
     {
@@ -22,10 +22,10 @@ export const STRENGTH_UPGRADES: Upgrade[] = [
     {
         id: 'tempered-vessel',
         name: 'Tempered Vessel',
-        description: 'Max Strain increases by 2.',
+        description: 'Max Strain increases by 3.',
         category: 'strength',
         cost: UPGRADE_COST,
-        maxStrainBonus: 2,
+        maxStrainBonus: 3,
     },
 ];
 

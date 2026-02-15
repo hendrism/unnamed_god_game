@@ -11,8 +11,8 @@ export const StrainMeter = () => {
 
     let effectText = 'Stable: no backlash effects.';
     if (strainLevel === 'Medium') effectText = 'Distortion: each cast adds +1 Consequence.';
-    if (strainLevel === 'High') effectText = 'Backlash: each cast adds +2 Consequence and -1 Essence.';
-    if (strainLevel === 'Critical') effectText = 'Critical Backlash: +3 Consequence, -2 Essence, and reduced Pressure.';
+    if (strainLevel === 'High') effectText = 'Backlash: each cast adds +1 Consequence and -1 Essence.';
+    if (strainLevel === 'Critical') effectText = 'Critical Backlash: +2 Consequence, -1 Essence, and reduced Pressure.';
 
     return (
         <div className="w-full max-w-md mx-auto mb-6">
@@ -26,8 +26,8 @@ export const StrainMeter = () => {
                     style={{ width: `${percentage}%` }}
                 />
                 {/* Threshold Markers */}
-                <div className="absolute top-0 bottom-0 left-[40%] w-0.5 bg-black/50" />
-                <div className="absolute top-0 bottom-0 left-[75%] w-0.5 bg-black/50" />
+                <div className="absolute top-0 bottom-0 left-[45%] w-0.5 bg-black/50" />
+                <div className="absolute top-0 bottom-0 left-[80%] w-0.5 bg-black/50" />
                 <div className="absolute top-0 bottom-0 left-[99%] w-0.5 bg-black/50" />
             </div>
             <p className="text-xs text-center mt-1 text-gray-600">

@@ -17,7 +17,8 @@ import type {
     Upgrade,
 } from '../types';
 
-const BASE_MAX_STRAIN = 10;
+const BASE_MAX_STRAIN = 20;
+const ENCOUNTER_STRAIN_RELIEF = 4;
 
 const DEFAULT_STRENGTH_BONUSES: StrengthBonuses = {
     firstCastStrainReduction: 0,
@@ -58,8 +59,8 @@ const getLastAbility = (history: AbilityId[]): AbilityId | null =>
 
 const calculateStrainLevel = (current: number, max: number): StrainLevel => {
     const ratio = max <= 0 ? 1 : current / max;
-    if (ratio < 0.4) return 'Low';
-    if (ratio < 0.75) return 'Medium';
+    if (ratio < 0.45) return 'Low';
+    if (ratio < 0.8) return 'Medium';
     if (ratio < 1) return 'High';
     return 'Critical';
 };
@@ -141,11 +142,11 @@ const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPre
 
     const notes: string[] = [];
     const previousUses = state.abilityUsage[ability.id] ?? 0;
-    const repeatedPowerBonus = previousUses;
+    const repeatedPowerBonus = Math.floor(previousUses / 3);
     const firstCastThisEncounter = state.castsThisEncounter === 0;
     const lastAbilityId = getLastAbility(state.history);
 
-    let strainCost = state.nextCastFree ? 0 : ability.baseStrainCost + previousUses;
+    let strainCost = state.nextCastFree ? 0 : ability.baseStrainCost + repeatedPowerBonus;
     if (state.nextCastFree) {
         notes.push('Twist Fate synergy: this cast costs 0 Strain.');
     }
@@ -163,7 +164,7 @@ const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPre
     let willGrantFreeCast = false;
 
     if (repeatedPowerBonus > 0) {
-        notes.push(`Escalation: ${ability.name} gains +${repeatedPowerBonus} Pressure this run.`);
+        notes.push(`Escalation: ${ability.name} gains +${repeatedPowerBonus} Pressure from repeated use.`);
     }
 
     if (firstCastThisEncounter && state.strengthBonuses.firstCastEssenceBonus > 0) {
@@ -211,14 +212,14 @@ const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPre
         consequenceDelta += 1;
         notes.push('Distortion: Medium Instability adds +1 Consequence.');
     } else if (projectedStrainLevel === 'High') {
+        consequenceDelta += 1;
+        essenceDelta -= 1;
+        notes.push('Backlash: High Instability adds +1 Consequence and -1 Essence.');
+    } else if (projectedStrainLevel === 'Critical') {
         consequenceDelta += 2;
         essenceDelta -= 1;
-        notes.push('Backlash: High Instability adds +2 Consequence and -1 Essence.');
-    } else if (projectedStrainLevel === 'Critical') {
-        consequenceDelta += 3;
-        essenceDelta -= 2;
         pressureDelta = Math.max(0, pressureDelta - 1);
-        notes.push('Backlash: Critical Instability adds +3 Consequence, -2 Essence, and -1 Pressure.');
+        notes.push('Backlash: Critical Instability adds +2 Consequence, -1 Essence, and -1 Pressure.');
     }
 
     essenceDelta = Math.max(0, essenceDelta);
@@ -362,12 +363,11 @@ export const useGameStore = create<GameState>()(
                         let carryGain = updatedConsequence + Math.ceil(unresolvedPressure / 4);
 
                         if (unresolvedPressure <= 0) {
-                            extraEssence += 2;
+                            extraEssence += 1;
                             carryGain = Math.max(0, carryGain - 1);
                             lastResolution =
                                 'Intervention triumphant. Order restored. Side effects remain theoretical.';
                         } else if (unresolvedPressure <= Math.ceil(state.currentEncounter.startingPressure / 2)) {
-                            extraEssence += 1;
                             carryGain += 1;
                             lastResolution =
                                 'Partial success. The district survives, and complains in equal measure.';
@@ -380,6 +380,7 @@ export const useGameStore = create<GameState>()(
 
                         carryOverInstability =
                             Math.max(0, Math.floor(state.carryOverInstability * 0.5) + carryGain);
+                        strainAfterAction = Math.max(0, strainAfterAction - ENCOUNTER_STRAIN_RELIEF);
 
                         if (encountersCompleted >= state.encountersTarget) {
                             phase = 'upgrade';
