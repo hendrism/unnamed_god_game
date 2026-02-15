@@ -1,12 +1,19 @@
 import type { ActiveEncounter } from '../types';
 
-interface EncounterCardProps {
-    encounter: ActiveEncounter;
-}
 
-export const EncounterCard = ({ encounter }: EncounterCardProps) => {
+
+export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncounter, resolved?: boolean }) => {
     return (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-md w-full shadow-2xl">
+        <div className="w-full max-w-md mx-auto bg-gray-900 border-2 border-gray-700 rounded-lg p-6 shadow-2xl relative overflow-hidden">
+            {/* Resolved Overlay */}
+            {resolved && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+                    <h2 className="text-4xl font-display text-mythic-gold tracking-[0.2em] animate-pulse drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
+                        SEVERED
+                    </h2>
+                </div>
+            )}
+
             <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-display text-white">{encounter.title}</h2>
                 <span className="text-xs bg-gray-800 px-2 py-1 rounded text-gray-400 uppercase tracking-wider">

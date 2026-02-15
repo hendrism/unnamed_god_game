@@ -120,9 +120,11 @@ export interface GameState {
     upgradeOptions: Upgrade[];
     draftOptions: Ability[];
     hasSeenTutorial: boolean;
+    encounterResolved: boolean;
     startRun: (doctrineId: DoctrineId) => void;
     selectDraftAbility: (abilityId: AbilityId) => void;
     markTutorialSeen: () => void;
+    nextEncounter: () => void;
     castAbility: (abilityId: AbilityId) => void;
     getAbilityPreview: (abilityId: AbilityId) => AbilityPreview | null;
     selectUpgrade: (upgradeId: string) => void;

@@ -30,6 +30,8 @@ export const GameView = () => {
         markTutorialSeen,
         hasSeenTutorial,
         endRun,
+        encounterResolved,
+        nextEncounter,
     } = useGameStore();
 
     // --- HOOKS (Must be at top level) ---
@@ -42,6 +44,16 @@ export const GameView = () => {
             setShowHelp(true);
         }
     }, [hasSeenTutorial, phase]);
+
+    // Handle Encounter Resolution Delay
+    useEffect(() => {
+        if (encounterResolved) {
+            const timer = setTimeout(() => {
+                nextEncounter();
+            }, 1500); // 1.5s delay to show "SEVERED"
+            return () => clearTimeout(timer);
+        }
+    }, [encounterResolved, nextEncounter]);
 
     // --- HANDLERS ---
     const handleCloseHelp = () => {
@@ -294,7 +306,10 @@ export const GameView = () => {
                         onCancel={() => setSelectedAbilityId(null)}
                     />
                 ) : currentEncounter ? (
-                    <EncounterCard encounter={currentEncounter} />
+                    <EncounterCard
+                        encounter={currentEncounter}
+                        resolved={encounterResolved}
+                    />
                 ) : (
                     <div className="text-gray-500 animate-pulse">Manifesting reality...</div>
                 )}

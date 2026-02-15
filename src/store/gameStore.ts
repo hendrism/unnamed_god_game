@@ -251,6 +251,7 @@ const INITIAL_STATE: Omit<
     | 'endRun'
     | 'selectDraftAbility'
     | 'markTutorialSeen'
+    | 'nextEncounter'
     | 'resetProgress'
 > = {
     essence: 0,
@@ -277,6 +278,7 @@ const INITIAL_STATE: Omit<
     upgradeOptions: [],
     draftOptions: [],
     hasSeenTutorial: false,
+    encounterResolved: false,
 };
 
 export const useGameStore = create<GameState>()(
@@ -341,9 +343,36 @@ export const useGameStore = create<GameState>()(
 
                 getAbilityPreview: (abilityId) => buildAbilityPreview(get(), abilityId),
 
+                nextEncounter: () => {
+                    const state = get();
+                    if (!state.encounterResolved) return;
+
+                    let phase: GameState['phase'] = 'encounter';
+                    let currentEncounter: ActiveEncounter | null = null;
+                    let upgradeOptions: Upgrade[] = [];
+
+                    if (state.encountersCompleted >= state.encountersTarget) {
+                        phase = 'upgrade';
+                        currentEncounter = null;
+                        upgradeOptions = buildUpgradeChoices(state.ownedUpgrades);
+                    } else {
+                        phase = 'encounter';
+                        currentEncounter = createEncounter(state.carryOverInstability, state.worldWeights);
+                    }
+
+                    set({
+                        phase,
+                        currentEncounter,
+                        upgradeOptions,
+                        encounterResolved: false,
+                        castsThisEncounter: 0,
+                        doctrinePassiveUsed: false,
+                    });
+                },
+
                 castAbility: (abilityId) => {
                     const state = get();
-                    if (state.phase !== 'encounter' || !state.currentEncounter) return;
+                    if (state.phase !== 'encounter' || !state.currentEncounter || state.encounterResolved) return;
 
                     const preview = buildAbilityPreview(state, abilityId);
                     if (!preview) return;
@@ -449,6 +478,7 @@ export const useGameStore = create<GameState>()(
                         nextCastFree,
                         lastResolution,
                         upgradeOptions,
+                        encounterResolved: encounterEndsNow,
                     });
                 },
 

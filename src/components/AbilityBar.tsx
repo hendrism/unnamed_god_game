@@ -38,9 +38,19 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
                                 {ability.name}
                             </span>
 
-                            {/* Simple cost indicator */}
-                            <div className="text-[10px] text-gray-500 font-mono">
-                                Strain: {ability.baseStrainCost}
+                            {/* Concise Stats */}
+                            <div className="flex gap-2 text-[10px] uppercase font-mono mt-1 opacity-80">
+                                <span className={preview ? 'text-red-400' : 'text-gray-500'}>
+                                    P:-{preview?.pressureDelta ?? '?'}
+                                </span>
+                                <span className={preview ? 'text-blue-400' : 'text-gray-500'}>
+                                    S:+{preview?.strainCost ?? '?'}
+                                </span>
+                                {preview && preview.essenceDelta > 0 && (
+                                    <span className="text-mythic-gold">
+                                        E:+{preview.essenceDelta}
+                                    </span>
+                                )}
                             </div>
                         </button>
                     );
