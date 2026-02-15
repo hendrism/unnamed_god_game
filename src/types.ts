@@ -1,63 +1,128 @@
 export type StrainLevel = 'Low' | 'Medium' | 'High' | 'Critical';
+export type GamePhase = 'menu' | 'encounter' | 'upgrade';
+export type AbilityId = 'smite' | 'manifest' | 'twist';
+export type DoctrineId = 'dominion' | 'revelation';
+export type UpgradeCategory = 'strength' | 'world';
 
 export interface Ability {
-    id: string;
+    id: AbilityId;
     name: string;
     description: string;
-    flavorText?: string;
+    flavorText: string;
     baseStrainCost: number;
-    // We'll use a simple effect system for MVP. 
-    // Real implementation might need a more complex effect engine.
-    // For now, these are markers for the resolver.
-    effectType: 'damage' | 'heal' | 'utility' | 'buff';
-    synergyKeywords: string[]; // e.g. ["storm", "void"]
+    basePressure: number;
+    baseEssence: number;
+    baseConsequence: number;
 }
 
-export interface Encounter {
+export interface EncounterTemplate {
     id: string;
     title: string;
     description: string;
-    pressure: string; // What bad thing is happening
-    reward: string; // What you get
-    consequence: string; // Secondary effect
-    // Internal state for the encounter logic
-    difficulty: number;
-    type: 'combat' | 'social' | 'puzzle' | 'bizarre';
+    pressureText: string;
+    rewardText: string;
+    consequenceText: string;
+    basePressure: number;
+    baseRewardPerTurn: number;
+    baseConsequence: number;
 }
 
-export interface Doctrine {
+export interface EncounterModifier {
     id: string;
     name: string;
     description: string;
-    startingAbilityId: string;
+    pressureDelta: number;
+    rewardDelta: number;
+    consequenceDelta: number;
+}
+
+export interface ActiveEncounter {
+    id: string;
+    templateId: string;
+    title: string;
+    description: string;
+    pressureText: string;
+    rewardText: string;
+    consequenceText: string;
+    modifierName: string;
+    modifierDescription: string;
+    startingPressure: number;
+    pressureRemaining: number;
+    rewardPerTurn: number;
+    consequenceMeter: number;
+    turn: number;
+    turnLimit: number;
+}
+
+export interface Doctrine {
+    id: DoctrineId;
+    name: string;
+    description: string;
+    startingAbilityId: AbilityId;
     passiveDescription: string;
 }
 
-export interface GameState {
-    // Session State
-    essence: number;
-    scars: string[]; // For v2, but keeping structure ready
+export interface Upgrade {
+    id: string;
+    name: string;
+    description: string;
+    category: UpgradeCategory;
+    cost: number;
+    firstCastStrainReduction?: number;
+    firstCastEssenceBonus?: number;
+    maxStrainBonus?: number;
+    encounterWeightDelta?: {
+        encounterId: string;
+        amount: number;
+    };
+}
 
-    // Run State
-    phase: 'menu' | 'drafting' | 'encounter' | 'resolution' | 'upgrade' | 'victory' | 'defeat';
+export interface StrengthBonuses {
+    firstCastStrainReduction: number;
+    firstCastEssenceBonus: number;
+    maxStrainBonus: number;
+}
+
+export interface AbilityPreview {
+    abilityId: AbilityId;
+    strainCost: number;
+    projectedStrain: number;
+    projectedStrainLevel: StrainLevel;
+    pressureDelta: number;
+    essenceDelta: number;
+    consequenceDelta: number;
+    willGrantFreeCast: boolean;
+    notes: string[];
+}
+
+export interface GameState {
+    essence: number;
+    runEssenceGained: number;
+    phase: GamePhase;
     currentStrain: number;
     maxStrain: number;
     strainLevel: StrainLevel;
-
-    deck: Ability[]; // Current draft pool for the run
-    hand: Ability[]; // Abilities available this turn (if we do card draw, otherwise just list)
-    // Design says "Abilities are always available". So no deck/hand in traditional sense.
-    // just "abilities" list.
     abilities: Ability[];
-
-    currentEncounter: Encounter | null;
+    abilityUsage: Record<AbilityId, number>;
+    history: AbilityId[];
+    lastResolution: string;
+    doctrine: Doctrine | null;
+    currentEncounter: ActiveEncounter | null;
     encountersCompleted: number;
-    history: string[]; // List of ability IDs used in this run
-
-    // Actions
-    startRun: (doctrineId: string) => void;
-    endRun: () => void;
-    castAbility: (abilityId: string) => void;
-    draftAbility: (abilityId: string) => void;
+    encountersTarget: number;
+    carryOverInstability: number;
+    castsThisEncounter: number;
+    doctrinePassiveUsed: boolean;
+    nextCastFree: boolean;
+    ownedUpgrades: string[];
+    strengthBonuses: StrengthBonuses;
+    worldWeights: Record<string, number>;
+    upgradeOptions: Upgrade[];
+    startRun: (doctrineId: DoctrineId) => void;
+    castAbility: (abilityId: AbilityId) => void;
+    getAbilityPreview: (abilityId: AbilityId) => AbilityPreview | null;
     selectUpgrade: (upgradeId: string) => void;
+    skipUpgrade: () => void;
+    endRun: () => void;
+    resetProgress: () => void;
 }

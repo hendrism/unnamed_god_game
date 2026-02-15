@@ -1,134 +1,533 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { GameState, StrainLevel } from '../types';
 import { CORE_ABILITIES } from '../data/abilities';
-import { ENC_TYPES } from '../data/encounters';
+import { DOCTRINES } from '../data/doctrines';
+import { ENCOUNTER_MODIFIERS, ENCOUNTER_TEMPLATES } from '../data/encounters';
+import { STRENGTH_UPGRADES, WORLD_UPGRADES } from '../data/upgrades';
+import type {
+    Ability,
+    AbilityId,
+    AbilityPreview,
+    ActiveEncounter,
+    Doctrine,
+    DoctrineId,
+    GameState,
+    StrainLevel,
+    StrengthBonuses,
+    Upgrade,
+} from '../types';
 
-interface GameActions {
-    startRun: () => void;
-    chooseAbility: (abilityId: string) => void;
-    nextEncounter: () => void;
-    resetGame: () => void;
-    calculateStrainLevel: (current: number, max: number) => StrainLevel;
-}
+const BASE_MAX_STRAIN = 10;
 
-// Initial State
-const INITIAL_STATE: Omit<GameState, 'startRun' | 'endRun' | 'castAbility' | 'draftAbility' | 'selectUpgrade'> = {
+const DEFAULT_STRENGTH_BONUSES: StrengthBonuses = {
+    firstCastStrainReduction: 0,
+    firstCastEssenceBonus: 0,
+    maxStrainBonus: 0,
+};
+
+const DEFAULT_WORLD_WEIGHTS: Record<string, number> = ENCOUNTER_TEMPLATES.reduce(
+    (acc, encounter) => {
+        acc[encounter.id] = 1;
+        return acc;
+    },
+    {} as Record<string, number>
+);
+
+const EMPTY_ABILITY_USAGE: Record<AbilityId, number> = {
+    smite: 0,
+    manifest: 0,
+    twist: 0,
+};
+
+const randomInt = (min: number, max: number) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+const randomFrom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+const getDoctrineById = (doctrineId: DoctrineId): Doctrine =>
+    DOCTRINES.find((doctrine) => doctrine.id === doctrineId) ?? DOCTRINES[0];
+
+const sortAbilitiesForDoctrine = (startingAbilityId: AbilityId): Ability[] => {
+    const start = CORE_ABILITIES.find((ability) => ability.id === startingAbilityId);
+    const rest = CORE_ABILITIES.filter((ability) => ability.id !== startingAbilityId);
+    return start ? [start, ...rest] : [...CORE_ABILITIES];
+};
+
+const getLastAbility = (history: AbilityId[]): AbilityId | null =>
+    history.length === 0 ? null : history[history.length - 1];
+
+const calculateStrainLevel = (current: number, max: number): StrainLevel => {
+    const ratio = max <= 0 ? 1 : current / max;
+    if (ratio < 0.4) return 'Low';
+    if (ratio < 0.75) return 'Medium';
+    if (ratio < 1) return 'High';
+    return 'Critical';
+};
+
+const pickEncounterTemplate = (weights: Record<string, number>) => {
+    const totalWeight = ENCOUNTER_TEMPLATES.reduce(
+        (sum, template) => sum + Math.max(1, weights[template.id] ?? 1),
+        0
+    );
+
+    let roll = Math.random() * totalWeight;
+    for (const template of ENCOUNTER_TEMPLATES) {
+        roll -= Math.max(1, weights[template.id] ?? 1);
+        if (roll <= 0) {
+            return template;
+        }
+    }
+
+    return ENCOUNTER_TEMPLATES[ENCOUNTER_TEMPLATES.length - 1];
+};
+
+const createEncounter = (
+    carryOverInstability: number,
+    worldWeights: Record<string, number>
+): ActiveEncounter => {
+    const template = pickEncounterTemplate(worldWeights);
+    const modifier = randomFrom(ENCOUNTER_MODIFIERS);
+    const pressureFromCarryOver = Math.min(3, carryOverInstability);
+    const startingPressure = Math.max(
+        4,
+        template.basePressure + modifier.pressureDelta + pressureFromCarryOver
+    );
+    const rewardPerTurn = Math.max(1, template.baseRewardPerTurn + modifier.rewardDelta);
+    const startingConsequence = Math.max(0, template.baseConsequence + modifier.consequenceDelta);
+
+    return {
+        id: `${template.id}-${modifier.id}-${Math.random().toString(36).slice(2, 8)}`,
+        templateId: template.id,
+        title: template.title,
+        description: template.description,
+        pressureText: template.pressureText,
+        rewardText: template.rewardText,
+        consequenceText: template.consequenceText,
+        modifierName: modifier.name,
+        modifierDescription: modifier.description,
+        startingPressure,
+        pressureRemaining: startingPressure,
+        rewardPerTurn,
+        consequenceMeter: startingConsequence,
+        turn: 1,
+        turnLimit: randomInt(3, 5),
+    };
+};
+
+const getAvailableUpgradeByCategory = (
+    upgrades: Upgrade[],
+    ownedUpgradeIds: string[]
+): Upgrade | null => {
+    const available = upgrades.filter((upgrade) => !ownedUpgradeIds.includes(upgrade.id));
+    if (available.length === 0) return null;
+    return randomFrom(available);
+};
+
+const buildUpgradeChoices = (ownedUpgradeIds: string[]) => {
+    const options: Upgrade[] = [];
+    const strengthChoice = getAvailableUpgradeByCategory(STRENGTH_UPGRADES, ownedUpgradeIds);
+    const worldChoice = getAvailableUpgradeByCategory(WORLD_UPGRADES, ownedUpgradeIds);
+
+    if (strengthChoice) options.push(strengthChoice);
+    if (worldChoice) options.push(worldChoice);
+
+    return options;
+};
+
+const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPreview | null => {
+    if (!state.currentEncounter) return null;
+    const ability = state.abilities.find((candidate) => candidate.id === abilityId);
+    if (!ability) return null;
+
+    const notes: string[] = [];
+    const previousUses = state.abilityUsage[ability.id] ?? 0;
+    const repeatedPowerBonus = previousUses;
+    const firstCastThisEncounter = state.castsThisEncounter === 0;
+    const lastAbilityId = getLastAbility(state.history);
+
+    let strainCost = state.nextCastFree ? 0 : ability.baseStrainCost + previousUses;
+    if (state.nextCastFree) {
+        notes.push('Twist Fate synergy: this cast costs 0 Strain.');
+    }
+    if (firstCastThisEncounter && state.strengthBonuses.firstCastStrainReduction > 0 && strainCost > 0) {
+        strainCost = Math.max(0, strainCost - state.strengthBonuses.firstCastStrainReduction);
+        notes.push(
+            `Upgrade bonus: first cast costs ${state.strengthBonuses.firstCastStrainReduction} less Strain.`
+        );
+    }
+
+    let strainRelief = 0;
+    let pressureDelta = ability.basePressure + repeatedPowerBonus;
+    let essenceDelta = state.currentEncounter.rewardPerTurn + ability.baseEssence;
+    let consequenceDelta = ability.baseConsequence;
+    let willGrantFreeCast = false;
+
+    if (repeatedPowerBonus > 0) {
+        notes.push(`Escalation: ${ability.name} gains +${repeatedPowerBonus} Pressure this run.`);
+    }
+
+    if (firstCastThisEncounter && state.strengthBonuses.firstCastEssenceBonus > 0) {
+        essenceDelta += state.strengthBonuses.firstCastEssenceBonus;
+        notes.push(`Upgrade bonus: first cast grants +${state.strengthBonuses.firstCastEssenceBonus} Essence.`);
+    }
+
+    if (ability.id === 'smite' && lastAbilityId === 'manifest') {
+        essenceDelta += 1;
+        notes.push('Synergy: Smite after Manifest Presence grants +1 Essence.');
+    }
+
+    if (ability.id === 'manifest' && lastAbilityId === 'twist') {
+        strainRelief += 2;
+        notes.push('Synergy: Manifest Presence after Twist Fate reduces Strain by 2.');
+    }
+
+    if (ability.id === 'twist' && lastAbilityId === 'smite') {
+        willGrantFreeCast = true;
+        notes.push('Synergy: next ability will cost 0 Strain.');
+    }
+
+    if (
+        state.doctrine?.id === 'dominion' &&
+        ability.id === 'smite' &&
+        !state.doctrinePassiveUsed
+    ) {
+        pressureDelta += 1;
+        notes.push('Doctrine bonus: first Smite each encounter deals +1 Pressure.');
+    }
+
+    if (
+        state.doctrine?.id === 'revelation' &&
+        ability.id === 'manifest' &&
+        !state.doctrinePassiveUsed
+    ) {
+        essenceDelta += 1;
+        notes.push('Doctrine bonus: first Manifest Presence each encounter grants +1 Essence.');
+    }
+
+    const projectedStrain = Math.max(0, state.currentStrain + strainCost - strainRelief);
+    const projectedStrainLevel = calculateStrainLevel(projectedStrain, state.maxStrain);
+
+    if (projectedStrainLevel === 'Medium') {
+        consequenceDelta += 1;
+        notes.push('Distortion: Medium Instability adds +1 Consequence.');
+    } else if (projectedStrainLevel === 'High') {
+        consequenceDelta += 2;
+        essenceDelta -= 1;
+        notes.push('Backlash: High Instability adds +2 Consequence and -1 Essence.');
+    } else if (projectedStrainLevel === 'Critical') {
+        consequenceDelta += 3;
+        essenceDelta -= 2;
+        pressureDelta = Math.max(0, pressureDelta - 1);
+        notes.push('Backlash: Critical Instability adds +3 Consequence, -2 Essence, and -1 Pressure.');
+    }
+
+    essenceDelta = Math.max(0, essenceDelta);
+
+    return {
+        abilityId,
+        strainCost,
+        projectedStrain,
+        projectedStrainLevel,
+        pressureDelta,
+        essenceDelta,
+        consequenceDelta,
+        willGrantFreeCast,
+        notes,
+    };
+};
+
+const INITIAL_STATE: Omit<
+    GameState,
+    | 'startRun'
+    | 'castAbility'
+    | 'getAbilityPreview'
+    | 'selectUpgrade'
+    | 'skipUpgrade'
+    | 'endRun'
+    | 'resetProgress'
+> = {
     essence: 0,
-    scars: [],
+    runEssenceGained: 0,
     phase: 'menu',
     currentStrain: 0,
-    maxStrain: 10,
+    maxStrain: BASE_MAX_STRAIN,
     strainLevel: 'Low',
-    deck: [],
-    hand: [],
-    abilities: [],
+    abilities: [...CORE_ABILITIES],
+    abilityUsage: { ...EMPTY_ABILITY_USAGE },
+    history: [],
+    lastResolution: 'The void awaits your flawless leadership.',
+    doctrine: null,
     currentEncounter: null,
     encountersCompleted: 0,
-    history: [],
+    encountersTarget: 0,
+    carryOverInstability: 0,
+    castsThisEncounter: 0,
+    doctrinePassiveUsed: false,
+    nextCastFree: false,
+    ownedUpgrades: [],
+    strengthBonuses: { ...DEFAULT_STRENGTH_BONUSES },
+    worldWeights: { ...DEFAULT_WORLD_WEIGHTS },
+    upgradeOptions: [],
 };
 
-// Helper: Select random encounter
-const getRandomEncounter = () => {
-    const idx = Math.floor(Math.random() * ENC_TYPES.length);
-    return { ...ENC_TYPES[idx] }; // Clone to avoid mutation of source
-};
-
-export const useGameStore = create<GameState & GameActions>()(
+export const useGameStore = create<GameState>()(
     devtools(
         persist(
             (set, get) => ({
                 ...INITIAL_STATE,
 
-                startRun: () => {
-                    // Reset run state
+                startRun: (doctrineId) => {
+                    const state = get();
+                    const doctrine = getDoctrineById(doctrineId);
+                    const orderedAbilities = sortAbilitiesForDoctrine(doctrine.startingAbilityId);
+                    const encountersTarget = randomInt(3, 5);
+                    const maxStrain = BASE_MAX_STRAIN + state.strengthBonuses.maxStrainBonus;
+
                     set({
                         phase: 'encounter',
-                        currentStrain: 0,
-                        maxStrain: 10,
-                        strainLevel: 'Low',
-                        encountersCompleted: 0,
-                        currentEncounter: getRandomEncounter(),
-                        abilities: [...CORE_ABILITIES],
+                        doctrine,
+                        abilities: orderedAbilities,
+                        abilityUsage: { ...EMPTY_ABILITY_USAGE },
                         history: [],
+                        encountersCompleted: 0,
+                        encountersTarget,
+                        currentEncounter: createEncounter(0, state.worldWeights),
+                        castsThisEncounter: 0,
+                        doctrinePassiveUsed: false,
+                        nextCastFree: false,
+                        carryOverInstability: 0,
+                        runEssenceGained: 0,
+                        currentStrain: 0,
+                        maxStrain,
+                        strainLevel: 'Low',
+                        upgradeOptions: [],
+                        lastResolution: `${doctrine.name} chosen. The realm will understand eventually.`,
                     });
                 },
 
-                chooseAbility: (abilityId: string) => {
+                getAbilityPreview: (abilityId) => buildAbilityPreview(get(), abilityId),
+
+                castAbility: (abilityId) => {
                     const state = get();
-                    const ability = state.abilities.find(a => a.id === abilityId);
-                    if (!ability) return;
+                    if (state.phase !== 'encounter' || !state.currentEncounter) return;
 
-                    // calculate strain cost
-                    const strainCost = ability.baseStrainCost;
-                    const newStrain = state.currentStrain + strainCost;
+                    const preview = buildAbilityPreview(state, abilityId);
+                    if (!preview) return;
 
-                    let essenceGain = 0;
+                    const abilityUsage = {
+                        ...state.abilityUsage,
+                        [abilityId]: (state.abilityUsage[abilityId] ?? 0) + 1,
+                    };
 
-                    // Synergy Check
-                    const history = state.history || [];
-                    const lastAbilityId = history.length > 0 ? history[history.length - 1] : null;
+                    const doctrineTriggered =
+                        (state.doctrine?.id === 'dominion' &&
+                            abilityId === 'smite' &&
+                            !state.doctrinePassiveUsed) ||
+                        (state.doctrine?.id === 'revelation' &&
+                            abilityId === 'manifest' &&
+                            !state.doctrinePassiveUsed);
 
-                    if (ability.id === 'smite' && lastAbilityId === 'manifest') {
-                        essenceGain += 1;
+                    const updatedPressure = Math.max(
+                        0,
+                        state.currentEncounter.pressureRemaining - preview.pressureDelta
+                    );
+                    const updatedConsequence = Math.max(
+                        0,
+                        state.currentEncounter.consequenceMeter + preview.consequenceDelta
+                    );
+                    const nextTurn = state.currentEncounter.turn + 1;
+                    const encounterEndsNow = nextTurn > state.currentEncounter.turnLimit;
+
+                    let phase: GameState['phase'] = 'encounter';
+                    let encountersCompleted = state.encountersCompleted;
+                    let carryOverInstability = state.carryOverInstability;
+                    let currentEncounter: ActiveEncounter | null = {
+                        ...state.currentEncounter,
+                        pressureRemaining: updatedPressure,
+                        consequenceMeter: updatedConsequence,
+                        turn: nextTurn,
+                    };
+                    let castsThisEncounter = state.castsThisEncounter + 1;
+                    let doctrinePassiveUsed = state.doctrinePassiveUsed || doctrineTriggered;
+                    const nextCastFree = preview.willGrantFreeCast;
+                    let extraEssence = 0;
+                    let strainAfterAction = preview.projectedStrain;
+                    let lastResolution = `${abilityId.toUpperCase()}: -${preview.pressureDelta} Pressure, +${preview.essenceDelta} Essence, ${preview.consequenceDelta >= 0 ? '+' : ''}${preview.consequenceDelta} Consequence.`;
+                    let upgradeOptions = state.upgradeOptions;
+
+                    if (encounterEndsNow) {
+                        encountersCompleted += 1;
+
+                        const unresolvedPressure = updatedPressure;
+                        let carryGain = updatedConsequence + Math.ceil(unresolvedPressure / 4);
+
+                        if (unresolvedPressure <= 0) {
+                            extraEssence += 2;
+                            carryGain = Math.max(0, carryGain - 1);
+                            lastResolution =
+                                'Intervention triumphant. Order restored. Side effects remain theoretical.';
+                        } else if (unresolvedPressure <= Math.ceil(state.currentEncounter.startingPressure / 2)) {
+                            extraEssence += 1;
+                            carryGain += 1;
+                            lastResolution =
+                                'Partial success. The district survives, and complains in equal measure.';
+                        } else {
+                            carryGain += 2;
+                            strainAfterAction += 1;
+                            lastResolution =
+                                'Backlash. Reality accepted your ruling with visible reluctance.';
+                        }
+
+                        carryOverInstability =
+                            Math.max(0, Math.floor(state.carryOverInstability * 0.5) + carryGain);
+
+                        if (encountersCompleted >= state.encountersTarget) {
+                            phase = 'upgrade';
+                            currentEncounter = null;
+                            castsThisEncounter = 0;
+                            doctrinePassiveUsed = false;
+                            upgradeOptions = buildUpgradeChoices(state.ownedUpgrades);
+                        } else {
+                            phase = 'encounter';
+                            currentEncounter = createEncounter(carryOverInstability, state.worldWeights);
+                            castsThisEncounter = 0;
+                            doctrinePassiveUsed = false;
+                        }
                     }
 
-                    // Finalize state update
-                    let finalStrain = newStrain;
-                    if (ability.id === 'manifest' && lastAbilityId === 'twist') {
-                        finalStrain -= 2;
+                    const totalEssenceGain = preview.essenceDelta + extraEssence;
+                    const currentStrain = Math.max(0, strainAfterAction);
+                    const strainLevel = calculateStrainLevel(currentStrain, state.maxStrain);
+
+                    set({
+                        phase,
+                        abilityUsage,
+                        history: [...state.history, abilityId],
+                        currentStrain,
+                        strainLevel,
+                        essence: state.essence + totalEssenceGain,
+                        runEssenceGained: state.runEssenceGained + totalEssenceGain,
+                        currentEncounter,
+                        encountersCompleted,
+                        carryOverInstability,
+                        castsThisEncounter,
+                        doctrinePassiveUsed,
+                        nextCastFree,
+                        lastResolution,
+                        upgradeOptions,
+                    });
+                },
+
+                selectUpgrade: (upgradeId) => {
+                    const state = get();
+                    if (state.phase !== 'upgrade') return;
+
+                    const upgrade = state.upgradeOptions.find((option) => option.id === upgradeId);
+                    if (!upgrade) return;
+                    if (state.essence < upgrade.cost) return;
+
+                    const nextStrengthBonuses: StrengthBonuses = { ...state.strengthBonuses };
+                    const nextWorldWeights = { ...state.worldWeights };
+
+                    if (upgrade.firstCastStrainReduction) {
+                        nextStrengthBonuses.firstCastStrainReduction += upgrade.firstCastStrainReduction;
+                    }
+                    if (upgrade.firstCastEssenceBonus) {
+                        nextStrengthBonuses.firstCastEssenceBonus += upgrade.firstCastEssenceBonus;
+                    }
+                    if (upgrade.maxStrainBonus) {
+                        nextStrengthBonuses.maxStrainBonus += upgrade.maxStrainBonus;
+                    }
+                    if (upgrade.encounterWeightDelta) {
+                        const { encounterId, amount } = upgrade.encounterWeightDelta;
+                        nextWorldWeights[encounterId] = Math.max(1, (nextWorldWeights[encounterId] ?? 1) + amount);
                     }
 
-                    if (ability.id === 'twist' && lastAbilityId === 'smite') {
-                        // implementation detail for "next ability costs 0"
-                        // this would require state "nextAbilityCostModifier"
-                        // ignoring for strict MVP simplicity or handling via complex logic?
-                        // "next ability costs 0 strain" -> we need a `modifiers` array in state.
-                        // For MVP, let's just refund strain or give massive essence?
-                        // Let's add 5 essence instead for now to signify "Good move" without adding system complexity yet.
-                        essenceGain += 3;
-                    }
-
-                    const maxStrain = state.maxStrain;
-                    const strainLevel = get().calculateStrainLevel(Math.max(0, finalStrain), maxStrain);
-
-                    set((prev) => ({
-                        currentStrain: Math.max(0, finalStrain),
-                        essence: prev.essence + essenceGain + 2,
-                        encountersCompleted: prev.encountersCompleted + 1,
-                        history: [...history, ability.id],
-                        // Check end of run
-                        phase: prev.encountersCompleted >= 3 ? 'upgrade' : 'encounter',
-                        currentEncounter: prev.encountersCompleted >= 3 ? null : getRandomEncounter(),
-                        strainLevel: strainLevel
-                    }));
+                    set({
+                        phase: 'menu',
+                        doctrine: null,
+                        currentEncounter: null,
+                        abilityUsage: { ...EMPTY_ABILITY_USAGE },
+                        history: [],
+                        encountersCompleted: 0,
+                        encountersTarget: 0,
+                        carryOverInstability: 0,
+                        castsThisEncounter: 0,
+                        doctrinePassiveUsed: false,
+                        nextCastFree: false,
+                        currentStrain: 0,
+                        strainLevel: 'Low',
+                        maxStrain: BASE_MAX_STRAIN + nextStrengthBonuses.maxStrainBonus,
+                        upgradeOptions: [],
+                        ownedUpgrades: [...state.ownedUpgrades, upgrade.id],
+                        strengthBonuses: nextStrengthBonuses,
+                        worldWeights: nextWorldWeights,
+                        essence: state.essence - upgrade.cost,
+                        runEssenceGained: 0,
+                        lastResolution: `${upgrade.name} acquired. Naturally, this will improve everything.`,
+                    });
                 },
 
-                nextEncounter: () => {
-                    // ...
+                skipUpgrade: () => {
+                    const state = get();
+                    if (state.phase !== 'upgrade') return;
+
+                    set({
+                        phase: 'menu',
+                        doctrine: null,
+                        currentEncounter: null,
+                        abilityUsage: { ...EMPTY_ABILITY_USAGE },
+                        history: [],
+                        encountersCompleted: 0,
+                        encountersTarget: 0,
+                        carryOverInstability: 0,
+                        castsThisEncounter: 0,
+                        doctrinePassiveUsed: false,
+                        nextCastFree: false,
+                        currentStrain: 0,
+                        strainLevel: 'Low',
+                        maxStrain: BASE_MAX_STRAIN + state.strengthBonuses.maxStrainBonus,
+                        upgradeOptions: [],
+                        runEssenceGained: 0,
+                        lastResolution: 'You reserve your Essence for a future correction.',
+                    });
                 },
 
-                resetGame: () => {
-                    set(INITIAL_STATE);
+                endRun: () => {
+                    const state = get();
+                    set({
+                        phase: 'menu',
+                        doctrine: null,
+                        currentEncounter: null,
+                        abilityUsage: { ...EMPTY_ABILITY_USAGE },
+                        history: [],
+                        encountersCompleted: 0,
+                        encountersTarget: 0,
+                        carryOverInstability: 0,
+                        castsThisEncounter: 0,
+                        doctrinePassiveUsed: false,
+                        nextCastFree: false,
+                        currentStrain: 0,
+                        strainLevel: 'Low',
+                        maxStrain: BASE_MAX_STRAIN + state.strengthBonuses.maxStrainBonus,
+                        runEssenceGained: 0,
+                        upgradeOptions: [],
+                        lastResolution: 'You withdraw before mortals can misunderstand your brilliance.',
+                    });
                 },
 
-                calculateStrainLevel: (current, max) => {
-                    const ratio = current / max;
-                    if (ratio < 0.3) return 'Low';
-                    if (ratio < 0.6) return 'Medium';
-                    if (ratio < 0.9) return 'High';
-                    return 'Critical';
+                resetProgress: () => {
+                    set({
+                        ...INITIAL_STATE,
+                        abilities: [...CORE_ABILITIES],
+                        worldWeights: { ...DEFAULT_WORLD_WEIGHTS },
+                        strengthBonuses: { ...DEFAULT_STRENGTH_BONUSES },
+                    });
                 },
-
-                // Missing implementation for interface methods
-                castAbility: (id) => get().chooseAbility(id),
-                draftAbility: () => { },
-                selectUpgrade: () => { },
-                endRun: () => set({ phase: 'menu' }),
-
             }),
             {
                 name: 'fallen-god-storage',
+                version: 2,
             }
         )
     )

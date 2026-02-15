@@ -9,6 +9,11 @@ export const StrainMeter = () => {
     if (strainLevel === 'High') colorClass = 'bg-orange-500';
     if (strainLevel === 'Critical') colorClass = 'bg-strain-red animate-pulse';
 
+    let effectText = 'Stable: no backlash effects.';
+    if (strainLevel === 'Medium') effectText = 'Distortion: each cast adds +1 Consequence.';
+    if (strainLevel === 'High') effectText = 'Backlash: each cast adds +2 Consequence and -1 Essence.';
+    if (strainLevel === 'Critical') effectText = 'Critical Backlash: +3 Consequence, -2 Essence, and reduced Pressure.';
+
     return (
         <div className="w-full max-w-md mx-auto mb-6">
             <div className="flex justify-between text-sm uppercase tracking-widest text-gray-400 mb-1">
@@ -21,12 +26,12 @@ export const StrainMeter = () => {
                     style={{ width: `${percentage}%` }}
                 />
                 {/* Threshold Markers */}
-                <div className="absolute top-0 bottom-0 left-[30%] w-0.5 bg-black/50" />
-                <div className="absolute top-0 bottom-0 left-[60%] w-0.5 bg-black/50" />
-                <div className="absolute top-0 bottom-0 left-[90%] w-0.5 bg-black/50" />
+                <div className="absolute top-0 bottom-0 left-[40%] w-0.5 bg-black/50" />
+                <div className="absolute top-0 bottom-0 left-[75%] w-0.5 bg-black/50" />
+                <div className="absolute top-0 bottom-0 left-[99%] w-0.5 bg-black/50" />
             </div>
             <p className="text-xs text-center mt-1 text-gray-600">
-                Fractured divinity struggling to contain power
+                {effectText}
             </p>
         </div>
     );
