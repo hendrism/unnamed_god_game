@@ -3,53 +3,44 @@ import { useGameStore } from '../store/gameStore';
 
 interface AbilityBarProps {
     abilities: Ability[];
+    selectedId: AbilityId | null;
     onChoose: (id: AbilityId) => void;
 }
 
-export const AbilityBar = ({ abilities, onChoose }: AbilityBarProps) => {
+export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps) => {
     const { getAbilityPreview } = useGameStore();
 
     return (
-        <div className="w-full max-w-2xl mx-auto mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="w-full max-w-2xl mx-auto mt-auto">
+            <div className="grid grid-cols-3 gap-2 pb-safe">
                 {abilities.map((ability) => {
                     const preview = getAbilityPreview(ability.id);
-                    const headlineNote = preview?.notes[0] ?? null;
+                    const isSelected = selectedId === ability.id;
 
                     return (
                         <button
                             key={ability.id}
                             onClick={() => onChoose(ability.id)}
                             disabled={!preview}
-                            className="group relative flex flex-col items-center p-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-mythic-gold hover:bg-gray-800 transition-all text-left"
+                            className={`
+                                relative flex flex-col items-center p-3 rounded-lg border transition-all text-center h-24 justify-center
+                                ${isSelected
+                                    ? 'bg-gray-800 border-mythic-gold shadow-[0_0_15px_rgba(251,191,36,0.2)]'
+                                    : 'bg-gray-900 border-gray-700 hover:bg-gray-800'
+                                }
+                                ${!preview ? 'opacity-50 cursor-not-allowed' : ''}
+                            `}
                         >
-                            {headlineNote && (
-                                <div className="absolute -top-3 bg-mythic-gold text-black text-[10px] font-bold px-2 py-0.5 rounded shadow-lg animate-bounce">
-                                    {headlineNote}
-                                </div>
-                            )}
-                            <span className="font-display text-lg text-gray-200 mb-1">
+                            <span className={`
+                                font-display text-sm leading-tight mb-1
+                                ${isSelected ? 'text-mythic-gold' : 'text-gray-200'}
+                            `}>
                                 {ability.name}
                             </span>
-                            <p className="text-xs text-gray-400 mb-2">{ability.description}</p>
 
-                            {preview && (
-                                <div className="w-full text-xs text-gray-300 space-y-1 mb-3">
-                                    <p>Pressure: -{preview.pressureDelta}</p>
-                                    <p>Essence: +{preview.essenceDelta}</p>
-                                    <p>
-                                        Consequence:{' '}
-                                        {preview.consequenceDelta >= 0 ? '+' : ''}
-                                        {preview.consequenceDelta}
-                                    </p>
-                                    <p>
-                                        Strain: +{preview.strainCost} {'->'} {preview.projectedStrain} ({preview.projectedStrainLevel})
-                                    </p>
-                                </div>
-                            )}
-
-                            <div className="mt-auto pt-2 border-t border-gray-800 w-full">
-                                <p className="text-[10px] text-gray-600 italic">"{ability.flavorText}"</p>
+                            {/* Simple cost indicator */}
+                            <div className="text-[10px] text-gray-500 font-mono">
+                                Strain: {ability.baseStrainCost}
                             </div>
                         </button>
                     );

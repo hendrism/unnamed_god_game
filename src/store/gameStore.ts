@@ -250,6 +250,7 @@ const INITIAL_STATE: Omit<
     | 'skipUpgrade'
     | 'endRun'
     | 'selectDraftAbility'
+    | 'markTutorialSeen'
     | 'resetProgress'
 > = {
     essence: 0,
@@ -275,6 +276,7 @@ const INITIAL_STATE: Omit<
     worldWeights: { ...DEFAULT_WORLD_WEIGHTS },
     upgradeOptions: [],
     draftOptions: [],
+    hasSeenTutorial: false,
 };
 
 export const useGameStore = create<GameState>()(
@@ -315,6 +317,10 @@ export const useGameStore = create<GameState>()(
                         draftOptions,
                         lastResolution: `${doctrine.name} chosen. Now, a minor addition to your arsenal.`,
                     });
+                },
+
+                markTutorialSeen: () => {
+                    set({ hasSeenTutorial: true });
                 },
 
                 selectDraftAbility: (abilityId) => {

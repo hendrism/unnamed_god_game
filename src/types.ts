@@ -119,8 +119,10 @@ export interface GameState {
     worldWeights: Record<string, number>;
     upgradeOptions: Upgrade[];
     draftOptions: Ability[];
+    hasSeenTutorial: boolean;
     startRun: (doctrineId: DoctrineId) => void;
     selectDraftAbility: (abilityId: AbilityId) => void;
+    markTutorialSeen: () => void;
     castAbility: (abilityId: AbilityId) => void;
     getAbilityPreview: (abilityId: AbilityId) => AbilityPreview | null;
     selectUpgrade: (upgradeId: string) => void;

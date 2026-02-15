@@ -1,7 +1,11 @@
+import { useState, useEffect } from 'react';
+import type { AbilityId } from '../types';
 import { DOCTRINES } from '../data/doctrines';
 import { useGameStore } from '../store/gameStore';
 import { AbilityBar } from './AbilityBar';
+import { ActionPreview } from './ActionPreview';
 import { EncounterCard } from './EncounterCard';
+import { HelpModal } from './HelpModal';
 import { StrainMeter } from './StrainMeter';
 
 export const GameView = () => {
@@ -23,12 +27,69 @@ export const GameView = () => {
         selectUpgrade,
         skipUpgrade,
         selectDraftAbility,
+        markTutorialSeen,
+        hasSeenTutorial,
         endRun,
     } = useGameStore();
 
+    // --- HOOKS (Must be at top level) ---
+    const [selectedAbilityId, setSelectedAbilityId] = useState<AbilityId | null>(null);
+    const [showHelp, setShowHelp] = useState(false);
+
+    // Auto-show tutorial when entering the first draft phase of a new save
+    useEffect(() => {
+        if (!hasSeenTutorial && phase === 'draft' && !showHelp) {
+            setShowHelp(true);
+        }
+    }, [hasSeenTutorial, phase]);
+
+    // --- HANDLERS ---
+    const handleCloseHelp = () => {
+        // Mark seen if we are in a run
+        if (!hasSeenTutorial && phase !== 'menu') {
+            markTutorialSeen();
+        }
+        setShowHelp(false);
+    };
+
+    const handleAbilityChoose = (id: AbilityId) => {
+        if (selectedAbilityId === id) {
+            setSelectedAbilityId(null); // Deselect if clicking again
+        } else {
+            setSelectedAbilityId(id);
+        }
+    };
+
+    const handleConfirmCast = () => {
+        if (selectedAbilityId) {
+            castAbility(selectedAbilityId);
+            setSelectedAbilityId(null);
+        }
+    };
+
+    // --- DERIVED STATE ---
+    const selectedAbility = selectedAbilityId ? abilities.find(a => a.id === selectedAbilityId) : null;
+    const selectedPreview = selectedAbilityId ? useGameStore.getState().getAbilityPreview(selectedAbilityId) : null;
+
+    // --- SHARED COMPONENTS ---
+    const HelpButton = () => (
+        <button
+            onClick={() => setShowHelp(true)}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full border border-gray-600 text-gray-400 hover:text-white hover:border-white flex items-center justify-center text-sm font-bold z-40 bg-black/50"
+            aria-label="Help"
+        >
+            ?
+        </button>
+    );
+
+    // --- RENDER PHASES ---
+
     if (phase === 'menu') {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-8">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-8 relative">
+                <HelpButton />
+                {showHelp && <HelpModal onClose={handleCloseHelp} />}
+
                 <h1 className="text-5xl font-display text-mythic-gold">FALLEN GOD</h1>
                 <p className="text-gray-400 italic max-w-xl text-center">
                     You are a fallen god making flawless decisions with entirely unreasonable consequences.
@@ -72,7 +133,10 @@ export const GameView = () => {
 
     if (phase === 'draft') {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-8">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-8 relative">
+                <HelpButton />
+                {showHelp && <HelpModal onClose={handleCloseHelp} />}
+
                 <h2 className="text-3xl font-display text-mythic-gold text-center">
                     A Fragment of Power Resurfaces
                 </h2>
@@ -121,7 +185,10 @@ export const GameView = () => {
 
     if (phase === 'upgrade') {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6 relative">
+                <HelpButton />
+                {showHelp && <HelpModal onClose={handleCloseHelp} />}
+
                 <h2 className="text-3xl font-display text-mythic-gold">Intervention Complete</h2>
                 <p className="text-gray-400 text-center max-w-xl">
                     Essence gathered this run: <span className="text-mythic-gold font-bold">{runEssenceGained}</span>
@@ -173,8 +240,12 @@ export const GameView = () => {
         );
     }
 
+    // Default: Encounter Phase
     return (
-        <div className="w-full max-w-4xl mx-auto p-4 flex flex-col items-center min-h-screen">
+        <div className="w-full max-w-4xl mx-auto p-4 flex flex-col items-center min-h-screen relative">
+            <HelpButton />
+            {showHelp && <HelpModal onClose={handleCloseHelp} />}
+
             <div className="w-full flex justify-between items-start mb-6 border-b border-gray-800 pb-4 gap-4">
                 <div className="flex flex-col text-left">
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest">Doctrine</span>
@@ -214,19 +285,30 @@ export const GameView = () => {
                 <p className="text-sm text-gray-300">{lastResolution}</p>
             </div>
 
-            <div className="flex-1 w-full flex flex-col items-center justify-center py-4">
-                {currentEncounter ? (
+            <div className="flex-1 w-full flex flex-col items-center justify-center py-4 relative">
+                {selectedAbility && selectedPreview ? (
+                    <ActionPreview
+                        ability={selectedAbility}
+                        preview={selectedPreview}
+                        onConfirm={handleConfirmCast}
+                        onCancel={() => setSelectedAbilityId(null)}
+                    />
+                ) : currentEncounter ? (
                     <EncounterCard encounter={currentEncounter} />
                 ) : (
                     <div className="text-gray-500 animate-pulse">Manifesting reality...</div>
                 )}
             </div>
 
-            <div className="w-full mt-auto pb-8">
+            <div className="w-full mt-auto pb-8 z-10 bg-mythic-black pt-4">
                 <h3 className="text-center text-xs text-gray-500 uppercase tracking-widest mb-2">
                     Available Interventions
                 </h3>
-                <AbilityBar abilities={abilities} onChoose={castAbility} />
+                <AbilityBar
+                    abilities={abilities}
+                    selectedId={selectedAbilityId}
+                    onChoose={handleAbilityChoose}
+                />
                 <div className="flex justify-center mt-4">
                     <button
                         onClick={endRun}
