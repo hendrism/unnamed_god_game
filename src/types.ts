@@ -25,20 +25,34 @@ export interface EncounterTemplate {
     basePressure: number;
     baseRewardPerTurn: number;
     baseConsequence: number;
+    consequenceThreshold: number;
+}
+
+export interface EncounterModifierAbilityEffect {
+    abilityId: AbilityId;
+    strainCostDelta?: number;
+    pressureDelta?: number;
+    consequenceDelta?: number;
+    essenceDelta?: number;
 }
 
 export interface EncounterModifier {
     id: string;
     name: string;
     description: string;
-    pressureDelta: number;
-    rewardDelta: number;
-    consequenceDelta: number;
+    effects: {
+        strainCostDelta?: number;
+        pressureDelta?: number;
+        consequenceDelta?: number;
+        essenceDelta?: number;
+        abilityEffects?: EncounterModifierAbilityEffect[];
+    };
 }
 
 export interface ActiveEncounter {
     id: string;
     templateId: string;
+    modifierId: string;
     title: string;
     description: string;
     pressureText: string;
@@ -46,10 +60,13 @@ export interface ActiveEncounter {
     consequenceText: string;
     modifierName: string;
     modifierDescription: string;
+    modifierEffects: EncounterModifier['effects'];
     startingPressure: number;
     pressureRemaining: number;
     rewardPerTurn: number;
     consequenceMeter: number;
+    consequenceThreshold: number;
+    thresholdExceeded: boolean;
     turn: number;
     turnLimit: number;
 }

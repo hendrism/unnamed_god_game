@@ -1,4 +1,4 @@
-import type { EncounterModifier, EncounterTemplate } from '../types';
+import type { EncounterTemplate } from '../types';
 
 export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
     {
@@ -8,9 +8,10 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         pressureText: 'Homes collapse under the surge.',
         rewardText: 'Recovered tribute from flooded vaults.',
         consequenceText: 'Salt-soaked fear lingers in nearby provinces.',
-        basePressure: 8,
+        basePressure: 9,
         baseRewardPerTurn: 1,
         baseConsequence: 1,
+        consequenceThreshold: 5,
     },
     {
         id: 'rebellion',
@@ -19,9 +20,10 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         pressureText: 'Influence fractures across the district.',
         rewardText: 'Seized offerings and public devotion.',
         consequenceText: 'Rumors spread to the next settlement.',
-        basePressure: 9,
+        basePressure: 10,
         baseRewardPerTurn: 1,
         baseConsequence: 2,
+        consequenceThreshold: 6,
     },
     {
         id: 'shrine',
@@ -30,9 +32,10 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         pressureText: 'Pilgrims abandon the holy route.',
         rewardText: 'Stone relics and pledged repairs.',
         consequenceText: 'Unstable sanctuaries strain future interventions.',
-        basePressure: 7,
+        basePressure: 8,
         baseRewardPerTurn: 2,
         baseConsequence: 1,
+        consequenceThreshold: 4,
     },
     {
         id: 'prayers',
@@ -41,9 +44,10 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         pressureText: 'Faith stagnates and requests become demands.',
         rewardText: 'Focused worship from those you answer.',
         consequenceText: 'Ignored pleas harden into resentment.',
-        basePressure: 8,
+        basePressure: 9,
         baseRewardPerTurn: 1,
         baseConsequence: 1,
+        consequenceThreshold: 5,
     },
     {
         id: 'blight',
@@ -52,51 +56,9 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         pressureText: 'Villages lose food and patience.',
         rewardText: 'Emergency rites yield concentrated Essence.',
         consequenceText: 'Famine panic spills into neighboring lands.',
-        basePressure: 10,
+        basePressure: 12,
         baseRewardPerTurn: 1,
         baseConsequence: 2,
-    },
-];
-
-export const ENCOUNTER_MODIFIERS: EncounterModifier[] = [
-    {
-        id: 'leyline-fracture',
-        name: 'Leyline Fracture',
-        description: 'Reality is already unstable here.',
-        pressureDelta: 2,
-        rewardDelta: 1,
-        consequenceDelta: 1,
-    },
-    {
-        id: 'calm-surface',
-        name: 'Calm Surface',
-        description: 'It looks easier than it is.',
-        pressureDelta: -1,
-        rewardDelta: 0,
-        consequenceDelta: 1,
-    },
-    {
-        id: 'devout-crowd',
-        name: 'Devout Crowd',
-        description: 'The people are eager to believe anything you say.',
-        pressureDelta: 0,
-        rewardDelta: 1,
-        consequenceDelta: -1,
-    },
-    {
-        id: 'ominous-echo',
-        name: 'Ominous Echo',
-        description: 'Every decree reverberates farther than intended.',
-        pressureDelta: 1,
-        rewardDelta: 1,
-        consequenceDelta: 2,
-    },
-    {
-        id: 'ritual-window',
-        name: 'Ritual Window',
-        description: 'For a brief moment, intervention is unusually clean.',
-        pressureDelta: -2,
-        rewardDelta: -1,
-        consequenceDelta: -1,
+        consequenceThreshold: 7,
     },
 ];
