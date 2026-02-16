@@ -74,6 +74,14 @@ export const ResolutionModal = ({ resolution, onContinue }: ResolutionModalProps
                             {resolution.thresholdExceeded && ' (EXCEEDED)'}
                         </span>
                     </div>
+                    {resolution.dominantConsequenceCategory && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Dominant Consequence:</span>
+                            <span className="text-gray-200 uppercase">
+                                {resolution.dominantConsequenceCategory}
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="space-y-2 mb-6 p-4 bg-black/40 rounded border border-gray-800">
@@ -88,6 +96,12 @@ export const ResolutionModal = ({ resolution, onContinue }: ResolutionModalProps
                         </div>
                     )}
                 </div>
+
+                {resolution.consequenceAftermath && (
+                    <div className="mb-6 p-3 bg-purple-900/20 border border-purple-900/50 rounded">
+                        <p className="text-xs text-purple-200">{resolution.consequenceAftermath}</p>
+                    </div>
+                )}
 
                 <button
                     onClick={onContinue}

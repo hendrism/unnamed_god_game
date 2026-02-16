@@ -12,7 +12,7 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
 
     return (
         <div className="w-full max-w-2xl mx-auto mt-auto">
-            <div className="grid grid-cols-3 gap-2 pb-safe">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pb-safe">
                 {abilities.map((ability) => {
                     const preview = getAbilityPreview(ability.id);
                     const isSelected = selectedId === ability.id;
@@ -37,9 +37,12 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
                             `}>
                                 {ability.name}
                             </span>
+                            <span className="text-[9px] uppercase tracking-widest text-gray-500">
+                                {ability.category}
+                            </span>
 
                             {/* Concise Stats */}
-                            <div className="flex gap-2 text-[10px] uppercase font-mono mt-1 opacity-80">
+                            <div className="flex gap-2 text-[10px] uppercase font-mono mt-1 opacity-80 flex-wrap justify-center">
                                 <span className={preview ? 'text-red-400' : 'text-gray-500'}>
                                     P:-{preview?.pressureDelta ?? '?'}
                                 </span>

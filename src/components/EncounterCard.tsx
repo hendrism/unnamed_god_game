@@ -3,6 +3,8 @@ import type { ActiveEncounter } from '../types';
 
 
 export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncounter, resolved?: boolean }) => {
+    const urgencyClass = encounter.urgency === 'urgent' ? 'text-strain-red border-strain-red' : 'text-gray-400 border-gray-700';
+
     return (
         <div className="w-full max-w-md mx-auto bg-gray-900 border-2 border-gray-700 rounded-lg p-6 shadow-2xl relative overflow-hidden">
             {/* Resolved Overlay */}
@@ -16,9 +18,14 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
 
             <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-display text-white">{encounter.title}</h2>
-                <span className="text-xs bg-gray-800 px-2 py-1 rounded text-gray-400 uppercase tracking-wider">
-                    {encounter.modifierName}
-                </span>
+                <div className="flex flex-col items-end gap-1">
+                    <span className={`text-xs bg-gray-800 px-2 py-1 rounded uppercase tracking-wider border ${urgencyClass}`}>
+                        {encounter.urgency === 'urgent' ? 'Urgent' : 'Steady'}
+                    </span>
+                    <span className="text-xs bg-gray-800 px-2 py-1 rounded text-gray-400 uppercase tracking-wider">
+                        {encounter.modifierName}
+                    </span>
+                </div>
             </div>
 
             <p className="text-gray-400 italic mb-6 border-l-2 border-void-purple pl-4">
@@ -46,6 +53,9 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                     <p className="text-sm text-gray-300">{encounter.consequenceText}</p>
                     <p className="text-xs text-gray-500 mt-2">Current consequence meter: {encounter.consequenceMeter}</p>
                     <p className="text-xs text-gray-500">Threshold: {encounter.consequenceThreshold}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                        Category impact: S {encounter.consequenceByCategory.smite} / M {encounter.consequenceByCategory.manifest} / T {encounter.consequenceByCategory.twist}
+                    </p>
                     {encounter.thresholdExceeded && (
                         <p className="text-xs text-strain-red mt-1">Threshold exceeded: instability penalties active.</p>
                     )}

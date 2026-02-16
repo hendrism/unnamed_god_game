@@ -3,6 +3,7 @@ import type { Ability } from '../types';
 export const CORE_ABILITIES: Ability[] = [
     {
         id: 'smite',
+        category: 'smite',
         name: 'Smite',
         description: 'Strike with divine force. If used after Manifest Presence, gain +1 Essence.',
         flavorText: 'An elegant solution to a complex problem.',
@@ -13,6 +14,7 @@ export const CORE_ABILITIES: Ability[] = [
     },
     {
         id: 'manifest',
+        category: 'manifest',
         name: 'Manifest Presence',
         description: 'Demand reverence. If used after Twist Fate, reduce current Strain by 2.',
         flavorText: 'They should know who is helping them.',
@@ -23,6 +25,7 @@ export const CORE_ABILITIES: Ability[] = [
     },
     {
         id: 'twist',
+        category: 'twist',
         name: 'Twist Fate',
         description: 'Alter the outcome. If used after Smite, the next ability costs 0 Strain.',
         flavorText: 'It was never meant to be this way. Let me fix it.',
@@ -36,6 +39,7 @@ export const CORE_ABILITIES: Ability[] = [
 export const DRAFT_POOL: Ability[] = [
     {
         id: 'condemn',
+        category: 'smite',
         name: 'Condemn',
         description: 'Overwhelming judgment. High pressure, high strain.',
         flavorText: 'Subtlety was never your strong suit.',
@@ -46,6 +50,7 @@ export const DRAFT_POOL: Ability[] = [
     },
     {
         id: 'witness',
+        category: 'twist',
         name: 'Witness',
         description: 'Observe the chaos. Generates Essence without applying Pressure.',
         flavorText: 'You are merely an observer. For now.',
@@ -56,6 +61,7 @@ export const DRAFT_POOL: Ability[] = [
     },
     {
         id: 'absolve',
+        category: 'manifest',
         name: 'Absolve',
         description: 'Forgive their transgressions. Reduces Consequence meter.',
         flavorText: 'Mercy is a luxury you can afford.',
@@ -66,6 +72,7 @@ export const DRAFT_POOL: Ability[] = [
     },
     {
         id: 'stifle',
+        category: 'manifest',
         name: 'Stifle',
         description: 'Silence the outcry. Applies minor pressure and reduces Consequence.',
         flavorText: 'Hush now. The grownups are talking.',
@@ -73,5 +80,40 @@ export const DRAFT_POOL: Ability[] = [
         basePressure: 1,
         baseEssence: 0,
         baseConsequence: -1,
-    }
+    },
+    {
+        id: 'edict',
+        category: 'smite',
+        name: 'Edict of Ash',
+        description: 'Issue a binding decree. Balanced pressure with escalating fear.',
+        flavorText: 'Policy written in lightning tends to be well respected.',
+        baseStrainCost: 2,
+        basePressure: 2,
+        baseEssence: 1,
+        baseConsequence: 1,
+    },
+    {
+        id: 'supplicate',
+        category: 'manifest',
+        name: 'Supplication Chorus',
+        description: 'Channel collective devotion into focused relief and resources.',
+        flavorText: 'They kneel. You call this alignment.',
+        baseStrainCost: 1,
+        basePressure: 1,
+        baseEssence: 1,
+        baseConsequence: -1,
+    },
+    {
+        id: 'rift',
+        category: 'twist',
+        name: 'Open Rift',
+        description: 'Fracture possibility itself. Heavy pressure, volatile aftermath.',
+        flavorText: 'Reality is mostly suggestions and signatures.',
+        baseStrainCost: 3,
+        basePressure: 3,
+        baseEssence: 1,
+        baseConsequence: 2,
+    },
 ];
+
+export const ALL_ABILITIES: Ability[] = [...CORE_ABILITIES, ...DRAFT_POOL];

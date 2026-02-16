@@ -1,12 +1,24 @@
 export type StrainLevel = 'Low' | 'Medium' | 'High' | 'Critical';
-export type GamePhase = 'menu' | 'draft' | 'encounter' | 'upgrade';
-export type AbilityId = 'smite' | 'manifest' | 'twist' | 'condemn' | 'witness' | 'absolve' | 'stifle';
+export type GamePhase = 'menu' | 'draft' | 'boon' | 'encounter' | 'upgrade';
+export type AbilityId =
+    | 'smite'
+    | 'manifest'
+    | 'twist'
+    | 'condemn'
+    | 'witness'
+    | 'absolve'
+    | 'stifle'
+    | 'edict'
+    | 'supplicate'
+    | 'rift';
+export type AbilityCategory = 'smite' | 'manifest' | 'twist';
 export type DoctrineId = 'dominion' | 'revelation';
 export type UpgradeCategory = 'strength' | 'world';
 export type ResolutionOutcome = 'perfect' | 'partial' | 'minimal' | 'catastrophic';
 
 export interface Ability {
     id: AbilityId;
+    category: AbilityCategory;
     name: string;
     description: string;
     flavorText: string;
@@ -54,6 +66,7 @@ export interface ActiveEncounter {
     id: string;
     templateId: string;
     modifierId: string;
+    urgency: 'steady' | 'urgent';
     title: string;
     description: string;
     pressureText: string;
@@ -67,7 +80,9 @@ export interface ActiveEncounter {
     rewardPerTurn: number;
     consequenceMeter: number;
     consequenceThreshold: number;
+    consequenceByCategory: Record<AbilityCategory, number>;
     thresholdExceeded: boolean;
+    thresholdRuptureUsed: boolean;
     turn: number;
     turnLimit: number;
 }
@@ -103,6 +118,7 @@ export interface StrengthBonuses {
 
 export interface AbilityPreview {
     abilityId: AbilityId;
+    category: AbilityCategory;
     baseStrainCost: number;
     strainCost: number;
     projectedStrain: number;
@@ -115,7 +131,9 @@ export interface AbilityPreview {
     consequenceDelta: number;
     projectedConsequenceMeter: number;
     willExceedThreshold: boolean;
+    willTriggerThresholdRupture: boolean;
     willGrantFreeCast: boolean;
+    synergyLabel: string | null;
     notes: string[];
 }
 
@@ -127,6 +145,14 @@ export interface EncounterResolution {
     essenceGained: number;
     carryoverAdded: number;
     flavorText: string;
+    dominantConsequenceCategory: AbilityCategory | null;
+    consequenceAftermath: string | null;
+}
+
+export interface EncounterForecast {
+    templateId: string;
+    title: string;
+    count: number;
 }
 
 export interface GameState {
@@ -137,6 +163,7 @@ export interface GameState {
     maxStrain: number;
     strainLevel: StrainLevel;
     abilities: Ability[];
+    encounterAbilityIds: AbilityId[];
     abilityUsage: Record<AbilityId, number>;
     history: AbilityId[];
     lastResolution: string;
@@ -145,10 +172,15 @@ export interface GameState {
     currentEncounter: ActiveEncounter | null;
     encountersCompleted: number;
     encountersTarget: number;
+    runEncounterQueue: string[];
+    runForecast: EncounterForecast[];
     carryOverInstability: number;
     castsThisEncounter: number;
-    doctrinePassiveUsed: boolean;
     nextCastFree: boolean;
+    boonOptions: Ability[];
+    boonPrompt: string;
+    synergyStreak: number;
+    lastSynergy: string;
     ownedUpgrades: string[];
     strengthBonuses: StrengthBonuses;
     worldWeights: Record<string, number>;
@@ -158,6 +190,7 @@ export interface GameState {
     encounterResolved: boolean;
     startRun: (doctrineId: DoctrineId) => void;
     selectDraftAbility: (abilityId: AbilityId) => void;
+    selectBoonAbility: (abilityId: AbilityId | null) => void;
     markTutorialSeen: () => void;
     nextEncounter: () => void;
     castAbility: (abilityId: AbilityId) => void;
