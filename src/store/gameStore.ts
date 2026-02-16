@@ -4,6 +4,7 @@ import { CORE_ABILITIES, DRAFT_POOL } from '../data/abilities';
 import { DOCTRINES } from '../data/doctrines';
 import { ENCOUNTER_TEMPLATES } from '../data/encounters';
 import { ENCOUNTER_MODIFIERS } from '../data/encounterModifiers';
+import { RESOLUTION_OUTCOMES } from '../data/resolutionOutcomes';
 import { STRENGTH_UPGRADES, WORLD_UPGRADES } from '../data/upgrades';
 import type {
     Ability,
@@ -12,7 +13,9 @@ import type {
     ActiveEncounter,
     Doctrine,
     DoctrineId,
+    EncounterResolution,
     GameState,
+    ResolutionOutcome,
     StrainLevel,
     StrengthBonuses,
     Upgrade,
@@ -144,6 +147,75 @@ const buildUpgradeChoices = (ownedUpgradeIds: string[]) => {
     if (worldChoice) options.push(worldChoice);
 
     return options;
+};
+
+const createEncounterResolution = (
+    pressureRemaining: number,
+    finalConsequence: number,
+    thresholdExceeded: boolean,
+    startingPressure: number,
+    consequenceThreshold: number
+): EncounterResolution => {
+    // Determine outcome based on pressure and consequence
+    let outcome: ResolutionOutcome;
+    let flavorCategory: keyof typeof RESOLUTION_OUTCOMES;
+    let essenceGained: number;
+    let carryoverAdded: number;
+
+    // Perfect: pressure eliminated AND low consequence
+    if (pressureRemaining <= 0 && finalConsequence <= Math.ceil(consequenceThreshold * 0.5)) {
+        outcome = 'perfect';
+        flavorCategory = 'perfectSuccess';
+        essenceGained = 3;
+        carryoverAdded = Math.max(0, Math.floor(finalConsequence / 2) - 1);
+    }
+    // Partial: pressure eliminated OR moderate pressure with low consequence
+    else if (
+        pressureRemaining <= 0 ||
+        (pressureRemaining <= Math.ceil(startingPressure * 0.33) &&
+         finalConsequence <= consequenceThreshold)
+    ) {
+        outcome = 'partial';
+        if (thresholdExceeded) {
+            flavorCategory = 'thresholdExceeded';
+        } else if (finalConsequence <= Math.ceil(consequenceThreshold * 0.5)) {
+            flavorCategory = 'lowConsequence';
+        } else {
+            flavorCategory = 'highConsequence';
+        }
+        essenceGained = 2;
+        carryoverAdded = Math.floor(finalConsequence / 2) + Math.ceil(pressureRemaining / 4);
+    }
+    // Minimal: high pressure remaining but didn't completely fail
+    else if (pressureRemaining <= Math.ceil(startingPressure * 0.67)) {
+        outcome = 'minimal';
+        if (thresholdExceeded) {
+            flavorCategory = 'thresholdExceeded';
+        } else {
+            flavorCategory = 'barelySucceeded';
+        }
+        essenceGained = 1;
+        carryoverAdded = finalConsequence + Math.ceil(pressureRemaining / 4) + 1;
+    }
+    // Catastrophic: very high pressure remaining
+    else {
+        outcome = 'catastrophic';
+        flavorCategory = 'thresholdExceeded';
+        essenceGained = 0;
+        carryoverAdded = finalConsequence + Math.ceil(pressureRemaining / 2) + 2;
+    }
+
+    const flavorText = randomFrom(RESOLUTION_OUTCOMES[flavorCategory]);
+
+    return {
+        outcome,
+        pressureRemaining,
+        finalConsequence,
+        thresholdExceeded,
+        essenceGained,
+        carryoverAdded,
+        flavorText,
+    };
 };
 
 const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPreview | null => {
@@ -464,7 +536,9 @@ export const useGameStore = create<GameState>()(
                         !state.currentEncounter.thresholdExceeded &&
                         updatedConsequence > state.currentEncounter.consequenceThreshold;
                     const nextTurn = state.currentEncounter.turn + 1;
-                    const encounterEndsNow = nextTurn > state.currentEncounter.turnLimit;
+                    const pressureEliminated = updatedPressure <= 0;
+                    const turnLimitReached = nextTurn > state.currentEncounter.turnLimit;
+                    const encounterEndsNow = pressureEliminated || turnLimitReached;
 
                     let phase: GameState['phase'] = 'encounter';
                     let encountersCompleted = state.encountersCompleted;
@@ -479,35 +553,32 @@ export const useGameStore = create<GameState>()(
                     let castsThisEncounter = state.castsThisEncounter + 1;
                     let doctrinePassiveUsed = state.doctrinePassiveUsed || doctrineTriggered;
                     const nextCastFree = preview.willGrantFreeCast;
-                    let extraEssence = 0;
                     let strainAfterAction = preview.projectedStrain;
                     let lastResolution = `${abilityId.toUpperCase()}: -${preview.pressureDelta} Pressure, +${preview.essenceDelta} Essence, ${preview.consequenceDelta >= 0 ? '+' : ''}${preview.consequenceDelta} Consequence.`;
                     let upgradeOptions = state.upgradeOptions;
+                    let lastEncounterResolution: EncounterResolution | null = null;
 
                     if (encounterEndsNow) {
                         encountersCompleted += 1;
 
-                        const unresolvedPressure = updatedPressure;
-                        let carryGain = updatedConsequence + Math.ceil(unresolvedPressure / 4);
+                        // Create resolution object with proper outcome determination
+                        const resolution = createEncounterResolution(
+                            updatedPressure,
+                            updatedConsequence,
+                            currentEncounter.thresholdExceeded || thresholdExceededNow,
+                            state.currentEncounter.startingPressure,
+                            state.currentEncounter.consequenceThreshold
+                        );
 
-                        if (unresolvedPressure <= 0) {
-                            extraEssence += 1;
-                            carryGain = Math.max(0, carryGain - 1);
-                            lastResolution =
-                                'Intervention triumphant. Order restored. Side effects remain theoretical.';
-                        } else if (unresolvedPressure <= Math.ceil(state.currentEncounter.startingPressure / 2)) {
-                            carryGain += 1;
-                            lastResolution =
-                                'Partial success. The district survives, and complains in equal measure.';
-                        } else {
-                            carryGain += 2;
-                            strainAfterAction += 1;
-                            lastResolution =
-                                'Backlash. Reality accepted your ruling with visible reluctance.';
-                        }
+                        lastEncounterResolution = resolution;
+                        lastResolution = resolution.flavorText;
 
-                        carryOverInstability =
-                            Math.max(0, Math.floor(state.carryOverInstability * 0.5) + carryGain);
+                        // Carryover calculation
+                        carryOverInstability = Math.max(
+                            0,
+                            Math.floor(state.carryOverInstability * 0.5) + resolution.carryoverAdded
+                        );
+
                         strainAfterAction = Math.max(0, strainAfterAction - ENCOUNTER_STRAIN_RELIEF);
 
                         if (encountersCompleted >= state.encountersTarget) {
@@ -524,11 +595,13 @@ export const useGameStore = create<GameState>()(
                         }
                     }
 
-                    if (thresholdExceededNow) {
+                    if (thresholdExceededNow && !encounterEndsNow) {
                         lastResolution += ' Consequence threshold exceeded; reality objects in writing.';
                     }
 
-                    const totalEssenceGain = Math.max(0, preview.essenceDelta + extraEssence);
+                    // Calculate essence gained: per-turn essence from preview + resolution bonus (if encounter ended)
+                    const resolutionEssence = lastEncounterResolution?.essenceGained ?? 0;
+                    const totalEssenceGain = Math.max(0, preview.essenceDelta + resolutionEssence);
                     const currentStrain = Math.max(0, strainAfterAction);
                     const strainLevel = calculateStrainLevel(currentStrain, state.maxStrain);
 
@@ -547,6 +620,7 @@ export const useGameStore = create<GameState>()(
                         doctrinePassiveUsed,
                         nextCastFree,
                         lastResolution,
+                        lastEncounterResolution,
                         upgradeOptions,
                         encounterResolved: encounterEndsNow,
                     });
