@@ -224,7 +224,7 @@ const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPre
     if (!ability) return null;
 
     const encounter = state.currentEncounter;
-    const modifierEffects = encounter.modifierEffects;
+    const modifierEffects = encounter.modifierEffects ?? {};
     const abilityModifier = modifierEffects.abilityEffects?.find(
         (effect) => effect.abilityId === ability.id
     );
@@ -735,7 +735,7 @@ export const useGameStore = create<GameState>()(
             }),
             {
                 name: 'fallen-god-storage',
-                version: 2,
+                version: 3,
             }
         )
     )
