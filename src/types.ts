@@ -155,6 +155,16 @@ export interface EncounterForecast {
     count: number;
 }
 
+export interface ActionLogEntry {
+    turn: number;
+    abilityId: AbilityId;
+    abilityName: string;
+    pressureDelta: number;
+    consequenceDelta: number;
+    essenceDelta: number;
+    synergyLabel: string | null;
+}
+
 export interface GameState {
     essence: number;
     runEssenceGained: number;
@@ -166,6 +176,7 @@ export interface GameState {
     encounterAbilityIds: AbilityId[];
     abilityUsage: Record<AbilityId, number>;
     history: AbilityId[];
+    actionLog: ActionLogEntry[];
     lastResolution: string;
     lastEncounterResolution: EncounterResolution | null;
     doctrine: Doctrine | null;

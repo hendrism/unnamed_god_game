@@ -604,6 +604,7 @@ const INITIAL_STATE: Omit<
     encounterAbilityIds: [],
     abilityUsage: { ...EMPTY_ABILITY_USAGE },
     history: [],
+    actionLog: [],
     lastResolution: 'The void awaits your flawless leadership.',
     lastEncounterResolution: null,
     doctrine: null,
@@ -658,6 +659,7 @@ export const useGameStore = create<GameState>()(
                         encounterAbilityIds: [],
                         abilityUsage: { ...EMPTY_ABILITY_USAGE },
                         history: [],
+                        actionLog: [],
                         encountersCompleted: 0,
                         encountersTarget,
                         runEncounterQueue,
@@ -934,10 +936,22 @@ export const useGameStore = create<GameState>()(
                     const currentStrain = Math.max(0, strainAfterAction);
                     const strainLevel = calculateStrainLevel(currentStrain, state.maxStrain);
 
+                    const newActionLogEntry = {
+                        turn: state.currentEncounter.turn,
+                        abilityId: ability.id,
+                        abilityName: ability.name,
+                        pressureDelta: preview.pressureDelta,
+                        consequenceDelta: preview.consequenceDelta,
+                        essenceDelta: totalEssenceGain,
+                        synergyLabel: preview.synergyLabel,
+                    };
+                    const updatedActionLog = [...state.actionLog, newActionLogEntry].slice(-5);
+
                     set({
                         phase,
                         abilityUsage,
                         history: [...state.history, abilityId],
+                        actionLog: encounterEndsNow ? [] : updatedActionLog,
                         currentStrain,
                         strainLevel,
                         essence: state.essence + totalEssenceGain,
@@ -997,6 +1011,7 @@ export const useGameStore = create<GameState>()(
                         encounterAbilityIds: [],
                         abilityUsage: { ...EMPTY_ABILITY_USAGE },
                         history: [],
+                        actionLog: [],
                         encountersCompleted: 0,
                         encountersTarget: 0,
                         runEncounterQueue: [],
@@ -1035,6 +1050,7 @@ export const useGameStore = create<GameState>()(
                         encounterAbilityIds: [],
                         abilityUsage: { ...EMPTY_ABILITY_USAGE },
                         history: [],
+                        actionLog: [],
                         encountersCompleted: 0,
                         encountersTarget: 0,
                         runEncounterQueue: [],
@@ -1067,6 +1083,7 @@ export const useGameStore = create<GameState>()(
                         encounterAbilityIds: [],
                         abilityUsage: { ...EMPTY_ABILITY_USAGE },
                         history: [],
+                        actionLog: [],
                         encountersCompleted: 0,
                         encountersTarget: 0,
                         runEncounterQueue: [],
