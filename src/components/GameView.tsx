@@ -357,31 +357,33 @@ export const GameView = () => {
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-4 flex flex-col items-center min-h-screen relative">
+        <div className="w-full max-w-4xl mx-auto px-3 py-4 sm:p-4 flex flex-col items-center min-h-screen relative">
             <HelpButton />
             {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
-            <div className="w-full flex justify-between items-start mb-6 border-b border-gray-800 pb-4 gap-4">
-                <div className="flex flex-col text-left">
+            <div className="w-full flex justify-between items-start mb-4 sm:mb-6 border-b border-gray-800 pb-3 sm:pb-4 gap-3 sm:gap-4">
+                <div className="flex flex-col text-left flex-1 min-w-0">
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest">Doctrine</span>
-                    <span className="text-sm text-gray-200">{doctrine?.name ?? 'Unbound'}</span>
-                    <span className="text-xs text-gray-500 mt-1">{doctrine?.passiveDescription}</span>
+                    <span className="text-xs sm:text-sm text-gray-200 truncate">{doctrine?.name ?? 'Unbound'}</span>
+                    <span className="hidden sm:block text-xs text-gray-500 mt-1">{doctrine?.passiveDescription}</span>
                 </div>
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end flex-shrink-0">
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest">Essence</span>
-                    <span className="text-xl font-bold text-mythic-gold">{essence}</span>
-                    <span className="text-xs text-gray-500 mt-1">Run gain: +{runEssenceGained}</span>
+                    <span className="text-lg sm:text-xl font-bold text-mythic-gold">{essence}</span>
+                    <span className="text-[10px] sm:text-xs text-gray-500 mt-1">+{runEssenceGained}</span>
                 </div>
             </div>
 
             {/* Goals Banner - Primary focus */}
             {currentEncounter && <GoalsBanner encounter={currentEncounter} />}
 
-            {/* Action Log */}
-            <ActionLog log={actionLog} />
+            {/* Action Log - Hidden on mobile */}
+            <div className="hidden sm:block w-full">
+                <ActionLog log={actionLog} />
+            </div>
 
-            {/* Secondary Stats */}
-            <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 text-center">
+            {/* Secondary Stats - Hidden on mobile to reduce clutter */}
+            <div className="hidden sm:grid w-full grid-cols-4 gap-2 mb-4 text-center">
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">
                     <p className="text-[10px] uppercase tracking-widest text-gray-500">Encounter</p>
                     <p className="text-sm text-gray-200">
@@ -407,13 +409,14 @@ export const GameView = () => {
             <StrainMeter />
 
             {synergyStreak > 0 && (
-                <div className="w-full bg-amber-950/40 border border-mythic-gold rounded p-2 mb-4 text-center animate-pulse">
-                    <p className="text-xs uppercase tracking-widest text-amber-200">Synergy Chain</p>
-                    <p className="text-sm text-mythic-gold">{lastSynergy}</p>
+                <div className="w-full bg-amber-950/40 border border-mythic-gold rounded p-2 mb-3 sm:mb-4 text-center animate-pulse">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-widest text-amber-200">Synergy Chain</p>
+                    <p className="text-xs sm:text-sm text-mythic-gold truncate">{lastSynergy}</p>
                 </div>
             )}
 
-            <div className="w-full bg-gray-900 border border-gray-800 rounded p-3 mb-6">
+            {/* Latest Decree - Hidden on mobile */}
+            <div className="hidden sm:block w-full bg-gray-900 border border-gray-800 rounded p-3 mb-6">
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Latest Decree</p>
                 <p className="text-sm text-gray-300">{lastResolution}</p>
             </div>
