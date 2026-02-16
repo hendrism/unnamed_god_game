@@ -34,6 +34,7 @@ export const GameView = () => {
         boonPrompt,
         synergyStreak,
         lastSynergy,
+        debugMode,
         startRun,
         castAbility,
         selectUpgrade,
@@ -45,6 +46,7 @@ export const GameView = () => {
         endRun,
         encounterResolved,
         nextEncounter,
+        toggleDebugMode,
     } = useGameStore();
 
     const [selectedAbilityId, setSelectedAbilityId] = useState<AbilityId | null>(null);
@@ -100,13 +102,26 @@ export const GameView = () => {
         : null;
 
     const HelpButton = () => (
-        <button
-            onClick={() => setShowHelp(true)}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full border border-gray-600 text-gray-400 hover:text-white hover:border-white flex items-center justify-center text-sm font-bold z-40 bg-black/50"
-            aria-label="Help"
-        >
-            ?
-        </button>
+        <>
+            <button
+                onClick={toggleDebugMode}
+                className={`absolute top-4 right-14 px-3 py-1 rounded border text-xs font-bold z-40 transition-colors ${
+                    debugMode
+                        ? 'bg-mythic-gold text-black border-mythic-gold'
+                        : 'bg-black/50 border-gray-600 text-gray-400 hover:text-white hover:border-white'
+                }`}
+                aria-label="Toggle Debug Mode"
+            >
+                {debugMode ? 'PLAIN' : 'DEBUG'}
+            </button>
+            <button
+                onClick={() => setShowHelp(true)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full border border-gray-600 text-gray-400 hover:text-white hover:border-white flex items-center justify-center text-sm font-bold z-40 bg-black/50"
+                aria-label="Help"
+            >
+                ?
+            </button>
+        </>
     );
 
     if (phase === 'menu') {

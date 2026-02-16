@@ -1,4 +1,5 @@
 import type { Ability, AbilityPreview } from '../types';
+import { useGameStore } from '../store/gameStore';
 
 interface ActionPreviewProps {
     ability: Ability;
@@ -8,6 +9,7 @@ interface ActionPreviewProps {
 }
 
 export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionPreviewProps) => {
+    const debugMode = useGameStore((state) => state.debugMode);
     return (
         <div className="w-full max-w-md mx-auto bg-gray-900 border-2 border-mythic-gold rounded-lg p-6 shadow-2xl animate-fade-in relative">
             <button
@@ -18,13 +20,20 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
             </button>
 
             <div className="text-center mb-6">
-                <h3 className="text-2xl font-display text-mythic-gold mb-1">{ability.name}</h3>
-                <p className="text-sm text-gray-400 italic">"{ability.flavorText}"</p>
+                <h3 className="text-2xl font-display text-mythic-gold mb-1">
+                    {debugMode
+                        ? `Ability: ${preview.pressureDelta} dmg, ${preview.consequenceDelta >= 0 ? '+' : ''}${preview.consequenceDelta} penalty`
+                        : ability.name
+                    }
+                </h3>
+                {!debugMode && <p className="text-sm text-gray-400 italic">"{ability.flavorText}"</p>}
             </div>
 
             <div className="space-y-4 mb-8">
                 <div className="bg-black/40 p-3 rounded border border-gray-800 flex justify-between items-center">
-                    <span className="text-sm text-red-400 uppercase tracking-wider">Pressure Impact</span>
+                    <span className="text-sm text-red-400 uppercase tracking-wider">
+                        {debugMode ? 'Damage' : 'Pressure Impact'}
+                    </span>
                     <div className="text-right">
                         {preview.basePressure !== preview.pressureDelta ? (
                             <span className="text-lg font-bold text-gray-200">
@@ -39,7 +48,9 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                 </div>
 
                 <div className="bg-black/40 p-3 rounded border border-gray-800 flex justify-between items-center">
-                    <span className="text-sm text-blue-400 uppercase tracking-wider">Strain Cost</span>
+                    <span className="text-sm text-blue-400 uppercase tracking-wider">
+                        {debugMode ? 'Stamina Cost' : 'Strain Cost'}
+                    </span>
                     <div className="text-right">
                         <span className="text-lg font-bold text-gray-200 block">
                             {preview.baseStrainCost !== preview.strainCost && (
@@ -56,7 +67,9 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                 </div>
 
                 <div className="bg-black/40 p-3 rounded border border-gray-800 flex justify-between items-center">
-                    <span className="text-sm text-mythic-gold uppercase tracking-wider">Essence Gain</span>
+                    <span className="text-sm text-mythic-gold uppercase tracking-wider">
+                        {debugMode ? 'Currency Gain' : 'Essence Gain'}
+                    </span>
                     <div className="text-right">
                         {preview.baseEssence !== preview.essenceDelta ? (
                             <span className="text-lg font-bold text-gray-200">
@@ -72,7 +85,9 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
 
                 {(preview.consequenceDelta !== 0 || preview.baseConsequence !== preview.consequenceDelta) && (
                     <div className={`bg-black/40 p-3 rounded border ${preview.willExceedThreshold ? 'border-strain-red' : 'border-gray-800'} flex justify-between items-center`}>
-                        <span className="text-sm text-void-purple uppercase tracking-wider">Consequence</span>
+                        <span className="text-sm text-void-purple uppercase tracking-wider">
+                            {debugMode ? 'Penalty' : 'Consequence'}
+                        </span>
                         <div className="text-right">
                             {preview.baseConsequence !== preview.consequenceDelta ? (
                                 <span className="text-lg font-bold">
@@ -109,7 +124,7 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                 onClick={onConfirm}
                 className="w-full py-4 bg-mythic-gold text-black font-display font-bold text-xl rounded hover:bg-yellow-400 transition-all shadow-lg hover:shadow-mythic-gold/20"
             >
-                CONFIRM INTERVENTION
+                {debugMode ? 'USE ABILITY' : 'CONFIRM INTERVENTION'}
             </button>
         </div>
     );

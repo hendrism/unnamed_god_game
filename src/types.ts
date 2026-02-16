@@ -188,6 +188,7 @@ export interface GameState {
     draftOptions: Ability[];
     hasSeenTutorial: boolean;
     encounterResolved: boolean;
+    debugMode: boolean;
     startRun: (doctrineId: DoctrineId) => void;
     selectDraftAbility: (abilityId: AbilityId) => void;
     selectBoonAbility: (abilityId: AbilityId | null) => void;
@@ -199,4 +200,5 @@ export interface GameState {
     skipUpgrade: () => void;
     endRun: () => void;
     resetProgress: () => void;
+    toggleDebugMode: () => void;
 }

@@ -586,6 +586,7 @@ const INITIAL_STATE: Omit<
     | 'markTutorialSeen'
     | 'nextEncounter'
     | 'resetProgress'
+    | 'toggleDebugMode'
 > = {
     essence: 0,
     runEssenceGained: 0,
@@ -619,6 +620,7 @@ const INITIAL_STATE: Omit<
     draftOptions: [],
     hasSeenTutorial: false,
     encounterResolved: false,
+    debugMode: false,
 };
 
 export const useGameStore = create<GameState>()(
@@ -1090,6 +1092,11 @@ export const useGameStore = create<GameState>()(
                         worldWeights: { ...DEFAULT_WORLD_WEIGHTS },
                         strengthBonuses: { ...DEFAULT_STRENGTH_BONUSES },
                     });
+                },
+
+                toggleDebugMode: () => {
+                    const state = get();
+                    set({ debugMode: !state.debugMode });
                 },
             }),
             {
