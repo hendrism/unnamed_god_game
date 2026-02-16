@@ -57,7 +57,10 @@ export const ResolutionModal = ({ resolution, onContinue }: ResolutionModalProps
                 <div className="space-y-3 mb-6">
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Pressure Remaining:</span>
-                        <span className="text-gray-200">{resolution.pressureRemaining}</span>
+                        <span className={resolution.pressureRemaining === 0 ? 'text-green-400 font-bold' : 'text-gray-200'}>
+                            {resolution.pressureRemaining}
+                            {resolution.pressureRemaining === 0 && ' ✓ ELIMINATED'}
+                        </span>
                     </div>
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Final Consequence:</span>
@@ -75,6 +78,21 @@ export const ResolutionModal = ({ resolution, onContinue }: ResolutionModalProps
                         </div>
                     )}
                 </div>
+
+                {/* Goal Achievement Feedback */}
+                {resolution.pressureRemaining === 0 && (
+                    <div className="mb-4 p-3 bg-green-900/20 border border-green-600/50 rounded">
+                        <p className="text-sm text-green-300 font-semibold">🎯 Goal 1 Achieved: Pressure Eliminated</p>
+                        <p className="text-xs text-green-400 mt-1">Next encounter starts with lower pressure and grants bonus essence.</p>
+                    </div>
+                )}
+
+                {resolution.thresholdExceeded && (
+                    <div className="mb-4 p-3 bg-red-900/30 border border-red-600/50 rounded">
+                        <p className="text-sm text-red-300 font-semibold">⚠ Goal 2 Failed: Consequences Breached</p>
+                        <p className="text-xs text-red-400 mt-1">Next encounter starts with higher pressure and reduced max turns.</p>
+                    </div>
+                )}
 
                 <div className="space-y-2 mb-6 p-4 bg-black/40 rounded border border-gray-800">
                     <div className="flex justify-between">
