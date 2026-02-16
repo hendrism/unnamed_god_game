@@ -3,8 +3,10 @@ import type { Ability, AbilityId } from '../types';
 import { DOCTRINES } from '../data/doctrines';
 import { useGameStore } from '../store/gameStore';
 import { AbilityBar } from './AbilityBar';
+import { ActionLog } from './ActionLog';
 import { ActionPreview } from './ActionPreview';
 import { EncounterCard } from './EncounterCard';
+import { GoalsBanner } from './GoalsBanner';
 import { HelpModal } from './HelpModal';
 import { ResolutionModal } from './ResolutionModal';
 import { StrainMeter } from './StrainMeter';
@@ -25,6 +27,7 @@ export const GameView = () => {
         encountersTarget,
         runForecast,
         carryOverInstability,
+        actionLog,
         lastResolution,
         lastEncounterResolution,
         upgradeOptions,
@@ -371,17 +374,18 @@ export const GameView = () => {
                 </div>
             </div>
 
+            {/* Goals Banner - Primary focus */}
+            {currentEncounter && <GoalsBanner encounter={currentEncounter} />}
+
+            {/* Action Log */}
+            <ActionLog log={actionLog} />
+
+            {/* Secondary Stats */}
             <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 text-center">
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">
                     <p className="text-[10px] uppercase tracking-widest text-gray-500">Encounter</p>
                     <p className="text-sm text-gray-200">
                         {encountersCompleted + 1} / {encountersTarget}
-                    </p>
-                </div>
-                <div className="bg-gray-900 border border-gray-800 rounded p-2">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Turn</p>
-                    <p className="text-sm text-gray-200">
-                        {currentEncounter?.turn ?? 0} / {currentEncounter?.turnLimit ?? 0}
                     </p>
                 </div>
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">
@@ -393,6 +397,10 @@ export const GameView = () => {
                     <p className="text-sm text-gray-200">
                         {encounterAbilityIds.length} / {abilities.length}
                     </p>
+                </div>
+                <div className="bg-gray-900 border border-gray-800 rounded p-2">
+                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Run Essence</p>
+                    <p className="text-sm text-mythic-gold">+{runEssenceGained}</p>
                 </div>
             </div>
 
