@@ -6,7 +6,7 @@ export const STRENGTH_UPGRADES: Upgrade[] = [
     {
         id: 'steady-opening',
         name: 'Steady Opening',
-        description: 'First ability each encounter costs 1 less Strain.',
+        description: 'First ability each encounter costs 1 less Strain. (Lets you cast more per encounter)',
         category: 'strength',
         cost: UPGRADE_COST,
         firstCastStrainReduction: 1,
@@ -14,7 +14,7 @@ export const STRENGTH_UPGRADES: Upgrade[] = [
     {
         id: 'votive-flow',
         name: 'Votive Flow',
-        description: 'First ability each encounter grants +1 Essence.',
+        description: 'First ability each encounter grants +1 Essence. (More upgrades over time)',
         category: 'strength',
         cost: UPGRADE_COST,
         firstCastEssenceBonus: 1,
@@ -22,7 +22,7 @@ export const STRENGTH_UPGRADES: Upgrade[] = [
     {
         id: 'tempered-vessel',
         name: 'Tempered Vessel',
-        description: 'Max Strain increases by 3.',
+        description: 'Max Strain increases by 3. (Cast more abilities before running out)',
         category: 'strength',
         cost: UPGRADE_COST,
         maxStrainBonus: 3,
@@ -33,7 +33,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'storm-calling',
         name: 'Storm Calling',
-        description: 'Storm encounters appear more often.',
+        description: 'Storm encounters appear more often. (Moderate pressure, average rewards)',
         category: 'world',
         cost: UPGRADE_COST,
         encounterWeightDelta: {
@@ -44,7 +44,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'shrine-claim',
         name: 'Shrine Claim',
-        description: 'Shrine encounters appear more often.',
+        description: 'Shrine encounters appear more often. (Lower pressure, BEST essence rewards)',
         category: 'world',
         cost: UPGRADE_COST,
         encounterWeightDelta: {
@@ -55,7 +55,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'zeal-incitement',
         name: 'Zeal Incitement',
-        description: 'Rebellion encounters appear more often.',
+        description: 'Rebellion encounters appear more often. (Higher pressure and consequences)',
         category: 'world',
         cost: UPGRADE_COST,
         encounterWeightDelta: {
