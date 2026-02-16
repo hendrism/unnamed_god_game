@@ -181,11 +181,11 @@ const createEncounter = (
 ): ActiveEncounter => {
     const template = getEncounterTemplateById(templateId);
     const modifier = randomFrom(ENCOUNTER_MODIFIERS);
-    const pressureFromCarryOver = Math.min(3, carryOverInstability);
+    const pressureFromCarryOver = Math.min(15, carryOverInstability);
     const isUrgent = Math.random() < URGENT_ENCOUNTER_CHANCE;
     const pressureScalar = isUrgent ? URGENT_PRESSURE_MULTIPLIER : 1;
     const startingPressure = Math.max(
-        4,
+        20,
         Math.round((template.basePressure + pressureFromCarryOver) * pressureScalar)
     );
     const rewardPerTurn = Math.max(1, template.baseRewardPerTurn);
@@ -531,18 +531,19 @@ const buildAbilityPreview = (
 
     const projectedStrainLevel = calculateStrainLevel(projectedStrain, state.maxStrain);
 
+    // STRAIN PENALTY: Higher strain = sloppier interventions = more consequences
     if (projectedStrainLevel === 'Medium') {
-        consequenceDelta += 1;
-        notes.push('Distortion: Medium Instability adds +1 Consequence.');
+        consequenceDelta += 5;
+        notes.push('⚡ Strain Penalty (Medium): +5 Consequence.');
     } else if (projectedStrainLevel === 'High') {
-        consequenceDelta += 1;
+        consequenceDelta += 8;
         essenceDelta -= 1;
-        notes.push('Backlash: High Instability adds +1 Consequence and -1 Essence.');
+        notes.push('⚡ Strain Penalty (High): +8 Consequence, -1 Essence.');
     } else if (projectedStrainLevel === 'Critical') {
-        consequenceDelta += 2;
+        consequenceDelta += 12;
         essenceDelta -= 1;
-        pressureDelta = Math.max(0, pressureDelta - 1);
-        notes.push('Backlash: Critical Instability adds +2 Consequence, -1 Essence, and -1 Pressure.');
+        pressureDelta = Math.max(0, pressureDelta - 5);
+        notes.push('⚡ Strain Penalty (CRITICAL): +12 Consequence, -1 Essence, -5 Pressure.');
     }
 
     pressureDelta = Math.max(0, pressureDelta);
@@ -906,6 +907,14 @@ export const useGameStore = create<GameState>()(
                             0,
                             strainAfterAction - ENCOUNTER_STRAIN_RELIEF
                         );
+
+                        // STRAIN CARRYOVER: Ending encounter at high strain affects next encounter
+                        const endingStrainLevel = calculateStrainLevel(strainAfterAction, state.maxStrain);
+                        if (endingStrainLevel === 'High') {
+                            carryOverInstability += 5;
+                        } else if (endingStrainLevel === 'Critical') {
+                            carryOverInstability += 10;
+                        }
                         nextCastFree = false;
                         encounterResolved = true;
                         synergyStreak = 0;
