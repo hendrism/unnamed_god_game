@@ -181,11 +181,11 @@ const createEncounter = (
 ): ActiveEncounter => {
     const template = getEncounterTemplateById(templateId);
     const modifier = randomFrom(ENCOUNTER_MODIFIERS);
-    const pressureFromCarryOver = Math.min(3, carryOverInstability);
+    const pressureFromCarryOver = Math.min(15, carryOverInstability);
     const isUrgent = Math.random() < URGENT_ENCOUNTER_CHANCE;
     const pressureScalar = isUrgent ? URGENT_PRESSURE_MULTIPLIER : 1;
     const startingPressure = Math.max(
-        4,
+        20,
         Math.round((template.basePressure + pressureFromCarryOver) * pressureScalar)
     );
     const rewardPerTurn = Math.max(1, template.baseRewardPerTurn);
