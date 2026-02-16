@@ -45,6 +45,10 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                     <span className="text-xs text-void-purple uppercase tracking-wider block mb-1">Consequence</span>
                     <p className="text-sm text-gray-300">{encounter.consequenceText}</p>
                     <p className="text-xs text-gray-500 mt-2">Current consequence meter: {encounter.consequenceMeter}</p>
+                    <p className="text-xs text-gray-500">Threshold: {encounter.consequenceThreshold}</p>
+                    {encounter.thresholdExceeded && (
+                        <p className="text-xs text-strain-red mt-1">Threshold exceeded: instability penalties active.</p>
+                    )}
                 </div>
             </div>
         </div>

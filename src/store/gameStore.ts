@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { CORE_ABILITIES, DRAFT_POOL } from '../data/abilities';
 import { DOCTRINES } from '../data/doctrines';
-import { ENCOUNTER_MODIFIERS, ENCOUNTER_TEMPLATES } from '../data/encounters';
+import { ENCOUNTER_TEMPLATES } from '../data/encounters';
+import { ENCOUNTER_MODIFIERS } from '../data/encounterModifiers';
 import { STRENGTH_UPGRADES, WORLD_UPGRADES } from '../data/upgrades';
 import type {
     Ability,
@@ -19,6 +20,8 @@ import type {
 
 const BASE_MAX_STRAIN = 20;
 const ENCOUNTER_STRAIN_RELIEF = 4;
+const THRESHOLD_PENALTY_STRAIN = 2;
+const THRESHOLD_PENALTY_ESSENCE = 1;
 
 const DEFAULT_STRENGTH_BONUSES: StrengthBonuses = {
     firstCastStrainReduction: 0,
@@ -95,14 +98,15 @@ const createEncounter = (
     const pressureFromCarryOver = Math.min(3, carryOverInstability);
     const startingPressure = Math.max(
         4,
-        template.basePressure + modifier.pressureDelta + pressureFromCarryOver
+        template.basePressure + pressureFromCarryOver
     );
-    const rewardPerTurn = Math.max(1, template.baseRewardPerTurn + modifier.rewardDelta);
-    const startingConsequence = Math.max(0, template.baseConsequence + modifier.consequenceDelta);
+    const rewardPerTurn = Math.max(1, template.baseRewardPerTurn);
+    const startingConsequence = Math.max(0, template.baseConsequence);
 
     return {
         id: `${template.id}-${modifier.id}-${Math.random().toString(36).slice(2, 8)}`,
         templateId: template.id,
+        modifierId: modifier.id,
         title: template.title,
         description: template.description,
         pressureText: template.pressureText,
@@ -110,10 +114,13 @@ const createEncounter = (
         consequenceText: template.consequenceText,
         modifierName: modifier.name,
         modifierDescription: modifier.description,
+        modifierEffects: modifier.effects,
         startingPressure,
         pressureRemaining: startingPressure,
         rewardPerTurn,
         consequenceMeter: startingConsequence,
+        consequenceThreshold: template.consequenceThreshold,
+        thresholdExceeded: false,
         turn: 1,
         turnLimit: randomInt(3, 5),
     };
@@ -144,31 +151,59 @@ const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPre
     const ability = state.abilities.find((candidate) => candidate.id === abilityId);
     if (!ability) return null;
 
+    const encounter = state.currentEncounter;
+    const modifierEffects = encounter.modifierEffects;
+    const abilityModifier = modifierEffects.abilityEffects?.find(
+        (effect) => effect.abilityId === ability.id
+    );
+
     const notes: string[] = [];
     const previousUses = state.abilityUsage[ability.id] ?? 0;
     const repeatedPowerBonus = Math.floor(previousUses / 3);
     const firstCastThisEncounter = state.castsThisEncounter === 0;
     const lastAbilityId = getLastAbility(state.history);
 
-    let strainCost = state.nextCastFree ? 0 : ability.baseStrainCost + repeatedPowerBonus;
+    let strainCost =
+        ability.baseStrainCost +
+        repeatedPowerBonus +
+        (modifierEffects.strainCostDelta ?? 0) +
+        (abilityModifier?.strainCostDelta ?? 0);
+
     if (state.nextCastFree) {
+        strainCost = 0;
         notes.push('Twist Fate synergy: this cast costs 0 Strain.');
     }
+
     if (firstCastThisEncounter && state.strengthBonuses.firstCastStrainReduction > 0 && strainCost > 0) {
         strainCost = Math.max(0, strainCost - state.strengthBonuses.firstCastStrainReduction);
         notes.push(
             `Upgrade bonus: first cast costs ${state.strengthBonuses.firstCastStrainReduction} less Strain.`
         );
     }
+    strainCost = Math.max(0, strainCost);
 
     let strainRelief = 0;
-    let pressureDelta = ability.basePressure + repeatedPowerBonus;
-    let essenceDelta = state.currentEncounter.rewardPerTurn + ability.baseEssence;
-    let consequenceDelta = ability.baseConsequence;
+    let pressureDelta =
+        ability.basePressure +
+        repeatedPowerBonus +
+        (modifierEffects.pressureDelta ?? 0) +
+        (abilityModifier?.pressureDelta ?? 0);
+    let essenceDelta =
+        encounter.rewardPerTurn +
+        ability.baseEssence +
+        (modifierEffects.essenceDelta ?? 0) +
+        (abilityModifier?.essenceDelta ?? 0);
+    let consequenceDelta =
+        ability.baseConsequence +
+        (modifierEffects.consequenceDelta ?? 0) +
+        (abilityModifier?.consequenceDelta ?? 0);
     let willGrantFreeCast = false;
 
     if (repeatedPowerBonus > 0) {
         notes.push(`Escalation: ${ability.name} gains +${repeatedPowerBonus} Pressure from repeated use.`);
+    }
+    if (abilityModifier) {
+        notes.push(`${encounter.modifierName} alters ${ability.name} in this district.`);
     }
 
     if (firstCastThisEncounter && state.strengthBonuses.firstCastEssenceBonus > 0) {
@@ -209,7 +244,19 @@ const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPre
         notes.push('Doctrine bonus: first Manifest Presence each encounter grants +1 Essence.');
     }
 
-    const projectedStrain = Math.max(0, state.currentStrain + strainCost - strainRelief);
+    let projectedStrain = Math.max(0, state.currentStrain + strainCost - strainRelief);
+    const projectedConsequence = Math.max(0, encounter.consequenceMeter + consequenceDelta);
+    const thresholdTriggered =
+        !encounter.thresholdExceeded && projectedConsequence > encounter.consequenceThreshold;
+
+    if (thresholdTriggered) {
+        projectedStrain += THRESHOLD_PENALTY_STRAIN;
+        essenceDelta -= THRESHOLD_PENALTY_ESSENCE;
+        notes.push(
+            `Threshold breached: +${THRESHOLD_PENALTY_STRAIN} Strain and -${THRESHOLD_PENALTY_ESSENCE} Essence.`
+        );
+    }
+
     const projectedStrainLevel = calculateStrainLevel(projectedStrain, state.maxStrain);
 
     if (projectedStrainLevel === 'Medium') {
@@ -226,6 +273,7 @@ const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPre
         notes.push('Backlash: Critical Instability adds +2 Consequence, -1 Essence, and -1 Pressure.');
     }
 
+    pressureDelta = Math.max(0, pressureDelta);
     essenceDelta = Math.max(0, essenceDelta);
 
     return {
@@ -398,6 +446,9 @@ export const useGameStore = create<GameState>()(
                         0,
                         state.currentEncounter.consequenceMeter + preview.consequenceDelta
                     );
+                    const thresholdExceededNow =
+                        !state.currentEncounter.thresholdExceeded &&
+                        updatedConsequence > state.currentEncounter.consequenceThreshold;
                     const nextTurn = state.currentEncounter.turn + 1;
                     const encounterEndsNow = nextTurn > state.currentEncounter.turnLimit;
 
@@ -408,6 +459,7 @@ export const useGameStore = create<GameState>()(
                         ...state.currentEncounter,
                         pressureRemaining: updatedPressure,
                         consequenceMeter: updatedConsequence,
+                        thresholdExceeded: state.currentEncounter.thresholdExceeded || thresholdExceededNow,
                         turn: nextTurn,
                     };
                     let castsThisEncounter = state.castsThisEncounter + 1;
@@ -458,7 +510,11 @@ export const useGameStore = create<GameState>()(
                         }
                     }
 
-                    const totalEssenceGain = preview.essenceDelta + extraEssence;
+                    if (thresholdExceededNow) {
+                        lastResolution += ' Consequence threshold exceeded; reality objects in writing.';
+                    }
+
+                    const totalEssenceGain = Math.max(0, preview.essenceDelta + extraEssence);
                     const currentStrain = Math.max(0, strainAfterAction);
                     const strainLevel = calculateStrainLevel(currentStrain, state.maxStrain);
 
