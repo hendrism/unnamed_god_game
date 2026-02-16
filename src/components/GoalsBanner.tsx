@@ -50,12 +50,6 @@ export const GoalsBanner = ({ encounter, runEssence, totalEssence }: GoalsBanner
         return 'DANGER (>80%)';
     };
 
-    const getTurnStatus = () => {
-        if (turnsLeft > 1) return `${turnsLeft} turns left`;
-        if (turnsLeft === 1) return 'FINAL TURN!';
-        return 'TIME UP';
-    };
-
     // Essence progress toward next upgrade (18 essence per upgrade)
     const UPGRADE_COST = 18;
     const essenceProgress = totalEssence % UPGRADE_COST;
