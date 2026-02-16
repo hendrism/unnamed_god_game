@@ -11,7 +11,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         basePressure: 9,
         baseRewardPerTurn: 1,
         baseConsequence: 1,
-        consequenceThreshold: 5,
+        consequenceThreshold: 10,
     },
     {
         id: 'rebellion',
@@ -23,7 +23,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         basePressure: 10,
         baseRewardPerTurn: 1,
         baseConsequence: 2,
-        consequenceThreshold: 6,
+        consequenceThreshold: 12,
     },
     {
         id: 'shrine',
@@ -35,7 +35,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         basePressure: 8,
         baseRewardPerTurn: 2,
         baseConsequence: 1,
-        consequenceThreshold: 4,
+        consequenceThreshold: 8,
     },
     {
         id: 'prayers',
@@ -47,7 +47,7 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         basePressure: 9,
         baseRewardPerTurn: 1,
         baseConsequence: 1,
-        consequenceThreshold: 5,
+        consequenceThreshold: 10,
     },
     {
         id: 'blight',
@@ -59,6 +59,6 @@ export const ENCOUNTER_TEMPLATES: EncounterTemplate[] = [
         basePressure: 12,
         baseRewardPerTurn: 1,
         baseConsequence: 2,
-        consequenceThreshold: 7,
+        consequenceThreshold: 14,
     },
 ];
