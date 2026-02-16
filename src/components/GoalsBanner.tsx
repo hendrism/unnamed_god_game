@@ -2,9 +2,11 @@ import type { ActiveEncounter } from '../types';
 
 interface GoalsBannerProps {
     encounter: ActiveEncounter;
+    runEssence: number;
+    totalEssence: number;
 }
 
-export const GoalsBanner = ({ encounter }: GoalsBannerProps) => {
+export const GoalsBanner = ({ encounter, runEssence, totalEssence }: GoalsBannerProps) => {
     // Calculate urgency states
     const pressurePercent = encounter.startingPressure > 0
         ? (encounter.pressureRemaining / encounter.startingPressure) * 100
@@ -43,9 +45,9 @@ export const GoalsBanner = ({ encounter }: GoalsBannerProps) => {
 
     const getConsequenceStatus = () => {
         if (encounter.thresholdExceeded) return 'BREACHED!';
-        if (consequencePercent <= 50) return 'Safe zone';
-        if (consequencePercent <= 80) return 'Approaching limit';
-        return 'DANGER ZONE';
+        if (consequencePercent <= 50) return 'Safe (<50%)';
+        if (consequencePercent <= 80) return 'Warning zone';
+        return 'DANGER (>80%)';
     };
 
     const getTurnStatus = () => {
@@ -54,8 +56,20 @@ export const GoalsBanner = ({ encounter }: GoalsBannerProps) => {
         return 'TIME UP';
     };
 
+    // Essence progress toward next upgrade (18 essence per upgrade)
+    const UPGRADE_COST = 18;
+    const essenceProgress = totalEssence % UPGRADE_COST;
+    const essencePercent = (essenceProgress / UPGRADE_COST) * 100;
+    const upgradesAvailable = Math.floor(totalEssence / UPGRADE_COST);
+
     return (
         <div className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            {/* Turn counter moved above goals */}
+            <div className={`text-center mb-2 text-xs ${getTurnColor()}`}>
+                Turn {encounter.turn} / {encounter.turnLimit}
+                {turnsLeft === 1 && <span className="ml-2 animate-pulse">⏰ FINAL TURN!</span>}
+            </div>
+
             <h2 className="text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 mb-2 sm:mb-3 text-center">
                 🎯 GOALS
             </h2>
@@ -93,20 +107,24 @@ export const GoalsBanner = ({ encounter }: GoalsBannerProps) => {
                     </div>
                 </div>
 
-                {/* Turn */}
-                <div className={`border-2 rounded-lg p-2 sm:p-4 text-center transition-all overflow-hidden ${getTurnColor()}`}>
+                {/* Essence (Run Progress) */}
+                <div className="border-2 rounded-lg p-2 sm:p-4 text-center transition-all overflow-hidden border-mythic-gold/50 text-mythic-gold">
                     <div className="text-[9px] sm:text-xs uppercase tracking-wider text-gray-400 mb-1 truncate">
-                        Turn
+                        Essence (This Run)
                     </div>
                     <div className="text-2xl sm:text-4xl font-bold mb-0.5 sm:mb-1">
-                        {encounter.turn}
-                        <span className="text-sm sm:text-lg opacity-50"> / {encounter.turnLimit}</span>
+                        {runEssence}
+                        <span className="text-sm sm:text-lg opacity-50"> / 15</span>
                     </div>
                     <div className="text-[9px] sm:text-xs opacity-70 mb-1 sm:mb-2 leading-tight">
-                        limit {encounter.turnLimit}
+                        {upgradesAvailable > 0 && <span className="text-green-400">{upgradesAvailable} upgrade{upgradesAvailable > 1 ? 's' : ''} ready!</span>}
+                        {upgradesAvailable === 0 && <span>{UPGRADE_COST - essenceProgress} more for upgrade</span>}
                     </div>
-                    <div className="text-[9px] sm:text-xs font-semibold truncate">
-                        {getTurnStatus()}
+                    <div className="w-full bg-gray-800 rounded-full h-1.5 sm:h-2 overflow-hidden">
+                        <div
+                            className="bg-mythic-gold h-full transition-all duration-300"
+                            style={{ width: `${essencePercent}%` }}
+                        />
                     </div>
                 </div>
             </div>

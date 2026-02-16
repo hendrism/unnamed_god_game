@@ -41,13 +41,13 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
             </div>
 
             <div className="space-y-2 mb-6">
-                {/* 1. PRESSURE (Goal 1) */}
+                {/* 1. PRESSURE (Goal 1) - Clearer wording */}
                 <div className="bg-black/40 p-3 rounded border border-red-900/30">
                     <div className="flex justify-between items-center mb-1">
                         <span className="text-xs text-red-400 uppercase tracking-wider font-semibold">
-                            {debugMode ? 'Damage' : '🎯 Pressure'}
+                            {debugMode ? 'Damage' : '🎯 Pressure (reduce to 0)'}
                         </span>
-                        <span className="text-red-400 font-bold text-lg">-{preview.pressureDelta}</span>
+                        <span className="text-green-400 font-bold text-lg">↓ {preview.pressureDelta}</span>
                     </div>
                     {currentEncounter && (
                         <div className="text-xs text-gray-500">
@@ -56,15 +56,15 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                     )}
                 </div>
 
-                {/* 2. CONSEQUENCE (Goal 2) */}
+                {/* 2. CONSEQUENCE (Goal 2) - Clearer wording */}
                 {preview.consequenceDelta !== 0 && (
                     <div className={`bg-black/40 p-3 rounded border ${preview.willExceedThreshold ? 'border-strain-red animate-pulse' : 'border-purple-900/30'}`}>
                         <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs text-void-purple uppercase tracking-wider font-semibold">
-                                {debugMode ? 'Penalty' : '🎯 Consequence'}
+                            <span className={`text-xs uppercase tracking-wider font-semibold ${preview.consequenceDelta > 0 ? 'text-void-purple' : 'text-green-400'}`}>
+                                {debugMode ? 'Penalty' : '🎯 Consequence (keep low)'}
                             </span>
-                            <span className={`font-bold text-lg ${preview.willExceedThreshold ? 'text-strain-red' : 'text-void-purple'}`}>
-                                {preview.consequenceDelta > 0 ? '+' : ''}{preview.consequenceDelta}
+                            <span className={`font-bold text-lg ${preview.willExceedThreshold ? 'text-strain-red' : preview.consequenceDelta > 0 ? 'text-void-purple' : 'text-green-400'}`}>
+                                {preview.consequenceDelta > 0 ? '↑' : '↓'} {Math.abs(preview.consequenceDelta)}
                             </span>
                         </div>
                         {currentEncounter && (
@@ -76,13 +76,13 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                     </div>
                 )}
 
-                {/* 3. STRAIN (Cost) */}
+                {/* 3. STRAIN (Cost) - Clearer wording */}
                 <div className="bg-black/40 p-3 rounded border border-blue-900/30">
                     <div className="flex justify-between items-center mb-1">
                         <span className="text-xs text-blue-400 uppercase tracking-wider font-semibold">
-                            {debugMode ? 'Stamina Cost' : 'Strain Cost'}
+                            {debugMode ? 'Stamina Cost' : '⚡ Strain Cost'}
                         </span>
-                        <span className="text-blue-400 font-bold text-lg">+{preview.strainCost}</span>
+                        <span className="text-orange-400 font-bold text-lg">↑ {preview.strainCost}</span>
                     </div>
                     <div className="text-xs text-gray-500">
                         {currentStrain} → <span className={`font-semibold ${
@@ -96,13 +96,13 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                     </div>
                 </div>
 
-                {/* 4. ESSENCE (Reward) */}
+                {/* 4. ESSENCE (Reward) - Clearer wording */}
                 <div className="bg-black/40 p-3 rounded border border-yellow-900/30">
                     <div className="flex justify-between items-center">
                         <span className="text-xs text-mythic-gold uppercase tracking-wider font-semibold">
-                            {debugMode ? 'Currency Gain' : 'Essence Gain'}
+                            {debugMode ? 'Currency Gain' : '✨ Essence Gain'}
                         </span>
-                        <span className="text-mythic-gold font-bold text-lg">+{preview.essenceDelta}</span>
+                        <span className="text-mythic-gold font-bold text-lg">↑ {preview.essenceDelta}</span>
                     </div>
                 </div>
             </div>

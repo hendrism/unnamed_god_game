@@ -318,18 +318,33 @@ export const GameView = () => {
                     {boonPrompt || 'A fragment of your former power is available.'}
                 </p>
 
-                {/* Current Abilities */}
+                {/* Current Abilities - Now with Stats! */}
                 <div className="w-full bg-gray-900 border border-gray-700 rounded-lg p-4">
                     <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Your Current Arsenal</p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {abilities.map((ability) => (
-                            <span
+                            <div
                                 key={ability.id}
-                                className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-800 border border-gray-700 text-gray-300"
+                                className="bg-black/40 border border-gray-800 rounded p-3"
                             >
-                                {ability.name}
-                                <span className="ml-2 text-[10px] text-gray-500">({ability.category})</span>
-                            </span>
+                                <p className="text-sm text-gray-200 font-semibold mb-1 truncate">{ability.name}</p>
+                                <div className="space-y-0.5 text-[10px] text-gray-500">
+                                    <div className="flex justify-between">
+                                        <span>Press</span>
+                                        <span className="text-red-400">-{ability.basePressure}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Cons</span>
+                                        <span className={ability.baseConsequence > 0 ? 'text-void-purple' : 'text-green-400'}>
+                                            {ability.baseConsequence > 0 ? '+' : ''}{ability.baseConsequence}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Strain</span>
+                                        <span className="text-blue-400">{ability.baseStrainCost}</span>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -458,7 +473,7 @@ export const GameView = () => {
             </div>
 
             {/* Goals Banner - Primary focus */}
-            {currentEncounter && <GoalsBanner encounter={currentEncounter} />}
+            {currentEncounter && <GoalsBanner encounter={currentEncounter} runEssence={runEssenceGained} totalEssence={essence} />}
 
             {/* Action Log - Hidden on mobile */}
             <div className="hidden sm:block w-full">
