@@ -3,6 +3,7 @@ export type GamePhase = 'menu' | 'draft' | 'encounter' | 'upgrade';
 export type AbilityId = 'smite' | 'manifest' | 'twist' | 'condemn' | 'witness' | 'absolve' | 'stifle';
 export type DoctrineId = 'dominion' | 'revelation';
 export type UpgradeCategory = 'strength' | 'world';
+export type ResolutionOutcome = 'perfect' | 'partial' | 'minimal' | 'catastrophic';
 
 export interface Ability {
     id: AbilityId;
@@ -102,14 +103,30 @@ export interface StrengthBonuses {
 
 export interface AbilityPreview {
     abilityId: AbilityId;
+    baseStrainCost: number;
     strainCost: number;
     projectedStrain: number;
     projectedStrainLevel: StrainLevel;
+    basePressure: number;
     pressureDelta: number;
+    baseEssence: number;
     essenceDelta: number;
+    baseConsequence: number;
     consequenceDelta: number;
+    projectedConsequenceMeter: number;
+    willExceedThreshold: boolean;
     willGrantFreeCast: boolean;
     notes: string[];
+}
+
+export interface EncounterResolution {
+    outcome: ResolutionOutcome;
+    pressureRemaining: number;
+    finalConsequence: number;
+    thresholdExceeded: boolean;
+    essenceGained: number;
+    carryoverAdded: number;
+    flavorText: string;
 }
 
 export interface GameState {
@@ -123,6 +140,7 @@ export interface GameState {
     abilityUsage: Record<AbilityId, number>;
     history: AbilityId[];
     lastResolution: string;
+    lastEncounterResolution: EncounterResolution | null;
     doctrine: Doctrine | null;
     currentEncounter: ActiveEncounter | null;
     encountersCompleted: number;

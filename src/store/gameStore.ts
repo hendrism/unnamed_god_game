@@ -276,14 +276,27 @@ const buildAbilityPreview = (state: GameState, abilityId: AbilityId): AbilityPre
     pressureDelta = Math.max(0, pressureDelta);
     essenceDelta = Math.max(0, essenceDelta);
 
+    const projectedConsequenceMeter = Math.max(0, state.currentEncounter.consequenceMeter + consequenceDelta);
+    const willExceedThreshold = projectedConsequenceMeter > state.currentEncounter.consequenceThreshold;
+
+    if (willExceedThreshold && !state.currentEncounter.thresholdExceeded) {
+        notes.push(`⚠ WARNING: This will exceed the consequence threshold (${state.currentEncounter.consequenceThreshold})!`);
+    }
+
     return {
         abilityId,
+        baseStrainCost: ability.baseStrainCost,
         strainCost,
         projectedStrain,
         projectedStrainLevel,
+        basePressure: ability.basePressure,
         pressureDelta,
+        baseEssence: ability.baseEssence,
         essenceDelta,
+        baseConsequence: ability.baseConsequence,
         consequenceDelta,
+        projectedConsequenceMeter,
+        willExceedThreshold,
         willGrantFreeCast,
         notes,
     };
@@ -312,6 +325,7 @@ const INITIAL_STATE: Omit<
     abilityUsage: { ...EMPTY_ABILITY_USAGE },
     history: [],
     lastResolution: 'The void awaits your flawless leadership.',
+    lastEncounterResolution: null,
     doctrine: null,
     currentEncounter: null,
     encountersCompleted: 0,

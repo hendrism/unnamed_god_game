@@ -6,6 +6,7 @@ import { AbilityBar } from './AbilityBar';
 import { ActionPreview } from './ActionPreview';
 import { EncounterCard } from './EncounterCard';
 import { HelpModal } from './HelpModal';
+import { ResolutionModal } from './ResolutionModal';
 import { StrainMeter } from './StrainMeter';
 
 export const GameView = () => {
@@ -20,6 +21,7 @@ export const GameView = () => {
         encountersTarget,
         carryOverInstability,
         lastResolution,
+        lastEncounterResolution,
         upgradeOptions,
         ownedUpgrades,
         startRun,
@@ -43,17 +45,7 @@ export const GameView = () => {
         if (!hasSeenTutorial && phase === 'draft' && !showHelp) {
             setShowHelp(true);
         }
-    }, [hasSeenTutorial, phase]);
-
-    // Handle Encounter Resolution Delay
-    useEffect(() => {
-        if (encounterResolved) {
-            const timer = setTimeout(() => {
-                nextEncounter();
-            }, 1500); // 1.5s delay to show "SEVERED"
-            return () => clearTimeout(timer);
-        }
-    }, [encounterResolved, nextEncounter]);
+    }, [hasSeenTutorial, phase, showHelp]);
 
     // --- HANDLERS ---
     const handleCloseHelp = () => {
@@ -333,6 +325,14 @@ export const GameView = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Resolution Modal */}
+            {encounterResolved && lastEncounterResolution && (
+                <ResolutionModal
+                    resolution={lastEncounterResolution}
+                    onContinue={nextEncounter}
+                />
+            )}
         </div>
     );
 };
