@@ -108,10 +108,9 @@ export const GoalsBanner = ({ encounter, runEssence, totalEssence }: GoalsBanner
                     </div>
                     <div className="text-2xl sm:text-4xl font-bold mb-0.5 sm:mb-1">
                         {runEssence}
-                        <span className="text-sm sm:text-lg opacity-50"> / 15</span>
                     </div>
                     <div className="text-[9px] sm:text-xs opacity-70 mb-1 leading-tight">
-                        this run (max 15)
+                        earned this run
                     </div>
                     <div className="text-[9px] sm:text-xs font-semibold mb-1 leading-tight">
                         {upgradesAvailable > 0 && <span className="text-green-400">🎁 {upgradesAvailable} upgrade{upgradesAvailable > 1 ? 's' : ''} ready!</span>}
