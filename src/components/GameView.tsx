@@ -50,6 +50,7 @@ export const GameView = () => {
         encounterResolved,
         nextEncounter,
         toggleDebugMode,
+        resetProgress,
     } = useGameStore();
 
     const [selectedAbilityId, setSelectedAbilityId] = useState<AbilityId | null>(null);
@@ -106,6 +107,13 @@ export const GameView = () => {
 
     const HelpButton = () => (
         <>
+            <button
+                onClick={resetProgress}
+                className="absolute top-4 left-4 px-3 py-1 rounded border text-xs font-bold z-40 transition-colors bg-black/50 border-gray-600 text-gray-400 hover:text-white hover:border-red-500"
+                aria-label="Reset Progress"
+            >
+                RESET
+            </button>
             <button
                 onClick={toggleDebugMode}
                 className={`absolute top-4 right-14 px-3 py-1 rounded border text-xs font-bold z-40 transition-colors ${
@@ -188,6 +196,22 @@ export const GameView = () => {
                     Choose one ability before the first intervention.
                 </p>
 
+                {/* Starting Abilities */}
+                <div className="w-full max-w-xl bg-gray-900 border border-gray-700 rounded-lg p-4 mb-2">
+                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Starting Arsenal</p>
+                    <div className="flex flex-wrap gap-2">
+                        {abilities.map((ability) => (
+                            <span
+                                key={ability.id}
+                                className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-800 border border-gray-700 text-gray-300"
+                            >
+                                {ability.name}
+                                <span className="ml-2 text-[10px] text-gray-500">({ability.category})</span>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="w-full max-w-xl bg-gray-900 border border-gray-700 rounded-lg p-4">
                     <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                         Foresight: Encounter Mix This Run
@@ -257,6 +281,22 @@ export const GameView = () => {
                 <p className="text-gray-300 text-center max-w-xl">
                     {boonPrompt || 'A fragment of your former power is available.'}
                 </p>
+
+                {/* Current Abilities */}
+                <div className="w-full bg-gray-900 border border-gray-700 rounded-lg p-4">
+                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Your Current Arsenal</p>
+                    <div className="flex flex-wrap gap-2">
+                        {abilities.map((ability) => (
+                            <span
+                                key={ability.id}
+                                className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-800 border border-gray-700 text-gray-300"
+                            >
+                                {ability.name}
+                                <span className="ml-2 text-[10px] text-gray-500">({ability.category})</span>
+                            </span>
+                        ))}
+                    </div>
+                </div>
 
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                     {boonOptions.map((ability) => (
@@ -366,6 +406,13 @@ export const GameView = () => {
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest">Doctrine</span>
                     <span className="text-xs sm:text-sm text-gray-200 truncate">{doctrine?.name ?? 'Unbound'}</span>
                     <span className="hidden sm:block text-xs text-gray-500 mt-1">{doctrine?.passiveDescription}</span>
+                </div>
+                <div className="flex flex-col items-center flex-shrink-0">
+                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">Run Progress</span>
+                    <span className="text-base sm:text-lg font-bold text-white">
+                        {encountersCompleted + 1} / {encountersTarget}
+                    </span>
+                    <span className="text-[10px] text-gray-500">encounters</span>
                 </div>
                 <div className="flex flex-col items-end flex-shrink-0">
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest">Essence</span>
