@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import type { EncounterResolution } from '../types';
 
 interface ResolutionModalProps {
@@ -7,13 +6,6 @@ interface ResolutionModalProps {
 }
 
 export const ResolutionModal = ({ resolution, onContinue }: ResolutionModalProps) => {
-    // Auto-close after 3 seconds
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            onContinue();
-        }, 3000);
-        return () => clearTimeout(timer);
-    }, [onContinue]);
 
     const getOutcomeClass = () => {
         switch (resolution.outcome) {
@@ -109,8 +101,6 @@ export const ResolutionModal = ({ resolution, onContinue }: ResolutionModalProps
                 >
                     Continue
                 </button>
-
-                <p className="text-xs text-gray-600 text-center mt-3">Auto-advancing in 3 seconds...</p>
             </div>
         </div>
     );

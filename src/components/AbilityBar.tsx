@@ -44,17 +44,15 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
                                 </span>
                             </div>
 
-                            {/* Clear Stats */}
+                            {/* Clear Stats - Ordered to match Goals */}
                             {preview && (
                                 <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm">
+                                    {/* 1. Pressure (matches Goal 1) */}
                                     <div className="flex justify-between items-center gap-2">
                                         <span className="text-gray-400 truncate">Pressure</span>
                                         <span className="text-red-400 font-bold flex-shrink-0">-{preview.pressureDelta}</span>
                                     </div>
-                                    <div className="flex justify-between items-center gap-2">
-                                        <span className="text-gray-400 truncate">Strain</span>
-                                        <span className="text-blue-400 font-bold flex-shrink-0">+{preview.strainCost}</span>
-                                    </div>
+                                    {/* 2. Consequence (matches Goal 2) */}
                                     {preview.consequenceDelta !== 0 && (
                                         <div className="flex justify-between items-center gap-2">
                                             <span className="text-gray-400 truncate">Consequence</span>
@@ -69,6 +67,12 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
                                             </span>
                                         </div>
                                     )}
+                                    {/* 3. Strain (cost to use) */}
+                                    <div className="flex justify-between items-center gap-2">
+                                        <span className="text-gray-400 truncate">Strain</span>
+                                        <span className="text-blue-400 font-bold flex-shrink-0">+{preview.strainCost}</span>
+                                    </div>
+                                    {/* 4. Essence (reward) */}
                                     {preview.essenceDelta > 0 && (
                                         <div className="flex justify-between items-center gap-2">
                                             <span className="text-gray-400 truncate">Essence</span>
