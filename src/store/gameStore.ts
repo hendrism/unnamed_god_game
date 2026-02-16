@@ -303,12 +303,12 @@ const createEncounterResolution = (
             flavorCategory = 'barelySucceeded';
         }
         essenceGained = 1;
-        carryoverAdded = finalConsequence + Math.ceil(pressureRemaining / 4) + 1;
+        carryoverAdded = Math.floor(finalConsequence / 2) + Math.ceil(pressureRemaining / 4) + 1;
     } else {
         outcome = 'catastrophic';
         flavorCategory = 'thresholdExceeded';
         essenceGained = 0;
-        carryoverAdded = finalConsequence + Math.ceil(pressureRemaining / 2) + 2;
+        carryoverAdded = Math.floor(finalConsequence / 2) + Math.ceil(pressureRemaining / 2) + 2;
     }
 
     const dominantConsequenceCategory =
@@ -376,7 +376,7 @@ const buildAbilityPreview = (
 
     if (state.nextCastFree) {
         strainCost = 0;
-        notes.push('Twist Fate or threshold rupture: this cast costs 0 Strain.');
+        notes.push('Twist Fate or threshold rupture: this cast costs 0 Strain and causes 0 Consequence.');
     }
 
     if (
@@ -434,21 +434,22 @@ const buildAbilityPreview = (
     }
 
     if (ability.id === 'smite' && lastAbilityId === 'manifest') {
-        essenceDelta += 1;
+        consequenceDelta = Math.min(0, consequenceDelta);
         synergyLabel = 'Manifest -> Smite';
-        notes.push('Synergy: Smite after Manifest Presence grants +1 Essence.');
+        notes.push('Synergy: Smite after Manifest Presence causes 0 Consequence (immunity).');
     }
 
     if (ability.id === 'manifest' && lastAbilityId === 'twist') {
         strainRelief += 2;
+        pressureDelta += 2;
         synergyLabel = 'Twist -> Manifest';
-        notes.push('Synergy: Manifest Presence after Twist Fate reduces Strain by 2.');
+        notes.push('Synergy: Manifest Presence after Twist Fate reduces Strain by 2 and gains +2 Pressure.');
     }
 
     if (ability.id === 'twist' && lastAbilityId === 'smite') {
         willGrantFreeCast = true;
         synergyLabel = 'Smite -> Twist';
-        notes.push('Synergy: next ability will cost 0 Strain.');
+        notes.push('Synergy: next ability will cost 0 Strain and cause 0 Consequence.');
     }
 
     if (ability.id === 'condemn' && lastAbilityId === 'witness') {
@@ -458,9 +459,10 @@ const buildAbilityPreview = (
     }
 
     if (ability.id === 'absolve' && lastAbilityId === 'condemn') {
-        consequenceDelta -= 2;
+        consequenceDelta -= 4;
+        essenceDelta += 1;
         synergyLabel = synergyLabel ?? 'Condemn -> Absolve';
-        notes.push('Synergy: Absolve after Condemn reduces Consequence by an extra 2.');
+        notes.push('Synergy: Absolve after Condemn reduces Consequence by an extra 4 and grants +1 Essence.');
     }
 
     if ((ability.id === 'stifle' || ability.id === 'supplicate') && lastAbilityId === 'manifest') {
@@ -480,6 +482,10 @@ const buildAbilityPreview = (
         pressureDelta += 1;
         essenceDelta += 1;
         notes.push('Doctrine of Revelation: essence abilities gain +1 Pressure and +1 Essence.');
+    }
+
+    if (state.nextCastFree) {
+        consequenceDelta = Math.min(0, consequenceDelta);
     }
 
     if (consequenceDelta > 0) {

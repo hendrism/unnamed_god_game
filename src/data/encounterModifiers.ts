@@ -29,12 +29,13 @@ export const ENCOUNTER_MODIFIERS: EncounterModifier[] = [
     {
         id: 'devout-crowd',
         name: 'Devout Crowd',
-        description: 'They arrived pre-kneeling. You appreciate competent mortals.',
+        description: 'They arrived pre-kneeling. Manifest commands carry twice the weight here.',
         effects: {
             abilityEffects: [
                 {
                     abilityId: 'manifest',
-                    essenceDelta: 1,
+                    pressureDelta: 2,
+                    essenceDelta: 2,
                 },
             ],
         },
@@ -70,13 +71,13 @@ export const ENCOUNTER_MODIFIERS: EncounterModifier[] = [
     {
         id: 'penitent-procession',
         name: 'Penitent Procession',
-        description: 'A line of confessors waits patiently for absolution and administrative closure.',
+        description: 'Forgiveness flows like water here. Absolve cleanses consequence completely.',
         effects: {
             abilityEffects: [
                 {
                     abilityId: 'absolve',
-                    consequenceDelta: -2,
-                    essenceDelta: 1,
+                    consequenceDelta: -4,
+                    essenceDelta: 2,
                 },
             ],
         },
@@ -84,13 +85,13 @@ export const ENCOUNTER_MODIFIERS: EncounterModifier[] = [
     {
         id: 'tribunal-square',
         name: 'Tribunal Square',
-        description: 'Everyone brought witnesses, accusations, and snacks. Judgment scales efficiently here.',
+        description: 'Judgment delivered here resonates across districts. Condemn becomes devastating.',
         effects: {
             abilityEffects: [
                 {
                     abilityId: 'condemn',
-                    pressureDelta: 2,
-                    consequenceDelta: 1,
+                    pressureDelta: 4,
+                    consequenceDelta: -1,
                 },
             ],
         },
@@ -157,17 +158,17 @@ export const ENCOUNTER_MODIFIERS: EncounterModifier[] = [
     {
         id: 'midnight-vigil',
         name: 'Midnight Vigil',
-        description: 'Lantern-lit witnesses record everything in exacting detail. Terrific morale, terrible spontaneity.',
+        description: 'Observation becomes power itself. Witness generates essence; force becomes amplified.',
         effects: {
             abilityEffects: [
                 {
                     abilityId: 'witness',
                     strainCostDelta: -1,
-                    essenceDelta: 1,
+                    essenceDelta: 3,
                 },
                 {
                     abilityId: 'smite',
-                    pressureDelta: -1,
+                    pressureDelta: 3,
                 },
             ],
         },
