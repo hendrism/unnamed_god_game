@@ -58,8 +58,8 @@ export const GoalsBanner = ({ encounter, runEssence, totalEssence }: GoalsBanner
 
     return (
         <div className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-            {/* Turn counter moved above goals */}
-            <div className={`text-center mb-2 text-xs ${getTurnColor()}`}>
+            {/* Turn counter moved above goals - more prominent */}
+            <div className={`text-center mb-2 text-sm font-bold ${getTurnColor()}`}>
                 Turn {encounter.turn} / {encounter.turnLimit}
                 {turnsLeft === 1 && <span className="ml-2 animate-pulse">⏰ FINAL TURN!</span>}
             </div>
@@ -101,18 +101,26 @@ export const GoalsBanner = ({ encounter, runEssence, totalEssence }: GoalsBanner
                     </div>
                 </div>
 
-                {/* Essence (Run Progress) */}
+                {/* Essence - clearer display */}
                 <div className="border-2 rounded-lg p-2 sm:p-4 text-center transition-all overflow-hidden border-mythic-gold/50 text-mythic-gold">
                     <div className="text-[9px] sm:text-xs uppercase tracking-wider text-gray-400 mb-1 truncate">
-                        Essence (This Run)
+                        Essence
                     </div>
                     <div className="text-2xl sm:text-4xl font-bold mb-0.5 sm:mb-1">
                         {runEssence}
                         <span className="text-sm sm:text-lg opacity-50"> / 15</span>
                     </div>
-                    <div className="text-[9px] sm:text-xs opacity-70 mb-1 sm:mb-2 leading-tight">
-                        {upgradesAvailable > 0 && <span className="text-green-400">{upgradesAvailable} upgrade{upgradesAvailable > 1 ? 's' : ''} ready!</span>}
-                        {upgradesAvailable === 0 && <span>{UPGRADE_COST - essenceProgress} more for upgrade</span>}
+                    <div className="text-[9px] sm:text-xs opacity-70 mb-1 leading-tight">
+                        this run (max 15)
+                    </div>
+                    <div className="text-[9px] sm:text-xs font-semibold mb-1 leading-tight">
+                        {upgradesAvailable > 0 && <span className="text-green-400">🎁 {upgradesAvailable} upgrade{upgradesAvailable > 1 ? 's' : ''} ready!</span>}
+                        {upgradesAvailable === 0 && (
+                            <span>
+                                Bank: {totalEssence} / 18
+                                <span className="opacity-60"> ({UPGRADE_COST - essenceProgress} more)</span>
+                            </span>
+                        )}
                     </div>
                     <div className="w-full bg-gray-800 rounded-full h-1.5 sm:h-2 overflow-hidden">
                         <div
