@@ -196,18 +196,33 @@ export const GameView = () => {
                     Choose one ability before the first intervention.
                 </p>
 
-                {/* Starting Abilities */}
+                {/* Starting Abilities - Now with Stats! */}
                 <div className="w-full max-w-xl bg-gray-900 border border-gray-700 rounded-lg p-4 mb-2">
                     <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Starting Arsenal</p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {abilities.map((ability) => (
-                            <span
+                            <div
                                 key={ability.id}
-                                className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-800 border border-gray-700 text-gray-300"
+                                className="bg-black/40 border border-gray-800 rounded p-3"
                             >
-                                {ability.name}
-                                <span className="ml-2 text-[10px] text-gray-500">({ability.category})</span>
-                            </span>
+                                <p className="text-sm text-gray-200 font-semibold mb-1">{ability.name}</p>
+                                <div className="space-y-0.5 text-[10px] text-gray-500">
+                                    <div className="flex justify-between">
+                                        <span>Pressure</span>
+                                        <span className="text-red-400">-{ability.basePressure}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Consequence</span>
+                                        <span className={ability.baseConsequence > 0 ? 'text-void-purple' : 'text-green-400'}>
+                                            {ability.baseConsequence > 0 ? '+' : ''}{ability.baseConsequence}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Strain</span>
+                                        <span className="text-blue-400">{ability.baseStrainCost}</span>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -217,15 +232,30 @@ export const GameView = () => {
                         Foresight: Encounter Mix This Run
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {runForecast.map((entry) => (
-                            <div
-                                key={entry.templateId}
-                                className="bg-black/40 border border-gray-800 rounded p-2"
-                            >
-                                <p className="text-sm text-gray-200">{entry.title}</p>
-                                <p className="text-xs text-gray-500">{entry.count} projected</p>
-                            </div>
-                        ))}
+                        {runForecast.map((entry) => {
+                            // Encounter difficulty info to help choose fragments
+                            const encounterInfo: Record<string, { difficulty: string; note: string }> = {
+                                shrine: { difficulty: 'Easy', note: 'Best essence rewards' },
+                                storm: { difficulty: 'Medium', note: 'Balanced challenge' },
+                                prayers: { difficulty: 'Medium', note: 'Average pressure' },
+                                rebellion: { difficulty: 'Hard', note: 'High consequences' },
+                                blight: { difficulty: 'Very Hard', note: 'Highest pressure' },
+                            };
+                            const info = encounterInfo[entry.templateId] || { difficulty: '?', note: '' };
+
+                            return (
+                                <div
+                                    key={entry.templateId}
+                                    className="bg-black/40 border border-gray-800 rounded p-2"
+                                >
+                                    <p className="text-sm text-gray-200">{entry.title}</p>
+                                    <div className="flex justify-between items-center mt-1">
+                                        <p className="text-xs text-gray-500">{entry.count} projected</p>
+                                        <p className="text-[10px] text-gray-400 italic">{info.note}</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -247,15 +277,21 @@ export const GameView = () => {
                             <div className="w-full space-y-1 mb-4 text-xs text-gray-500">
                                 <div className="flex justify-between">
                                     <span>Pressure</span>
-                                    <span className="text-gray-300">{ability.basePressure}</span>
+                                    <span className="text-red-400">-{ability.basePressure}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Consequence</span>
+                                    <span className={ability.baseConsequence > 0 ? 'text-void-purple' : ability.baseConsequence < 0 ? 'text-green-400' : 'text-gray-300'}>
+                                        {ability.baseConsequence > 0 ? '+' : ''}{ability.baseConsequence}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Strain Cost</span>
-                                    <span className="text-gray-300">{ability.baseStrainCost}</span>
+                                    <span className="text-blue-400">{ability.baseStrainCost}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Essence</span>
-                                    <span className="text-gray-300">+{ability.baseEssence}</span>
+                                    <span className="text-mythic-gold">+{ability.baseEssence}</span>
                                 </div>
                             </div>
 
