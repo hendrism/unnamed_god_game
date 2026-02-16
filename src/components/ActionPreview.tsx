@@ -25,13 +25,26 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
             <div className="space-y-4 mb-8">
                 <div className="bg-black/40 p-3 rounded border border-gray-800 flex justify-between items-center">
                     <span className="text-sm text-red-400 uppercase tracking-wider">Pressure Impact</span>
-                    <span className="text-lg font-bold text-gray-200">-{preview.pressureDelta}</span>
+                    <div className="text-right">
+                        {preview.basePressure !== preview.pressureDelta ? (
+                            <span className="text-lg font-bold text-gray-200">
+                                <span className="text-gray-500 line-through text-sm">{preview.basePressure}</span>
+                                {' → '}
+                                <span className="text-red-400">-{preview.pressureDelta}</span>
+                            </span>
+                        ) : (
+                            <span className="text-lg font-bold text-gray-200">-{preview.pressureDelta}</span>
+                        )}
+                    </div>
                 </div>
 
                 <div className="bg-black/40 p-3 rounded border border-gray-800 flex justify-between items-center">
                     <span className="text-sm text-blue-400 uppercase tracking-wider">Strain Cost</span>
                     <div className="text-right">
                         <span className="text-lg font-bold text-gray-200 block">
+                            {preview.baseStrainCost !== preview.strainCost && (
+                                <span className="text-gray-500 line-through text-sm">{preview.baseStrainCost} → </span>
+                            )}
                             {preview.strainCost} <span className="text-gray-500 text-xs">→</span> {preview.projectedStrain}
                         </span>
                         <span className={`text-[10px] uppercase ${preview.projectedStrainLevel === 'Critical' ? 'text-strain-red animate-pulse' :
@@ -42,12 +55,42 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                     </div>
                 </div>
 
-                {preview.consequenceDelta !== 0 && (
-                    <div className="bg-black/40 p-3 rounded border border-gray-800 flex justify-between items-center">
+                <div className="bg-black/40 p-3 rounded border border-gray-800 flex justify-between items-center">
+                    <span className="text-sm text-mythic-gold uppercase tracking-wider">Essence Gain</span>
+                    <div className="text-right">
+                        {preview.baseEssence !== preview.essenceDelta ? (
+                            <span className="text-lg font-bold text-gray-200">
+                                <span className="text-gray-500 line-through text-sm">{preview.baseEssence}</span>
+                                {' → '}
+                                <span className="text-mythic-gold">+{preview.essenceDelta}</span>
+                            </span>
+                        ) : (
+                            <span className="text-lg font-bold text-gray-200">+{preview.essenceDelta}</span>
+                        )}
+                    </div>
+                </div>
+
+                {(preview.consequenceDelta !== 0 || preview.baseConsequence !== preview.consequenceDelta) && (
+                    <div className={`bg-black/40 p-3 rounded border ${preview.willExceedThreshold ? 'border-strain-red' : 'border-gray-800'} flex justify-between items-center`}>
                         <span className="text-sm text-void-purple uppercase tracking-wider">Consequence</span>
-                        <span className="text-lg font-bold text-gray-200">
-                            {preview.consequenceDelta > 0 ? '+' : ''}{preview.consequenceDelta}
-                        </span>
+                        <div className="text-right">
+                            {preview.baseConsequence !== preview.consequenceDelta ? (
+                                <span className="text-lg font-bold">
+                                    <span className="text-gray-500 line-through text-sm">{preview.baseConsequence > 0 ? '+' : ''}{preview.baseConsequence}</span>
+                                    {' → '}
+                                    <span className={preview.willExceedThreshold ? 'text-strain-red' : 'text-gray-200'}>
+                                        {preview.consequenceDelta > 0 ? '+' : ''}{preview.consequenceDelta}
+                                    </span>
+                                </span>
+                            ) : (
+                                <span className={`text-lg font-bold ${preview.willExceedThreshold ? 'text-strain-red' : 'text-gray-200'}`}>
+                                    {preview.consequenceDelta > 0 ? '+' : ''}{preview.consequenceDelta}
+                                </span>
+                            )}
+                            {preview.willExceedThreshold && (
+                                <div className="text-[10px] text-strain-red uppercase mt-1 animate-pulse">⚠ THRESHOLD</div>
+                            )}
+                        </div>
                     </div>
                 )}
 
