@@ -365,29 +365,51 @@ export const GameView = () => {
                     <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                         {upgradeOptions.map((upgrade) => {
                             const canAfford = essence >= upgrade.cost;
+                            const isStrength = upgrade.category === 'strength';
                             return (
                                 <div
                                     key={upgrade.id}
-                                    className="bg-gray-900 border border-gray-700 rounded-lg p-4 text-left"
+                                    className={`rounded-lg p-5 text-left border-2 ${
+                                        isStrength
+                                            ? 'bg-gradient-to-br from-blue-950/40 to-gray-900 border-blue-700/50'
+                                            : 'bg-gradient-to-br from-purple-950/40 to-gray-900 border-purple-700/50'
+                                    }`}
                                 >
-                                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">
-                                        {upgrade.category === 'strength'
-                                            ? 'Strength Upgrade'
-                                            : 'World-Shaping Upgrade'}
-                                    </p>
-                                    <h3 className="font-display text-xl text-mythic-gold mb-2">
+                                    <div className={`inline-block px-2 py-1 rounded text-[10px] uppercase tracking-widest font-bold mb-2 ${
+                                        isStrength
+                                            ? 'bg-blue-900/50 text-blue-300 border border-blue-700/30'
+                                            : 'bg-purple-900/50 text-purple-300 border border-purple-700/30'
+                                    }`}>
+                                        {isStrength ? '⚔️ Power' : '🌍 World'}
+                                    </div>
+                                    <h3 className="font-display text-2xl text-mythic-gold mb-2">
                                         {upgrade.name}
                                     </h3>
-                                    <p className="text-sm text-gray-300 mb-4">{upgrade.description}</p>
-                                    <p className="text-xs text-gray-500 mb-4">
+                                    <p className="text-base text-gray-200 mb-3 leading-relaxed">{upgrade.description}</p>
+
+                                    {/* Strategic context */}
+                                    <div className={`text-xs mb-4 p-2 rounded border ${
+                                        isStrength
+                                            ? 'bg-blue-950/30 border-blue-800/30 text-blue-200'
+                                            : 'bg-purple-950/30 border-purple-800/30 text-purple-200'
+                                    }`}>
+                                        <span className="font-semibold">Strategy: </span>
+                                        {isStrength ? (
+                                            'Makes you stronger each encounter'
+                                        ) : (
+                                            'Changes the types of challenges you face'
+                                        )}
+                                    </div>
+
+                                    <p className="text-sm text-gray-400 mb-4 font-semibold">
                                         Cost: {upgrade.cost} Essence
                                     </p>
                                     <button
                                         onClick={() => selectUpgrade(upgrade.id)}
                                         disabled={!canAfford}
-                                        className={`w-full px-4 py-2 rounded font-semibold transition-all ${
+                                        className={`w-full px-4 py-3 rounded font-semibold transition-all text-base ${
                                             canAfford
-                                                ? 'bg-void-purple text-white hover:bg-void-purple-dark'
+                                                ? 'bg-mythic-gold text-black hover:bg-yellow-400 shadow-lg'
                                                 : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                                         }`}
                                     >
