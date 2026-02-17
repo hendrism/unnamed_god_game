@@ -27,6 +27,22 @@ export const STRENGTH_UPGRADES: Upgrade[] = [
         cost: UPGRADE_COST,
         maxStrainBonus: 3,
     },
+    {
+        id: 'lingering-authority',
+        name: 'Lingering Authority',
+        description: 'Your presence echoes forward. Reduces carryover instability by 4 at the start of each new encounter.',
+        category: 'strength',
+        cost: UPGRADE_COST,
+        carryoverDecayBonus: 4,
+    },
+    {
+        id: 'resonant-chains',
+        name: 'Resonant Chains',
+        description: 'Synergies accumulate power. Each triggered synergy grants +1 Essence.',
+        category: 'strength',
+        cost: UPGRADE_COST,
+        synergyEssenceBonus: 1,
+    },
 ];
 
 export const WORLD_UPGRADES: Upgrade[] = [
@@ -60,6 +76,50 @@ export const WORLD_UPGRADES: Upgrade[] = [
         cost: UPGRADE_COST,
         encounterWeightDelta: {
             encounterId: 'rebellion',
+            amount: 2,
+        },
+    },
+    {
+        id: 'drought-dominion',
+        name: 'Drought Dominion',
+        description: 'Sanctioned Drought encounters appear more often. (Lower essence but builds consequence slowly)',
+        category: 'world',
+        cost: UPGRADE_COST,
+        encounterWeightDelta: {
+            encounterId: 'drought',
+            amount: 2,
+        },
+    },
+    {
+        id: 'miracle-watch',
+        name: 'Miracle Watch',
+        description: 'Surplus of Miracles encounters appear more often. (Fast rewards, tight consequence threshold)',
+        category: 'world',
+        cost: UPGRADE_COST,
+        encounterWeightDelta: {
+            encounterId: 'miracles',
+            amount: 2,
+        },
+    },
+    {
+        id: 'philosopher-silence',
+        name: "Philosopher's Silence",
+        description: 'Reasonable Philosopher encounters appear more often. (Lower reward, manageable if handled cleanly)',
+        category: 'world',
+        cost: UPGRADE_COST,
+        encounterWeightDelta: {
+            encounterId: 'heresy',
+            amount: 2,
+        },
+    },
+    {
+        id: 'mountain-accord',
+        name: 'Mountain Accord',
+        description: 'Geological Opinion encounters appear more often. (Hardest encounters, 2 essence/turn)',
+        category: 'world',
+        cost: UPGRADE_COST,
+        encounterWeightDelta: {
+            encounterId: 'volcano',
             amount: 2,
         },
     },

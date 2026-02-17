@@ -39,6 +39,8 @@ const DEFAULT_STRENGTH_BONUSES: StrengthBonuses = {
     firstCastStrainReduction: 0,
     firstCastEssenceBonus: 0,
     maxStrainBonus: 0,
+    carryoverDecayBonus: 0,
+    synergyEssenceBonus: 0,
 };
 
 const DEFAULT_WORLD_WEIGHTS: Record<string, number> = ENCOUNTER_TEMPLATES.reduce(
@@ -66,6 +68,10 @@ const EMPTY_ABILITY_USAGE: Record<AbilityId, number> = {
     edict: 0,
     supplicate: 0,
     rift: 0,
+    ordain: 0,
+    invoke: 0,
+    unravel: 0,
+    coerce: 0,
 };
 
 const randomInt = (min: number, max: number) =>
@@ -318,17 +324,17 @@ const createEncounterResolution = (
     if (dominantConsequenceCategory === 'smite') {
         carryoverAdded += 1;
         consequenceAftermath =
-            'SMITE aftermath: fear spreads and refugees flee into nearby districts (+1 carryover).';
+            'Smite aftermath: the righteous fear you inspired has spread into neighboring districts. You consider this bonus coverage.';
     } else if (dominantConsequenceCategory === 'manifest') {
         carryoverAdded += 1;
         essenceGained += 1;
         consequenceAftermath =
-            'MANIFEST aftermath: zealot demands intensify (+1 carryover, +1 essence).';
+            'Manifest aftermath: your followers have become emphatic. This is their decision to manage.';
     } else if (dominantConsequenceCategory === 'twist') {
         const fractureOverflow = randomInt(0, 2);
         carryoverAdded += fractureOverflow;
         essenceGained += 1;
-        consequenceAftermath = `TWIST aftermath: reality fractures unpredictably (+${fractureOverflow} carryover, +1 essence).`;
+        consequenceAftermath = `Twist aftermath: reality has formed strong opinions about what you did. The details remain under review.`;
     }
 
     const flavorText = randomFrom(RESOLUTION_OUTCOMES[flavorCategory]);
@@ -376,7 +382,7 @@ const buildAbilityPreview = (
 
     if (state.nextCastFree) {
         strainCost = 0;
-        notes.push('Twist Fate or threshold rupture: this cast costs 0 Strain and causes 0 Consequence.');
+        notes.push('Rupture in effect: this cast is free. The cosmos is being cooperative.');
     }
 
     if (
@@ -413,17 +419,17 @@ const buildAbilityPreview = (
 
     if (state.doctrine?.id === 'dominion' && ability.basePressure > 0 && strainCost > 0) {
         strainCost = Math.max(0, strainCost - 1);
-        notes.push('Doctrine of Dominion: pressure abilities cost 1 less Strain.');
+        notes.push('Dominion passive: force is discounted. This is correct and expected.');
     }
     strainCost = Math.max(0, strainCost);
 
     if (repeatedPowerBonus > 0) {
         notes.push(
-            `Escalation: ${ability.name} gains +${repeatedPowerBonus} Pressure from repeated use.`
+            `Repetition: ${ability.name} has grown accustomed to being deployed. +${repeatedPowerBonus} Pressure.`
         );
     }
     if (abilityModifier) {
-        notes.push(`${encounter.modifierName} alters ${ability.name} in this district.`);
+        notes.push(`${encounter.modifierName}: local conditions affect ${ability.name}.`);
     }
 
     if (firstCastThisEncounter && state.strengthBonuses.firstCastEssenceBonus > 0) {
@@ -478,10 +484,35 @@ const buildAbilityPreview = (
         notes.push('Synergy: Open Rift after Twist Fate adds +1 Pressure and +1 Consequence.');
     }
 
+    if (ability.id === 'ordain' && lastAbilityId === 'manifest') {
+        essenceDelta += 2;
+        synergyLabel = synergyLabel ?? 'Manifest -> Ordain';
+        notes.push('Synergy: Ordain after Manifest Presence grants +2 Essence. Legitimacy is lucrative.');
+    }
+
+    if (ability.id === 'invoke' && lastAbilityId === 'witness') {
+        pressureDelta += 1;
+        consequenceDelta -= 2;
+        synergyLabel = synergyLabel ?? 'Witness -> Invoke';
+        notes.push('Synergy: Invoke after Witness converts observation into +1 Pressure and -2 Consequence.');
+    }
+
+    if (ability.id === 'unravel' && lastAbilityId === 'smite') {
+        consequenceDelta -= 3;
+        synergyLabel = synergyLabel ?? 'Smite -> Unravel';
+        notes.push('Synergy: Unravel after Smite revises the aftermath. -3 Consequence.');
+    }
+
+    if (ability.id === 'coerce' && lastAbilityId === 'ordain') {
+        pressureDelta += 3;
+        synergyLabel = synergyLabel ?? 'Ordain -> Coerce';
+        notes.push('Synergy: Coerce after Ordain backs the mandate with force. +3 Pressure.');
+    }
+
     if (state.doctrine?.id === 'revelation' && ability.baseEssence > 0) {
         pressureDelta += 1;
         essenceDelta += 1;
-        notes.push('Doctrine of Revelation: essence abilities gain +1 Pressure and +1 Essence.');
+        notes.push('Revelation passive: presence compounds into pressure and tribute.');
     }
 
     if (state.nextCastFree) {
@@ -491,20 +522,20 @@ const buildAbilityPreview = (
     if (consequenceDelta > 0) {
         if (ability.category === 'smite') {
             consequenceDelta += 1;
-            notes.push('SMITE consequence: fear spreads (+1 Consequence).');
+            notes.push('Smite consequence: the fear has spread further than planned. You had a plan.');
         } else if (ability.category === 'manifest') {
             consequenceDelta += 1;
             essenceDelta += 1;
-            notes.push('MANIFEST consequence: zealot demands rise (+1 Consequence, +1 Essence).');
+            notes.push('Manifest consequence: the devout have become demanding. Their faith is excessive.');
         } else if (ability.category === 'twist') {
             consequenceDelta += 1;
             const fractureHitsPressure = encounter.turn % 2 === 1;
             if (fractureHitsPressure) {
                 pressureDelta += 1;
-                notes.push('TWIST consequence: reality fracture surges into pressure (+1 Pressure, +1 Consequence).');
+                notes.push('Twist consequence: reality fractures. Additional pressure surfaces, unannounced.');
             } else {
                 essenceDelta += 1;
-                notes.push('TWIST consequence: reality fracture leaks power (+1 Essence, +1 Consequence).');
+                notes.push('Twist consequence: reality fractures. Power escapes through the gap.');
             }
         }
     }
@@ -522,7 +553,7 @@ const buildAbilityPreview = (
         essenceDelta -= THRESHOLD_PENALTY_ESSENCE;
         if (willTriggerThresholdRupture) {
             essenceDelta += THRESHOLD_RUPTURE_ESSENCE;
-            notes.push('Threshold rupture: +1 Essence and your next cast becomes free.');
+            notes.push('Threshold ruptured: something gave way. Take the bonus and the free cast.');
         }
         notes.push(
             `Threshold breached: +${THRESHOLD_PENALTY_STRAIN} Strain and -${THRESHOLD_PENALTY_ESSENCE} Essence.`
@@ -534,16 +565,16 @@ const buildAbilityPreview = (
     // STRAIN PENALTY: Higher strain = sloppier interventions = more consequences
     if (projectedStrainLevel === 'Medium') {
         consequenceDelta += 5;
-        notes.push('⚡ Strain Penalty (Medium): +5 Consequence.');
+        notes.push('Strain (Medium): the intervention grows sloppy. +5 Consequence.');
     } else if (projectedStrainLevel === 'High') {
         consequenceDelta += 8;
         essenceDelta -= 1;
-        notes.push('⚡ Strain Penalty (High): +8 Consequence, -1 Essence.');
+        notes.push('Strain (High): divine overreach. The execution suffers. +8 Consequence, -1 Essence.');
     } else if (projectedStrainLevel === 'Critical') {
         consequenceDelta += 12;
         essenceDelta -= 1;
         pressureDelta = Math.max(0, pressureDelta - 5);
-        notes.push('⚡ Strain Penalty (CRITICAL): +12 Consequence, -1 Essence, -5 Pressure.');
+        notes.push('Strain (Critical): the god is pushing too hard. Reality is resisting. +12 Consequence, -1 Essence, -5 Pressure.');
     }
 
     pressureDelta = Math.max(0, pressureDelta);
@@ -554,7 +585,7 @@ const buildAbilityPreview = (
 
     if (willExceedThreshold && !encounter.thresholdExceeded) {
         notes.push(
-            `WARNING: This will exceed the consequence threshold (${encounter.consequenceThreshold}).`
+            'Warning: this will exceed the consequence threshold. The cosmos will file a complaint.'
         );
     }
 
@@ -733,9 +764,9 @@ export const useGameStore = create<GameState>()(
                                     ...updatedEncounterAbilityIds,
                                     picked.id,
                                 ];
-                                lastResolution = `${picked.name} absorbed. It is available immediately.`;
+                                lastResolution = `${picked.name} reclaimed. Deploy it at your earliest inconvenience.`;
                             } else {
-                                lastResolution = `${picked.name} absorbed. It joins your arsenal for future encounters.`;
+                                lastResolution = `${picked.name} reclaimed. It will be useful when the time is appropriate.`;
                             }
                         }
                     }
@@ -776,9 +807,13 @@ export const useGameStore = create<GameState>()(
                     const templateId =
                         state.runEncounterQueue[state.encountersCompleted] ??
                         pickEncounterTemplateId(state.worldWeights);
+                    const adjustedCarryover = Math.max(
+                        0,
+                        state.carryOverInstability - state.strengthBonuses.carryoverDecayBonus
+                    );
                     const nextEncounter = createEncounter(
                         templateId,
-                        state.carryOverInstability
+                        adjustedCarryover
                     );
 
                     set({
@@ -878,6 +913,10 @@ export const useGameStore = create<GameState>()(
                         ? `${preview.synergyLabel} x${synergyStreak}`
                         : '';
 
+                    const synergyBonus = (preview.synergyLabel && state.strengthBonuses.synergyEssenceBonus > 0)
+                        ? state.strengthBonuses.synergyEssenceBonus
+                        : 0;
+
                     if (thresholdRuptureTriggered) {
                         lastResolution += ' Threshold rupture grants your next cast for free.';
                     }
@@ -923,7 +962,7 @@ export const useGameStore = create<GameState>()(
 
                     if (thresholdExceededNow && !encounterEndsNow) {
                         lastResolution +=
-                            ' Consequence threshold exceeded; reality objects in writing.';
+                            ' Consequence threshold breached. Reality has lodged a formal objection.';
                     }
 
                     if (!encounterEndsNow && castsThisEncounter % CASTS_PER_BOON === 0) {
@@ -940,7 +979,7 @@ export const useGameStore = create<GameState>()(
                     const resolutionEssence = lastEncounterResolution?.essenceGained ?? 0;
                     const totalEssenceGain = Math.max(
                         0,
-                        preview.essenceDelta + resolutionEssence
+                        preview.essenceDelta + resolutionEssence + synergyBonus
                     );
                     const currentStrain = Math.max(0, strainAfterAction);
                     const strainLevel = calculateStrainLevel(currentStrain, state.maxStrain);
@@ -1004,6 +1043,12 @@ export const useGameStore = create<GameState>()(
                     }
                     if (upgrade.maxStrainBonus) {
                         nextStrengthBonuses.maxStrainBonus += upgrade.maxStrainBonus;
+                    }
+                    if (upgrade.carryoverDecayBonus) {
+                        nextStrengthBonuses.carryoverDecayBonus += upgrade.carryoverDecayBonus;
+                    }
+                    if (upgrade.synergyEssenceBonus) {
+                        nextStrengthBonuses.synergyEssenceBonus += upgrade.synergyEssenceBonus;
                     }
                     if (upgrade.encounterWeightDelta) {
                         const { encounterId, amount } = upgrade.encounterWeightDelta;

@@ -10,7 +10,11 @@ export type AbilityId =
     | 'stifle'
     | 'edict'
     | 'supplicate'
-    | 'rift';
+    | 'rift'
+    | 'ordain'
+    | 'invoke'
+    | 'unravel'
+    | 'coerce';
 export type AbilityCategory = 'smite' | 'manifest' | 'twist';
 export type DoctrineId = 'dominion' | 'revelation';
 export type UpgradeCategory = 'strength' | 'world';
@@ -104,6 +108,8 @@ export interface Upgrade {
     firstCastStrainReduction?: number;
     firstCastEssenceBonus?: number;
     maxStrainBonus?: number;
+    carryoverDecayBonus?: number;
+    synergyEssenceBonus?: number;
     encounterWeightDelta?: {
         encounterId: string;
         amount: number;
@@ -114,6 +120,8 @@ export interface StrengthBonuses {
     firstCastStrainReduction: number;
     firstCastEssenceBonus: number;
     maxStrainBonus: number;
+    carryoverDecayBonus: number;
+    synergyEssenceBonus: number;
 }
 
 export interface AbilityPreview {

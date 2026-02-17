@@ -6,6 +6,8 @@ export const RESOLUTION_OUTCOMES = {
         'Crisis resolved with precision. Any scorch marks are ceremonial.',
         'Reality complied immediately. Finally, proper workplace behavior.',
         'A clean decree, elegantly delivered. The panic appears optional.',
+        'Perfect outcome. You are unsurprised. You were never worried.',
+        'Intervention complete. Even the affected parties seem impressed, briefly.',
     ],
     partialSuccess: [
         'Acceptable outcome. The survivors seem ungrateful.',
@@ -14,6 +16,8 @@ export const RESOLUTION_OUTCOMES = {
         'Good enough for now. File this under ongoing excellence.',
         'The damage is localized, which is functionally mercy.',
         'The realm persists. Please direct applause to the nearest shrine.',
+        'Partial resolution. The remainder will sort itself out. Probably.',
+        'Managed. Not elegantly, but the definition of elegance is flexible.',
     ],
     barelySucceeded: [
         'Technically successful. The screaming will subside eventually.',
@@ -22,6 +26,8 @@ export const RESOLUTION_OUTCOMES = {
         'Success recorded. Side effects remain under enthusiastic review.',
         'The crisis blinked first. Barely, but that still counts.',
         'Intervention complete. The paperwork may describe this as a miracle.',
+        'A victory, broadly defined. You stand by this definition.',
+        'Resolved. The margin was a stylistic choice.',
     ],
     lowConsequence: [
         'Clean intervention. Reality accepted your decree with minimal complaint.',
@@ -30,6 +36,8 @@ export const RESOLUTION_OUTCOMES = {
         'Efficient work. Even causality appears cooperative.',
         'Low consequence profile confirmed. You were gentle, by your standards.',
         'A tidy miracle. The auditors will be disappointed.',
+        'Consequence well managed. The god shows restraint. Briefly.',
+        'Neat resolution. The region will recover before anyone compiles a report.',
     ],
     highConsequence: [
         'The district survives. The neighboring districts have questions.',
@@ -38,6 +46,8 @@ export const RESOLUTION_OUTCOMES = {
         'Results are positive overall, assuming a flexible definition of local.',
         'The objective was met. The aftermath is merely energetic.',
         'High consequence registered. Please file all complaints with destiny.',
+        "Crisis handled. The ripples are someone else's jurisdiction.",
+        'The intervention landed. So did everything adjacent to the intervention.',
     ],
     thresholdExceeded: [
         'Reality rejected your proposal. This is a learning opportunity.',
@@ -46,5 +56,7 @@ export const RESOLUTION_OUTCOMES = {
         'The intervention spilled past approved boundaries. Efficiently.',
         'Containment failed gracefully. You will call it expansion.',
         'The world objected in writing. You declined to read it.',
+        'Threshold breached. The god considers this a strong opening position.',
+        'Excessive consequence logged. The god considers this feedback, not criticism.',
     ],
 };
