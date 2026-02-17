@@ -33,12 +33,23 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                     }
                 </h3>
                 {!debugMode && <p className="text-sm text-gray-400 italic">"{ability.flavorText}"</p>}
-                {preview.synergyLabel && (
-                    <div className="mt-2 inline-block px-3 py-1 bg-amber-900/30 border border-amber-600/50 rounded">
-                        <p className="text-xs text-amber-400">⚡ {preview.synergyLabel}</p>
-                    </div>
-                )}
             </div>
+
+            {/* Synergy Banner - More prominent */}
+            {preview.synergyLabel && (
+                <div className="mb-4 p-3 bg-gradient-to-r from-amber-900/40 to-amber-800/40 border-2 border-amber-500 rounded-lg">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                        <span className="text-amber-400 text-xl">⚡</span>
+                        <p className="text-sm font-bold text-amber-300 uppercase tracking-wide">{preview.synergyLabel}</p>
+                        <span className="text-amber-400 text-xl">⚡</span>
+                    </div>
+                    {preview.notes.filter(note => note.startsWith('Synergy:')).map((note, idx) => (
+                        <p key={idx} className="text-sm text-amber-200 text-center">
+                            {note.replace('Synergy: ', '')}
+                        </p>
+                    ))}
+                </div>
+            )}
 
             <div className="space-y-2 mb-6">
                 {/* 1. PRESSURE (Goal 1) - Clearer wording */}
@@ -107,15 +118,25 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                 </div>
             </div>
 
-            {/* Simplified Notes */}
-            {preview.notes.length > 0 && (
-                <div className="mb-4 p-2 bg-blue-900/10 border border-blue-900/30 rounded">
-                    <p className="text-[10px] text-blue-300 uppercase tracking-wide mb-1">Modifiers</p>
-                    {preview.notes.map((note, idx) => (
-                        <p key={idx} className="text-xs text-blue-200">• {note}</p>
-                    ))}
-                </div>
-            )}
+            {/* Other Modifiers - Clearer display */}
+            {(() => {
+                const otherNotes = preview.notes.filter(note => !note.startsWith('Synergy:'));
+                if (otherNotes.length === 0) return null;
+
+                return (
+                    <div className="mb-4 p-3 bg-blue-900/20 border border-blue-700/50 rounded-lg">
+                        <p className="text-xs text-blue-300 uppercase tracking-wide mb-2 font-semibold">Active Modifiers</p>
+                        <div className="space-y-1.5">
+                            {otherNotes.map((note, idx) => (
+                                <div key={idx} className="flex items-start gap-2">
+                                    <span className="text-blue-400 mt-0.5 flex-shrink-0">•</span>
+                                    <p className="text-sm text-blue-100 leading-snug">{note}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
 
             <button
                 onClick={onConfirm}

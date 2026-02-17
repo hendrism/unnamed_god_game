@@ -33,7 +33,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'storm-calling',
         name: 'Storm Calling',
-        description: 'Storm encounters appear more often. (Moderate pressure, average rewards)',
+        description: 'Storm encounters appear more often. (Moderate challenge, 1 essence/turn)',
         category: 'world',
         cost: UPGRADE_COST,
         encounterWeightDelta: {
@@ -44,7 +44,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'shrine-claim',
         name: 'Shrine Claim',
-        description: 'Shrine encounters appear more often. (Lower pressure, BEST essence rewards)',
+        description: 'Shrine encounters appear more often. (Easiest encounters, 2 essence/turn)',
         category: 'world',
         cost: UPGRADE_COST,
         encounterWeightDelta: {
@@ -55,7 +55,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'zeal-incitement',
         name: 'Zeal Incitement',
-        description: 'Rebellion encounters appear more often. (Higher pressure and consequences)',
+        description: 'Rebellion encounters appear more often. (Harder + risky, but 2 essence/turn)',
         category: 'world',
         cost: UPGRADE_COST,
         encounterWeightDelta: {
