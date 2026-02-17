@@ -143,7 +143,7 @@ export const GameView = () => {
 
                 <h1 className="text-5xl font-display text-mythic-gold">FALLEN GOD</h1>
                 <p className="text-gray-400 italic max-w-xl text-center">
-                    You are a fallen god making flawless decisions with entirely unreasonable consequences.
+                    You are a fallen god making obviously correct decisions that, for some reason, keep causing problems.
                 </p>
 
                 <div className="w-full max-w-xl bg-gray-900 border border-gray-700 rounded-lg p-4 text-left">
@@ -193,7 +193,7 @@ export const GameView = () => {
                     A Fragment of Power Resurfaces
                 </h2>
                 <p className="text-gray-400 italic text-center max-w-xl">
-                    Choose one ability before the first intervention.
+                    One fragment must be reclaimed before the first crisis.
                 </p>
 
                 {/* Starting Abilities - Now with Stats! */}
@@ -431,9 +431,9 @@ export const GameView = () => {
                                     }`}>
                                         <span className="font-semibold">Strategy: </span>
                                         {isStrength ? (
-                                            'Makes you stronger each encounter'
+                                            'Increases your divine capabilities directly.'
                                         ) : (
-                                            'Changes the types of challenges you face'
+                                            'Shapes which crises you will face in future runs.'
                                         )}
                                     </div>
 
@@ -456,7 +456,7 @@ export const GameView = () => {
                         })}
                     </div>
                 ) : (
-                    <p className="text-sm text-gray-500">No new upgrades are available.</p>
+                    <p className="text-sm text-gray-500">No further refinements are available at this time.</p>
                 )}
 
                 <button
@@ -570,7 +570,7 @@ export const GameView = () => {
                         onClick={endRun}
                         className="px-4 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded hover:bg-gray-700 text-sm"
                     >
-                        End Run Early
+                        Withdraw
                     </button>
                 </div>
             </div>
