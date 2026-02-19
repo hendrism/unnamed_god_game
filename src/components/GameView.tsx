@@ -137,7 +137,7 @@ export const GameView = () => {
 
     if (phase === 'menu') {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-8 relative">
+            <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-8 relative">
                 <HelpButton />
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
@@ -185,7 +185,7 @@ export const GameView = () => {
 
     if (phase === 'draft') {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6 relative">
+            <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6 relative">
                 <HelpButton />
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
@@ -271,7 +271,7 @@ export const GameView = () => {
 
     if (phase === 'boon') {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-3xl mx-auto px-4 py-8 space-y-6 relative">
+            <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-3xl mx-auto px-4 py-8 space-y-6 relative">
                 <HelpButton />
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
@@ -348,7 +348,7 @@ export const GameView = () => {
 
     if (phase === 'upgrade') {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6 relative">
+            <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6 relative">
                 <HelpButton />
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
@@ -434,7 +434,7 @@ export const GameView = () => {
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-3 py-4 sm:p-4 flex flex-col items-center min-h-screen relative">
+        <div key={phase} className="phase-enter w-full max-w-4xl mx-auto px-3 py-4 sm:p-4 flex flex-col items-center min-h-screen relative">
             <HelpButton />
             {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
