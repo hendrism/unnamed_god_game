@@ -16,6 +16,7 @@ import type {
     DoctrineId,
     EncounterForecast,
     EncounterResolution,
+    EncounterTemplate,
     GameState,
     ResolutionOutcome,
     StrainLevel,
@@ -623,6 +624,7 @@ const INITIAL_STATE: Omit<
     | 'selectBoonAbility'
     | 'markTutorialSeen'
     | 'nextEncounter'
+    | 'selectPetition'
     | 'resetProgress'
     | 'toggleDebugMode'
 > = {
@@ -650,6 +652,7 @@ const INITIAL_STATE: Omit<
     nextCastFree: false,
     boonOptions: [],
     boonPrompt: '',
+    petitionOptions: [],
     synergyStreak: 0,
     lastSynergy: '',
     ownedUpgrades: [],
@@ -798,8 +801,39 @@ export const useGameStore = create<GameState>()(
                             nextCastFree: false,
                             boonOptions: [],
                             boonPrompt: '',
+                            petitionOptions: [],
                             synergyStreak: 0,
                             lastSynergy: '',
+                        });
+                        return;
+                    }
+
+                    // Show petition when there are 2+ encounters remaining
+                    if (state.encountersCompleted + 1 < state.encountersTarget) {
+                        const templateIdA =
+                            state.runEncounterQueue[state.encountersCompleted] ??
+                            pickEncounterTemplateId(state.worldWeights);
+                        const templateIdB = pickEncounterTemplateId(
+                            state.worldWeights,
+                            templateIdA
+                        );
+                        const petitionOptions: EncounterTemplate[] = [
+                            getEncounterTemplateById(templateIdA),
+                            getEncounterTemplateById(templateIdB),
+                        ];
+
+                        set({
+                            phase: 'petition',
+                            petitionOptions,
+                            currentEncounter: null,
+                            encounterResolved: false,
+                            castsThisEncounter: 0,
+                            nextCastFree: false,
+                            boonOptions: [],
+                            boonPrompt: '',
+                            synergyStreak: 0,
+                            lastSynergy: '',
+                            lastEncounterResolution: null,
                         });
                         return;
                     }
@@ -811,15 +845,40 @@ export const useGameStore = create<GameState>()(
                         0,
                         state.carryOverInstability - state.strengthBonuses.carryoverDecayBonus
                     );
-                    const nextEncounter = createEncounter(
-                        templateId,
-                        adjustedCarryover
-                    );
+                    const nextEnc = createEncounter(templateId, adjustedCarryover);
 
                     set({
                         phase: 'encounter',
-                        currentEncounter: nextEncounter,
+                        currentEncounter: nextEnc,
                         encounterAbilityIds: buildEncounterAbilityPool(state.abilities),
+                        upgradeOptions: [],
+                        petitionOptions: [],
+                        encounterResolved: false,
+                        castsThisEncounter: 0,
+                        nextCastFree: false,
+                        boonOptions: [],
+                        boonPrompt: '',
+                        synergyStreak: 0,
+                        lastSynergy: '',
+                        lastEncounterResolution: null,
+                    });
+                },
+
+                selectPetition: (templateId) => {
+                    const state = get();
+                    if (state.phase !== 'petition') return;
+
+                    const adjustedCarryover = Math.max(
+                        0,
+                        state.carryOverInstability - state.strengthBonuses.carryoverDecayBonus
+                    );
+                    const nextEnc = createEncounter(templateId, adjustedCarryover);
+
+                    set({
+                        phase: 'encounter',
+                        currentEncounter: nextEnc,
+                        encounterAbilityIds: buildEncounterAbilityPool(state.abilities),
+                        petitionOptions: [],
                         upgradeOptions: [],
                         encounterResolved: false,
                         castsThisEncounter: 0,
@@ -829,6 +888,7 @@ export const useGameStore = create<GameState>()(
                         synergyStreak: 0,
                         lastSynergy: '',
                         lastEncounterResolution: null,
+                        lastResolution: 'The petition has been heard. Begin the intervention.',
                     });
                 },
 
@@ -1075,6 +1135,7 @@ export const useGameStore = create<GameState>()(
                         nextCastFree: false,
                         boonOptions: [],
                         boonPrompt: '',
+                        petitionOptions: [],
                         synergyStreak: 0,
                         lastSynergy: '',
                         currentStrain: 0,
@@ -1114,6 +1175,7 @@ export const useGameStore = create<GameState>()(
                         nextCastFree: false,
                         boonOptions: [],
                         boonPrompt: '',
+                        petitionOptions: [],
                         synergyStreak: 0,
                         lastSynergy: '',
                         currentStrain: 0,
@@ -1147,6 +1209,7 @@ export const useGameStore = create<GameState>()(
                         nextCastFree: false,
                         boonOptions: [],
                         boonPrompt: '',
+                        petitionOptions: [],
                         synergyStreak: 0,
                         lastSynergy: '',
                         currentStrain: 0,
@@ -1178,7 +1241,7 @@ export const useGameStore = create<GameState>()(
             }),
             {
                 name: 'fallen-god-storage',
-                version: 4,
+                version: 5,
             }
         )
     )
