@@ -48,6 +48,7 @@ export const GameView = () => {
         hasSeenTutorial,
         endRun,
         encounterResolved,
+        castsThisEncounter,
         nextEncounter,
         toggleDebugMode,
         resetProgress,
@@ -550,16 +551,27 @@ export const GameView = () => {
                         onCancel={() => setSelectedAbilityId(null)}
                     />
                 ) : currentEncounter ? (
-                    <EncounterCard encounter={currentEncounter} resolved={encounterResolved} />
+                    <div key={currentEncounter.id} className="phase-enter w-full">
+                        <EncounterCard encounter={currentEncounter} resolved={encounterResolved} />
+                    </div>
                 ) : (
                     <div className="text-gray-500 animate-pulse">Manifesting reality...</div>
                 )}
             </div>
 
             <div className="w-full mt-auto pb-8 z-10 bg-mythic-black pt-4">
-                <h3 className="text-center text-xs text-gray-500 uppercase tracking-widest mb-2">
-                    Available Interventions
-                </h3>
+                <div className="flex items-center justify-between mb-2 px-1">
+                    <h3 className="text-xs text-gray-500 uppercase tracking-widest">
+                        Available Interventions
+                    </h3>
+                    {!encounterResolved && (
+                        <span className="text-xs text-gray-700 tracking-wide">
+                            {2 - (castsThisEncounter % 2) === 1
+                                ? 'Fragment surfaces next cast'
+                                : 'Fragment surfaces in 2 casts'}
+                        </span>
+                    )}
+                </div>
                 <AbilityBar
                     abilities={encounterAbilities}
                     selectedId={selectedAbilityId}
@@ -576,7 +588,13 @@ export const GameView = () => {
             </div>
 
             {encounterResolved && lastEncounterResolution && (
-                <ResolutionModal resolution={lastEncounterResolution} onContinue={nextEncounter} />
+                <ResolutionModal
+                    resolution={lastEncounterResolution}
+                    onContinue={nextEncounter}
+                    carryOver={carryOverInstability}
+                    encountersCompleted={encountersCompleted}
+                    encountersTarget={encountersTarget}
+                />
             )}
         </div>
     );
