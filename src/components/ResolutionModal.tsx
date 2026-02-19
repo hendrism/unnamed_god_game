@@ -3,9 +3,14 @@ import type { EncounterResolution } from '../types';
 interface ResolutionModalProps {
     resolution: EncounterResolution;
     onContinue: () => void;
+    carryOver: number;
+    encountersCompleted: number;
+    encountersTarget: number;
 }
 
-export const ResolutionModal = ({ resolution, onContinue }: ResolutionModalProps) => {
+export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersCompleted, encountersTarget }: ResolutionModalProps) => {
+    const isLastEncounter = encountersCompleted + 1 >= encountersTarget;
+    const nextEncounterNum = encountersCompleted + 2;
 
     const getOutcomeClass = () => {
         switch (resolution.outcome) {
@@ -108,16 +113,33 @@ export const ResolutionModal = ({ resolution, onContinue }: ResolutionModalProps
                 </div>
 
                 {resolution.consequenceAftermath && (
-                    <div className="mb-6 p-3 bg-purple-900/20 border border-purple-900/50 rounded">
+                    <div className="mb-4 p-3 bg-purple-900/20 border border-purple-900/50 rounded">
                         <p className="text-xs text-purple-200">{resolution.consequenceAftermath}</p>
                     </div>
                 )}
+
+                {/* Carry-forward preview */}
+                <div className="mb-6 p-3 bg-gray-800/60 border border-gray-700 rounded space-y-1">
+                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                        {isLastEncounter ? 'Run Complete' : `Proceeding to Intervention ${nextEncounterNum} of ${encountersTarget}`}
+                    </p>
+                    <div className="flex justify-between text-xs">
+                        <span className="text-gray-500">Residual Instability:</span>
+                        <span className={carryOver > 8 ? 'text-orange-400 font-semibold' : carryOver > 0 ? 'text-yellow-500' : 'text-gray-500'}>
+                            {carryOver > 0 ? `+${carryOver} starting pressure` : 'None — clean approach'}
+                        </span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                        <span className="text-gray-500">Strain:</span>
+                        <span className="text-gray-400">Carries forward unchanged</span>
+                    </div>
+                </div>
 
                 <button
                     onClick={onContinue}
                     className="w-full py-3 bg-void-purple text-white font-semibold rounded hover:bg-void-purple-dark transition-all"
                 >
-                    Continue
+                    {isLastEncounter ? 'Conclude the Session' : `Proceed to Intervention ${nextEncounterNum}`}
                 </button>
             </div>
         </div>
