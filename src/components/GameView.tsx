@@ -35,6 +35,7 @@ export const GameView = () => {
         draftOptions,
         boonOptions,
         boonPrompt,
+        petitionOptions,
         synergyStreak,
         lastSynergy,
         debugMode,
@@ -44,6 +45,7 @@ export const GameView = () => {
         skipUpgrade,
         selectDraftAbility,
         selectBoonAbility,
+        selectPetition,
         markTutorialSeen,
         hasSeenTutorial,
         endRun,
@@ -379,6 +381,54 @@ export const GameView = () => {
                 >
                     Decline Fragment
                 </button>
+            </div>
+        );
+    }
+
+    if (phase === 'petition') {
+        return (
+            <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-3xl mx-auto px-4 py-8 space-y-6 relative">
+                <HelpButton />
+                {showHelp && <HelpModal onClose={handleCloseHelp} />}
+
+                <h2 className="text-3xl font-display text-mythic-gold text-center">
+                    Petitions Await
+                </h2>
+                <p className="text-gray-400 italic text-center max-w-xl">
+                    Two matters require your divine attention. You will hear one.
+                </p>
+
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {petitionOptions.map((template) => {
+                        const isUrgent = template.basePressure > 40;
+                        return (
+                            <div
+                                key={template.id}
+                                className="flex flex-col p-5 bg-gray-900 border border-gray-700 rounded-lg text-left"
+                            >
+                                <div className={`inline-block self-start px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold mb-3 ${
+                                    isUrgent
+                                        ? 'bg-red-950/50 text-red-300 border border-red-800/40'
+                                        : 'bg-gray-800 text-gray-400 border border-gray-700'
+                                }`}>
+                                    {isUrgent ? 'Urgent' : 'Steady'}
+                                </div>
+                                <h3 className="font-display text-2xl text-gray-100 mb-2">
+                                    {template.title}
+                                </h3>
+                                <p className="text-sm text-gray-300 mb-6 flex-1">
+                                    {template.description}
+                                </p>
+                                <button
+                                    onClick={() => selectPetition(template.id)}
+                                    className="w-full px-4 py-2 bg-void-purple text-white rounded hover:bg-void-purple-dark transition-all font-semibold"
+                                >
+                                    Hear This Petition
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         );
     }

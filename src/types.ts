@@ -1,5 +1,5 @@
 export type StrainLevel = 'Low' | 'Medium' | 'High' | 'Critical';
-export type GamePhase = 'menu' | 'draft' | 'boon' | 'encounter' | 'upgrade';
+export type GamePhase = 'menu' | 'draft' | 'boon' | 'encounter' | 'upgrade' | 'petition';
 export type AbilityId =
     | 'smite'
     | 'manifest'
@@ -198,6 +198,7 @@ export interface GameState {
     nextCastFree: boolean;
     boonOptions: Ability[];
     boonPrompt: string;
+    petitionOptions: EncounterTemplate[];
     synergyStreak: number;
     lastSynergy: string;
     ownedUpgrades: string[];
@@ -215,6 +216,7 @@ export interface GameState {
     nextEncounter: () => void;
     castAbility: (abilityId: AbilityId) => void;
     getAbilityPreview: (abilityId: AbilityId) => AbilityPreview | null;
+    selectPetition: (templateId: string) => void;
     selectUpgrade: (upgradeId: string) => void;
     skipUpgrade: () => void;
     endRun: () => void;
