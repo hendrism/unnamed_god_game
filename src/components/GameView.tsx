@@ -54,10 +54,12 @@ export const GameView = () => {
         nextEncounter,
         toggleDebugMode,
         resetProgress,
+        getAbilityPreview,
     } = useGameStore();
 
     const [selectedAbilityId, setSelectedAbilityId] = useState<AbilityId | null>(null);
     const [showHelp, setShowHelp] = useState(false);
+    const [resetConfirming, setResetConfirming] = useState(false);
 
     useEffect(() => {
         if (!hasSeenTutorial && phase === 'draft' && !showHelp) {
@@ -105,18 +107,37 @@ export const GameView = () => {
         ? encounterAbilities.find((ability) => ability.id === selectedAbilityId)
         : null;
     const selectedPreview = selectedAbilityId
-        ? useGameStore.getState().getAbilityPreview(selectedAbilityId)
+        ? getAbilityPreview(selectedAbilityId)
         : null;
 
     const HelpButton = () => (
         <>
-            <button
-                onClick={resetProgress}
-                className="absolute top-4 left-4 px-3 py-1 rounded border text-xs font-bold z-40 transition-colors bg-black/50 border-gray-600 text-gray-400 hover:text-white hover:border-red-500"
-                aria-label="Reset Progress"
-            >
-                RESET
-            </button>
+            {resetConfirming ? (
+                <div className="absolute top-4 left-4 flex gap-1 z-40">
+                    <button
+                        onClick={() => { resetProgress(); setResetConfirming(false); }}
+                        className="px-3 py-1 rounded border text-xs font-bold transition-colors bg-red-900 border-red-500 text-red-200 hover:bg-red-700"
+                        aria-label="Confirm Reset"
+                    >
+                        CONFIRM
+                    </button>
+                    <button
+                        onClick={() => setResetConfirming(false)}
+                        className="px-3 py-1 rounded border text-xs font-bold transition-colors bg-black/50 border-gray-600 text-gray-400 hover:text-white"
+                        aria-label="Cancel Reset"
+                    >
+                        CANCEL
+                    </button>
+                </div>
+            ) : (
+                <button
+                    onClick={() => setResetConfirming(true)}
+                    className="absolute top-4 left-4 px-3 py-1 rounded border text-xs font-bold z-40 transition-colors bg-black/50 border-gray-600 text-gray-400 hover:text-white hover:border-red-500"
+                    aria-label="Reset Progress"
+                >
+                    RESET
+                </button>
+            )}
             <button
                 onClick={toggleDebugMode}
                 className={`absolute top-4 right-14 px-3 py-1 rounded border text-xs font-bold z-40 transition-colors ${
@@ -534,7 +555,7 @@ export const GameView = () => {
                 <div className="flex flex-col items-center flex-shrink-0">
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest">Run Progress</span>
                     <span className="text-base sm:text-lg font-bold text-white">
-                        {encountersCompleted + 1} / {encountersTarget}
+                        {Math.min(encountersCompleted + 1, encountersTarget)} / {encountersTarget}
                     </span>
                     <span className="text-[10px] text-gray-500">encounters</span>
                 </div>
@@ -558,7 +579,7 @@ export const GameView = () => {
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">
                     <p className="text-[10px] uppercase tracking-widest text-gray-500">Encounter</p>
                     <p className="text-sm text-gray-200">
-                        {encountersCompleted + 1} / {encountersTarget}
+                        {Math.min(encountersCompleted + 1, encountersTarget)} / {encountersTarget}
                     </p>
                 </div>
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">

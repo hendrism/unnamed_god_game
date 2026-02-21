@@ -5,7 +5,7 @@ export const CORE_ABILITIES: Ability[] = [
         id: 'smite',
         category: 'smite',
         name: 'Smite',
-        description: 'Strike with divine force. If used after Manifest Presence, gain +1 Essence.',
+        description: 'Strike with divine force. If used after Manifest Presence, causes 0 Consequence.',
         flavorText: 'An elegant solution to a complex problem.',
         baseStrainCost: 1,
         basePressure: 18,

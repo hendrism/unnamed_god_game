@@ -10,9 +10,9 @@ export const StrainMeter = () => {
     if (strainLevel === 'Critical') colorClass = 'bg-strain-red animate-pulse';
 
     let effectText = 'Stable: no backlash effects.';
-    if (strainLevel === 'Medium') effectText = 'Distortion: each cast adds +1 Consequence.';
-    if (strainLevel === 'High') effectText = 'Backlash: each cast adds +1 Consequence and -1 Essence.';
-    if (strainLevel === 'Critical') effectText = 'Critical Backlash: +2 Consequence, -1 Essence, and reduced Pressure.';
+    if (strainLevel === 'Medium') effectText = 'Distortion: each cast adds +5 Consequence.';
+    if (strainLevel === 'High') effectText = 'Backlash: each cast adds +8 Consequence and -1 Essence.';
+    if (strainLevel === 'Critical') effectText = 'Critical Backlash: +12 Consequence, -1 Essence, -5 Pressure.';
 
     return (
         <div className="w-full max-w-md mx-auto mb-6">

@@ -95,7 +95,7 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                 {resolution.thresholdExceeded && (
                     <div className="mb-4 p-3 bg-red-900/30 border border-red-600/50 rounded">
                         <p className="text-sm text-red-300 font-semibold">⚠ Goal 2 Failed: Consequences Breached</p>
-                        <p className="text-xs text-red-400 mt-1">Next encounter starts with higher pressure and reduced max turns.</p>
+                        <p className="text-xs text-red-400 mt-1">Next encounter starts with higher pressure from added instability.</p>
                     </div>
                 )}
 
