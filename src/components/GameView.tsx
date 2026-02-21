@@ -7,6 +7,7 @@ import { ActionLog } from './ActionLog';
 import { ActionPreview } from './ActionPreview';
 import { EncounterCard } from './EncounterCard';
 import { GoalsBanner } from './GoalsBanner';
+import { HeaderControls } from './HeaderControls';
 import { HelpModal } from './HelpModal';
 import { ResolutionModal } from './ResolutionModal';
 import { StrainMeter } from './StrainMeter';
@@ -110,59 +111,21 @@ export const GameView = () => {
         ? getAbilityPreview(selectedAbilityId)
         : null;
 
-    const HelpButton = () => (
-        <>
-            {resetConfirming ? (
-                <div className="absolute top-4 left-4 flex gap-1 z-40">
-                    <button
-                        onClick={() => { resetProgress(); setResetConfirming(false); }}
-                        className="px-3 py-1 rounded border text-xs font-bold transition-colors bg-red-900 border-red-500 text-red-200 hover:bg-red-700"
-                        aria-label="Confirm Reset"
-                    >
-                        CONFIRM
-                    </button>
-                    <button
-                        onClick={() => setResetConfirming(false)}
-                        className="px-3 py-1 rounded border text-xs font-bold transition-colors bg-black/50 border-gray-600 text-gray-400 hover:text-white"
-                        aria-label="Cancel Reset"
-                    >
-                        CANCEL
-                    </button>
-                </div>
-            ) : (
-                <button
-                    onClick={() => setResetConfirming(true)}
-                    className="absolute top-4 left-4 px-3 py-1 rounded border text-xs font-bold z-40 transition-colors bg-black/50 border-gray-600 text-gray-400 hover:text-white hover:border-red-500"
-                    aria-label="Reset Progress"
-                >
-                    RESET
-                </button>
-            )}
-            <button
-                onClick={toggleDebugMode}
-                className={`absolute top-4 right-14 px-3 py-1 rounded border text-xs font-bold z-40 transition-colors ${
-                    debugMode
-                        ? 'bg-mythic-gold text-black border-mythic-gold'
-                        : 'bg-black/50 border-gray-600 text-gray-400 hover:text-white hover:border-white'
-                }`}
-                aria-label="Toggle Debug Mode"
-            >
-                {debugMode ? 'PLAIN' : 'DEBUG'}
-            </button>
-            <button
-                onClick={() => setShowHelp(true)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full border border-gray-600 text-gray-400 hover:text-white hover:border-white flex items-center justify-center text-sm font-bold z-40 bg-black/50"
-                aria-label="Help"
-            >
-                ?
-            </button>
-        </>
+    const headerControls = (
+        <HeaderControls
+            debugMode={debugMode}
+            resetConfirming={resetConfirming}
+            setResetConfirming={setResetConfirming}
+            onResetConfirm={resetProgress}
+            onToggleDebug={toggleDebugMode}
+            onShowHelp={() => setShowHelp(true)}
+        />
     );
 
     if (phase === 'menu') {
         return (
             <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-8 relative">
-                <HelpButton />
+                {headerControls}
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
                 <h1 className="text-5xl font-display text-mythic-gold">FALLEN GOD</h1>
@@ -210,7 +173,7 @@ export const GameView = () => {
     if (phase === 'draft') {
         return (
             <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6 relative">
-                <HelpButton />
+                {headerControls}
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
                 <h2 className="text-3xl font-display text-mythic-gold text-center">
@@ -332,7 +295,7 @@ export const GameView = () => {
     if (phase === 'boon') {
         return (
             <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-3xl mx-auto px-4 py-8 space-y-6 relative">
-                <HelpButton />
+                {headerControls}
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
                 <h2 className="text-3xl font-display text-mythic-gold text-center">
@@ -409,7 +372,7 @@ export const GameView = () => {
     if (phase === 'petition') {
         return (
             <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-3xl mx-auto px-4 py-8 space-y-6 relative">
-                <HelpButton />
+                {headerControls}
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
                 <h2 className="text-3xl font-display text-mythic-gold text-center">
@@ -457,7 +420,7 @@ export const GameView = () => {
     if (phase === 'upgrade') {
         return (
             <div key={phase} className="phase-enter flex flex-col items-center justify-center min-h-[60vh] w-full max-w-4xl mx-auto px-4 py-8 space-y-6 relative">
-                <HelpButton />
+                {headerControls}
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
                 <h2 className="text-3xl font-display text-mythic-gold">Intervention Complete</h2>
@@ -543,7 +506,7 @@ export const GameView = () => {
 
     return (
         <div key={phase} className="phase-enter w-full max-w-4xl mx-auto px-3 py-4 sm:p-4 flex flex-col items-center min-h-screen relative">
-            <HelpButton />
+            {headerControls}
             {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
             <div className="w-full flex justify-between items-start mb-4 sm:mb-6 border-b border-gray-800 pb-3 sm:pb-4 gap-3 sm:gap-4">
@@ -569,13 +532,13 @@ export const GameView = () => {
             {/* Goals Banner - Primary focus */}
             {currentEncounter && <GoalsBanner encounter={currentEncounter} runEssence={runEssenceGained} totalEssence={essence} />}
 
-            {/* Action Log - Hidden on mobile */}
-            <div className="hidden sm:block w-full">
+            {/* Action Log */}
+            <div className="w-full">
                 <ActionLog log={actionLog} />
             </div>
 
-            {/* Secondary Stats - Hidden on mobile to reduce clutter */}
-            <div className="hidden sm:grid w-full grid-cols-4 gap-2 mb-4 text-center">
+            {/* Secondary Stats */}
+            <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 text-center">
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">
                     <p className="text-[10px] uppercase tracking-widest text-gray-500">Encounter</p>
                     <p className="text-sm text-gray-200">
@@ -607,8 +570,8 @@ export const GameView = () => {
                 </div>
             )}
 
-            {/* Latest Decree - Hidden on mobile */}
-            <div className="hidden sm:block w-full bg-gray-900 border border-gray-800 rounded p-3 mb-6">
+            {/* Latest Decree */}
+            <div className="w-full bg-gray-900 border border-gray-800 rounded p-3 mb-6">
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Latest Decree</p>
                 <p className="text-sm text-gray-300">{lastResolution}</p>
             </div>
