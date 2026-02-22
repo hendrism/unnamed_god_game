@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { CORE_ABILITIES, DRAFT_POOL } from '../data/abilities';
 import type {
+    ActiveEncounter,
     Ability,
     GameState,
     StrengthBonuses,
@@ -29,6 +30,20 @@ import {
     shuffle,
     sortAbilitiesForDoctrine,
 } from '../utils/gameLogic';
+
+// Apply world-shaping strength bonuses to a freshly created encounter (mutates in place)
+const applyWorldBonuses = (enc: ActiveEncounter, bonuses: StrengthBonuses) => {
+    if (bonuses.conseqThresholdBonus > 0) {
+        enc.consequenceThreshold += bonuses.conseqThresholdBonus;
+    }
+    if (bonuses.turnLimitBonus > 0) {
+        enc.turnLimit += bonuses.turnLimitBonus;
+    }
+    if (bonuses.pressureStartReduction > 0) {
+        enc.startingPressure = Math.max(1, enc.startingPressure - bonuses.pressureStartReduction);
+        enc.pressureRemaining = enc.startingPressure;
+    }
+};
 
 const INITIAL_STATE: Omit<
     GameState,
@@ -95,7 +110,7 @@ export const useGameStore = create<GameState>()(
                     const orderedAbilities = sortAbilitiesForDoctrine(
                         doctrine.startingAbilityId
                     );
-                    const encountersTarget = Math.floor(Math.random() * 3) + 3;
+                    const encountersTarget = Math.floor(Math.random() * 3) + 3 + state.strengthBonuses.runLengthBonus;
                     const maxStrain = BASE_MAX_STRAIN + state.strengthBonuses.maxStrainBonus;
                     const runEncounterQueue = buildEncounterQueue(
                         encountersTarget,
@@ -152,6 +167,7 @@ export const useGameStore = create<GameState>()(
                         state.runEncounterQueue[0] ??
                         pickEncounterTemplateId(state.worldWeights);
                     const firstEncounter = createEncounter(firstTemplateId, 0);
+                    applyWorldBonuses(firstEncounter, state.strengthBonuses);
 
                     set({
                         phase: 'encounter',
@@ -263,6 +279,7 @@ export const useGameStore = create<GameState>()(
                         state.carryOverInstability - state.strengthBonuses.carryoverDecayBonus
                     );
                     const nextEnc = createEncounter(templateId, adjustedCarryover);
+                    applyWorldBonuses(nextEnc, state.strengthBonuses);
 
                     set({
                         phase: 'encounter',
@@ -278,6 +295,10 @@ export const useGameStore = create<GameState>()(
                         synergyStreak: 0,
                         lastSynergy: '',
                         lastEncounterResolution: null,
+                        ...(state.strengthBonuses.resetStrainOnEncounterStart && {
+                            currentStrain: 0,
+                            strainLevel: 'Low' as const,
+                        }),
                     });
                 },
 
@@ -290,6 +311,7 @@ export const useGameStore = create<GameState>()(
                         state.carryOverInstability - state.strengthBonuses.carryoverDecayBonus
                     );
                     const nextEnc = createEncounter(templateId, adjustedCarryover);
+                    applyWorldBonuses(nextEnc, state.strengthBonuses);
 
                     set({
                         phase: 'encounter',
@@ -306,6 +328,10 @@ export const useGameStore = create<GameState>()(
                         lastSynergy: '',
                         lastEncounterResolution: null,
                         lastResolution: 'The petition has been heard. Begin the intervention.',
+                        ...(state.strengthBonuses.resetStrainOnEncounterStart && {
+                            currentStrain: 0,
+                            strainLevel: 'Low' as const,
+                        }),
                     });
                 },
 
@@ -454,9 +480,11 @@ export const useGameStore = create<GameState>()(
                     }
 
                     const resolutionEssence = lastEncounterResolution?.essenceGained ?? 0;
+                    const perfectBonus = (encounterEndsNow && updatedPressure === 0)
+                        ? (state.strengthBonuses.perfectClearEssenceBonus ?? 0) : 0;
                     const totalEssenceGain = Math.max(
                         0,
-                        preview.essenceDelta + resolutionEssence + synergyBonus
+                        preview.essenceDelta + resolutionEssence + synergyBonus + perfectBonus
                     );
                     const currentStrain = Math.max(0, strainAfterAction);
                     const strainLevel = calculateStrainLevel(currentStrain, state.maxStrain);
@@ -527,6 +555,24 @@ export const useGameStore = create<GameState>()(
                     if (upgrade.synergyEssenceBonus) {
                         nextStrengthBonuses.synergyEssenceBonus += upgrade.synergyEssenceBonus;
                     }
+                    if (upgrade.perfectClearEssenceBonus) {
+                        nextStrengthBonuses.perfectClearEssenceBonus += upgrade.perfectClearEssenceBonus;
+                    }
+                    if (upgrade.conseqThresholdBonus) {
+                        nextStrengthBonuses.conseqThresholdBonus += upgrade.conseqThresholdBonus;
+                    }
+                    if (upgrade.runLengthBonus) {
+                        nextStrengthBonuses.runLengthBonus += upgrade.runLengthBonus;
+                    }
+                    if (upgrade.turnLimitBonus) {
+                        nextStrengthBonuses.turnLimitBonus += upgrade.turnLimitBonus;
+                    }
+                    if (upgrade.pressureStartReduction) {
+                        nextStrengthBonuses.pressureStartReduction += upgrade.pressureStartReduction;
+                    }
+                    if (upgrade.resetStrainOnEncounterStart) {
+                        nextStrengthBonuses.resetStrainOnEncounterStart = true;
+                    }
                     if (upgrade.encounterWeightDelta) {
                         const { encounterId, amount } = upgrade.encounterWeightDelta;
                         nextWorldWeights[encounterId] = Math.max(
@@ -593,7 +639,7 @@ export const useGameStore = create<GameState>()(
                             : [],
                         strengthBonuses:
                             s.strengthBonuses && typeof s.strengthBonuses === 'object'
-                                ? (s.strengthBonuses as StrengthBonuses)
+                                ? { ...DEFAULT_STRENGTH_BONUSES, ...(s.strengthBonuses as Partial<StrengthBonuses>) }
                                 : { ...DEFAULT_STRENGTH_BONUSES },
                         worldWeights:
                             s.worldWeights &&

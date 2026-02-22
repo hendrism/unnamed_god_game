@@ -437,47 +437,48 @@ export const GameView = () => {
                 </p>
 
                 {upgradeOptions.length > 0 ? (
-                    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
                         {upgradeOptions.map((upgrade) => {
                             const canAfford = essence >= upgrade.cost;
                             const isStrength = upgrade.category === 'strength';
+                            const tierLabel = upgrade.tier === 3 ? 'Dominion' : upgrade.tier === 2 ? 'Aspect' : 'Fragment';
+                            const tierBadgeClass = upgrade.tier === 3
+                                ? 'bg-yellow-900/50 text-mythic-gold border border-yellow-700/40'
+                                : upgrade.tier === 2
+                                ? 'bg-cyan-900/50 text-cyan-300 border border-cyan-700/40'
+                                : 'bg-gray-800/50 text-gray-400 border border-gray-700/40';
+                            const cardBorderClass = upgrade.tier === 3
+                                ? (isStrength ? 'border-yellow-600/60' : 'border-yellow-700/50')
+                                : (isStrength ? 'border-blue-700/50' : 'border-purple-700/50');
+                            const cardBgClass = upgrade.tier === 3
+                                ? 'bg-gradient-to-br from-yellow-950/30 to-gray-900'
+                                : isStrength
+                                ? 'bg-gradient-to-br from-blue-950/40 to-gray-900'
+                                : 'bg-gradient-to-br from-purple-950/40 to-gray-900';
                             return (
                                 <div
                                     key={upgrade.id}
-                                    className={`rounded-lg p-5 text-left border-2 ${
-                                        isStrength
-                                            ? 'bg-gradient-to-br from-blue-950/40 to-gray-900 border-blue-700/50'
-                                            : 'bg-gradient-to-br from-purple-950/40 to-gray-900 border-purple-700/50'
-                                    }`}
+                                    className={`rounded-lg p-5 text-left border-2 ${cardBgClass} ${cardBorderClass}`}
                                 >
-                                    <div className={`inline-block px-2 py-1 rounded text-[10px] uppercase tracking-widest font-bold mb-2 ${
-                                        isStrength
-                                            ? 'bg-blue-900/50 text-blue-300 border border-blue-700/30'
-                                            : 'bg-purple-900/50 text-purple-300 border border-purple-700/30'
-                                    }`}>
-                                        {isStrength ? '⚔️ Power' : '🌍 World'}
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className={`inline-block px-2 py-1 rounded text-[10px] uppercase tracking-widest font-bold ${
+                                            isStrength
+                                                ? 'bg-blue-900/50 text-blue-300 border border-blue-700/30'
+                                                : 'bg-purple-900/50 text-purple-300 border border-purple-700/30'
+                                        }`}>
+                                            {isStrength ? '⚔️ Power' : '🌍 World'}
+                                        </div>
+                                        <div className={`inline-block px-2 py-1 rounded text-[10px] uppercase tracking-widest font-bold ${tierBadgeClass}`}>
+                                            {tierLabel}
+                                        </div>
                                     </div>
                                     <h3 className="font-display text-2xl text-mythic-gold mb-2">
                                         {upgrade.name}
                                     </h3>
                                     <p className="text-base text-gray-200 mb-3 leading-relaxed">{upgrade.description}</p>
 
-                                    {/* Strategic context */}
-                                    <div className={`text-xs mb-4 p-2 rounded border ${
-                                        isStrength
-                                            ? 'bg-blue-950/30 border-blue-800/30 text-blue-200'
-                                            : 'bg-purple-950/30 border-purple-800/30 text-purple-200'
-                                    }`}>
-                                        <span className="font-semibold">Strategy: </span>
-                                        {isStrength ? (
-                                            'Increases your divine capabilities directly.'
-                                        ) : (
-                                            'Shapes which crises you will face in future runs.'
-                                        )}
-                                    </div>
-
-                                    <p className="text-sm text-gray-400 mb-4 font-semibold">
-                                        Cost: {upgrade.cost} Essence
+                                    <p className={`text-sm mb-4 font-semibold ${canAfford ? 'text-gray-300' : 'text-gray-600'}`}>
+                                        Cost: <span className={canAfford ? 'text-mythic-gold' : 'text-gray-600'}>{upgrade.cost}</span> Essence
                                     </p>
                                     <button
                                         onClick={() => selectUpgrade(upgrade.id)}

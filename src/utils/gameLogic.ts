@@ -3,7 +3,7 @@ import { DOCTRINES } from '../data/doctrines';
 import { ENCOUNTER_MODIFIERS } from '../data/encounterModifiers';
 import { ENCOUNTER_TEMPLATES } from '../data/encounters';
 import { RESOLUTION_OUTCOMES } from '../data/resolutionOutcomes';
-import { STRENGTH_UPGRADES, WORLD_UPGRADES } from '../data/upgrades';
+import { STRENGTH_UPGRADES, T2_UPGRADES, T3_UPGRADES, WORLD_UPGRADES } from '../data/upgrades';
 import type {
     Ability,
     AbilityCategory,
@@ -44,6 +44,13 @@ export const DEFAULT_STRENGTH_BONUSES: StrengthBonuses = {
     maxStrainBonus: 0,
     carryoverDecayBonus: 0,
     synergyEssenceBonus: 0,
+    // T2/T3 bonuses
+    perfectClearEssenceBonus: 0,
+    conseqThresholdBonus: 0,
+    runLengthBonus: 0,
+    turnLimitBonus: 0,
+    pressureStartReduction: 0,
+    resetStrainOnEncounterStart: false,
 };
 
 export const DEFAULT_WORLD_WEIGHTS: Record<string, number> = ENCOUNTER_TEMPLATES.reduce(
@@ -246,15 +253,17 @@ const getAvailableUpgradeByCategory = (
 };
 
 export const buildUpgradeChoices = (ownedUpgradeIds: string[]) => {
-    const options: Upgrade[] = [];
-    const strengthChoice = getAvailableUpgradeByCategory(
-        STRENGTH_UPGRADES,
-        ownedUpgradeIds
-    );
-    const worldChoice = getAvailableUpgradeByCategory(WORLD_UPGRADES, ownedUpgradeIds);
+    const ALL_UPGRADES = [...STRENGTH_UPGRADES, ...WORLD_UPGRADES, ...T2_UPGRADES, ...T3_UPGRADES];
+    const unowned = ALL_UPGRADES.filter((u) => !ownedUpgradeIds.includes(u.id));
 
-    if (strengthChoice) options.push(strengthChoice);
-    if (worldChoice) options.push(worldChoice);
+    const t1 = unowned.filter((u) => u.tier === 1);
+    const t2 = unowned.filter((u) => u.tier === 2);
+    const t3 = unowned.filter((u) => u.tier === 3);
+
+    const options: Upgrade[] = [];
+    if (t1.length > 0) options.push(randomFrom(t1));
+    if (t2.length > 0) options.push(randomFrom(t2));
+    if (t3.length > 0) options.push(randomFrom(t3));
 
     return options;
 };

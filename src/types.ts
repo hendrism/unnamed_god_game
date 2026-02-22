@@ -104,6 +104,7 @@ export interface Upgrade {
     name: string;
     description: string;
     category: UpgradeCategory;
+    tier: 1 | 2 | 3;
     cost: number;
     firstCastStrainReduction?: number;
     firstCastEssenceBonus?: number;
@@ -114,6 +115,13 @@ export interface Upgrade {
         encounterId: string;
         amount: number;
     };
+    // T2/T3 new mechanic fields
+    perfectClearEssenceBonus?: number;
+    conseqThresholdBonus?: number;
+    runLengthBonus?: number;
+    turnLimitBonus?: number;
+    pressureStartReduction?: number;
+    resetStrainOnEncounterStart?: boolean;
 }
 
 export interface StrengthBonuses {
@@ -122,6 +130,13 @@ export interface StrengthBonuses {
     maxStrainBonus: number;
     carryoverDecayBonus: number;
     synergyEssenceBonus: number;
+    // T2/T3 bonuses
+    perfectClearEssenceBonus: number;
+    conseqThresholdBonus: number;
+    runLengthBonus: number;
+    turnLimitBonus: number;
+    pressureStartReduction: number;
+    resetStrainOnEncounterStart: boolean;
 }
 
 export interface AbilityPreview {
