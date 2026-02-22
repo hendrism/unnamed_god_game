@@ -1,8 +1,8 @@
 export const HelpModal = ({ onClose }: { onClose: () => void }) => {
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="flex min-h-full items-center justify-center p-4">
-                <div className="bg-gray-900 border-2 border-void-purple rounded-lg max-w-lg w-full p-6 shadow-2xl relative">
+            <div className="flex min-h-full items-start justify-center p-4 py-8">
+                <div className="bg-gray-900 border-2 border-void-purple rounded-lg max-w-lg w-full p-5 shadow-2xl relative">
                     <button
                         onClick={onClose}
                         className="absolute top-4 right-4 text-gray-400 hover:text-white"
@@ -10,11 +10,11 @@ export const HelpModal = ({ onClose }: { onClose: () => void }) => {
                         ✕
                     </button>
 
-                    <h2 className="text-2xl font-display text-mythic-gold mb-4 text-center">
+                    <h2 className="text-xl font-display text-mythic-gold mb-3 text-center">
                         Divine Guidance
                     </h2>
 
-                    <div className="space-y-6 text-gray-300 text-sm">
+                    <div className="space-y-4 text-gray-300 text-sm">
                         <section>
                             <h3 className="text-void-purple font-bold uppercase tracking-wider mb-2">The Goal</h3>
                             <p>
@@ -55,10 +55,10 @@ export const HelpModal = ({ onClose }: { onClose: () => void }) => {
                         </section>
                     </div>
 
-                    <div className="mt-8">
+                    <div className="mt-5">
                         <button
                             onClick={onClose}
-                            className="w-full py-3 bg-void-purple text-white font-bold rounded hover:bg-void-purple-dark transition-all"
+                            className="w-full py-2.5 bg-void-purple text-white font-bold rounded hover:bg-void-purple-dark transition-all"
                         >
                             I UNDERSTAND
                         </button>

@@ -6,7 +6,6 @@ import { AbilityBar } from './AbilityBar';
 import { ActionLog } from './ActionLog';
 import { ActionPreview } from './ActionPreview';
 import { EncounterCard } from './EncounterCard';
-import { GoalsBanner } from './GoalsBanner';
 import { HeaderControls } from './HeaderControls';
 import { HelpModal } from './HelpModal';
 import { ResolutionModal } from './ResolutionModal';
@@ -534,22 +533,13 @@ export const GameView = () => {
                 </div>
             </div>
 
-            {/* Goals Banner - Primary focus */}
-            {currentEncounter && <GoalsBanner encounter={currentEncounter} runEssence={runEssenceGained} totalEssence={essence} />}
-
             {/* Action Log */}
             <div className="w-full">
                 <ActionLog log={actionLog} />
             </div>
 
-            {/* Secondary Stats */}
-            <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 text-center">
-                <div className="bg-gray-900 border border-gray-800 rounded p-2">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Encounter</p>
-                    <p className="text-sm text-gray-200">
-                        {Math.min(encountersCompleted + 1, encountersTarget)} / {encountersTarget}
-                    </p>
-                </div>
+            {/* Secondary Stats — unique values only (encounter# and run essence are already in header) */}
+            <div className="w-full grid grid-cols-2 gap-2 mb-4 text-center">
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">
                     <p className="text-[10px] uppercase tracking-widest text-gray-500">Carryover</p>
                     <p className="text-sm text-gray-200">{carryOverInstability}</p>
@@ -559,10 +549,6 @@ export const GameView = () => {
                     <p className="text-sm text-gray-200">
                         {encounterAbilityIds.length} / {abilities.length}
                     </p>
-                </div>
-                <div className="bg-gray-900 border border-gray-800 rounded p-2">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Run Essence</p>
-                    <p className="text-sm text-mythic-gold">+{runEssenceGained}</p>
                 </div>
             </div>
 
