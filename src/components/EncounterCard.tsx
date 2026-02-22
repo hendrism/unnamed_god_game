@@ -21,7 +21,7 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
             <div className="flex justify-between items-start mb-3 border-b border-gray-800 pb-2">
                 <div className="flex-1 pr-4">
                     <h2 className="text-lg font-display text-white leading-tight">{encounter.title}</h2>
-                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{encounter.description}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">{encounter.description}</p>
                 </div>
                 <div className="flex flex-col items-end shrink-0">
                     <span className="text-[10px] bg-void-purple/20 text-void-purple px-2 py-0.5 rounded border border-void-purple/30 uppercase tracking-wider mb-1 font-bold">
@@ -50,7 +50,7 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                             style={{ width: `${pressurePercent}%` }}
                         />
                     </div>
-                    <p className="text-[10px] text-gray-500 italic truncate">{encounter.pressureText}</p>
+                    <p className="text-[10px] text-gray-500 italic leading-snug">{encounter.pressureText}</p>
                 </div>
 
                 {/* Consequence */}
@@ -76,7 +76,7 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                         )}
                     </div>
                     <div className="flex justify-between text-[10px] text-gray-500 leading-tight">
-                        <span className="italic truncate max-w-[60%]">{encounter.consequenceText}</span>
+                        <span className="italic leading-snug">{encounter.consequenceText}</span>
                         <span className={encounter.thresholdExceeded ? 'text-strain-red font-bold' : 'text-yellow-600/80'}>
                             Threshold: {encounter.consequenceThreshold}
                         </span>
