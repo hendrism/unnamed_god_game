@@ -37,6 +37,8 @@ export const GameView = () => {
         boonOptions,
         boonPrompt,
         petitionOptions,
+        pimPetitionTemplateId,
+        lastPetitionWasPim,
         synergyStreak,
         lastSynergy,
         startRun,
@@ -354,24 +356,41 @@ export const GameView = () => {
                     Petitions Await
                 </h2>
                 <p className="text-gray-400 italic text-center max-w-xl">
-                    Two matters require your divine attention. You will hear one.
+                    Several matters require your divine attention. You will hear one.
                 </p>
 
-                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
                     {petitionOptions.map((template) => {
                         const isUrgent = template.basePressure > 40;
+                        const isPim = template.id === pimPetitionTemplateId;
                         return (
                             <div
                                 key={template.id}
-                                className="flex flex-col p-5 bg-gray-900 border border-gray-700 rounded-lg text-left"
+                                className={`flex flex-col p-5 rounded-lg text-left border ${
+                                    isPim
+                                        ? 'bg-amber-950/20 border-amber-700/40'
+                                        : 'bg-gray-900 border-gray-700'
+                                }`}
                             >
-                                <div className={`inline-block self-start px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold mb-3 ${
-                                    isUrgent
-                                        ? 'bg-red-950/50 text-red-300 border border-red-800/40'
-                                        : 'bg-gray-800 text-gray-400 border border-gray-700'
-                                }`}>
-                                    {isUrgent ? 'Urgent' : 'Steady'}
+                                <div className="flex items-center gap-2 mb-3">
+                                    <div className={`inline-block px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold ${
+                                        isUrgent
+                                            ? 'bg-red-950/50 text-red-300 border border-red-800/40'
+                                            : 'bg-gray-800 text-gray-400 border border-gray-700'
+                                    }`}>
+                                        {isUrgent ? 'Urgent' : 'Steady'}
+                                    </div>
+                                    {isPim && (
+                                        <div className="inline-block px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold bg-amber-900/40 text-amber-400 border border-amber-700/40">
+                                            Pim's Pick
+                                        </div>
+                                    )}
                                 </div>
+                                {isPim && (
+                                    <p className="text-[10px] text-amber-500/70 italic mb-2">
+                                        "I took the liberty of preparing this one, my lord."
+                                    </p>
+                                )}
                                 <h3 className="font-display text-2xl text-gray-100 mb-2">
                                     {template.title}
                                 </h3>
@@ -386,9 +405,13 @@ export const GameView = () => {
                                 </div>
                                 <button
                                     onClick={() => selectPetition(template.id)}
-                                    className="w-full px-4 py-2 bg-void-purple text-white rounded hover:bg-void-purple-dark transition-all font-semibold"
+                                    className={`w-full px-4 py-2 rounded transition-all font-semibold ${
+                                        isPim
+                                            ? 'bg-amber-700 text-white hover:bg-amber-600'
+                                            : 'bg-void-purple text-white hover:bg-void-purple-dark'
+                                    }`}
                                 >
-                                    Hear This Petition
+                                    {isPim ? "Hear Pim's Petition" : 'Hear This Petition'}
                                 </button>
                             </div>
                         );
@@ -519,11 +542,11 @@ export const GameView = () => {
             {/* Secondary Stats — unique values only (encounter# and run essence are already in header) */}
             <div className="w-full grid grid-cols-2 gap-2 mb-4 text-center">
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Carryover</p>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Mortal Grievances</p>
                     <p className="text-sm text-gray-200">{carryOverInstability}</p>
                 </div>
                 <div className="bg-gray-900 border border-gray-800 rounded p-2">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Hand</p>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Pim's Selection</p>
                     <p className="text-sm text-gray-200">
                         {encounterAbilityIds.length} / {abilities.length}
                     </p>
@@ -597,6 +620,7 @@ export const GameView = () => {
                     carryOver={carryOverInstability}
                     encountersCompleted={encountersCompleted}
                     encountersTarget={encountersTarget}
+                    petitionWasPim={lastPetitionWasPim}
                 />
             )}
         </div>

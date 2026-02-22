@@ -214,6 +214,8 @@ export interface GameState {
     boonOptions: Ability[];
     boonPrompt: string;
     petitionOptions: EncounterTemplate[];
+    pimPetitionTemplateId: string | null;
+    lastPetitionWasPim: boolean;
     synergyStreak: number;
     lastSynergy: string;
     ownedUpgrades: string[];

@@ -86,6 +86,8 @@ const INITIAL_STATE: Omit<
     boonOptions: [],
     boonPrompt: '',
     petitionOptions: [],
+    pimPetitionTemplateId: null,
+    lastPetitionWasPim: false,
     synergyStreak: 0,
     lastSynergy: '',
     ownedUpgrades: [],
@@ -248,16 +250,22 @@ export const useGameStore = create<GameState>()(
                             pickEncounterTemplateId(state.worldWeights);
                         const templateIdB = pickEncounterTemplateId(
                             state.worldWeights,
-                            templateIdA
+                            [templateIdA]
+                        );
+                        const templateIdPim = pickEncounterTemplateId(
+                            state.worldWeights,
+                            [templateIdA, templateIdB]
                         );
                         const petitionOptions = [
                             getEncounterTemplateById(templateIdA),
                             getEncounterTemplateById(templateIdB),
+                            getEncounterTemplateById(templateIdPim),
                         ];
 
                         set({
                             phase: 'petition',
                             petitionOptions,
+                            pimPetitionTemplateId: templateIdPim,
                             currentEncounter: null,
                             encounterResolved: false,
                             castsThisEncounter: 0,
@@ -306,6 +314,7 @@ export const useGameStore = create<GameState>()(
                     const state = get();
                     if (state.phase !== 'petition') return;
 
+                    const wasPim = templateId === state.pimPetitionTemplateId;
                     const adjustedCarryover = Math.max(
                         0,
                         state.carryOverInstability - state.strengthBonuses.carryoverDecayBonus
@@ -318,6 +327,8 @@ export const useGameStore = create<GameState>()(
                         currentEncounter: nextEnc,
                         encounterAbilityIds: buildEncounterAbilityPool(state.abilities),
                         petitionOptions: [],
+                        pimPetitionTemplateId: null,
+                        lastPetitionWasPim: wasPim,
                         upgradeOptions: [],
                         encounterResolved: false,
                         castsThisEncounter: 0,

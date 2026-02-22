@@ -7,9 +7,10 @@ interface ResolutionModalProps {
     carryOver: number;
     encountersCompleted: number;
     encountersTarget: number;
+    petitionWasPim?: boolean;
 }
 
-export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersCompleted, encountersTarget }: ResolutionModalProps) => {
+export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersCompleted, encountersTarget, petitionWasPim }: ResolutionModalProps) => {
     const isLastEncounter = encountersCompleted >= encountersTarget;
     const nextEncounterNum = encountersCompleted + 1;
 
@@ -101,6 +102,16 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                     </div>
                 )}
 
+                {petitionWasPim && (
+                    <div className="mb-4 p-3 bg-amber-950/30 border border-amber-700/40 rounded">
+                        <p className="text-xs text-amber-400 italic">
+                            {resolution.outcome === 'perfect' || resolution.outcome === 'partial'
+                                ? '"An excellent outcome, my lord." — Pim, taking no credit whatsoever'
+                                : '"I may have misjudged the severity, my lord. I accept full responsibility." — Pim'}
+                        </p>
+                    </div>
+                )}
+
                 <div className="space-y-2 mb-6 p-4 bg-black/40 rounded border border-gray-800">
                     <div className="flex justify-between">
                         <span className="text-gray-400 text-sm">Essence Gained:</span>
@@ -108,7 +119,7 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                     </div>
                     {resolution.carryoverAdded > 0 && (
                         <div className="flex justify-between">
-                            <span className="text-gray-400 text-sm">Carryover Instability:</span>
+                            <span className="text-gray-400 text-sm">Mortal Grievances Added:</span>
                             <span className="text-orange-400">+{resolution.carryoverAdded}</span>
                         </div>
                     )}
@@ -126,9 +137,9 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                         {isLastEncounter ? 'Run Complete' : `Proceeding to Intervention ${nextEncounterNum} of ${encountersTarget}`}
                     </p>
                     <div className="flex justify-between text-xs">
-                        <span className="text-gray-500">Residual Instability:</span>
+                        <span className="text-gray-500">Mortal Grievances:</span>
                         <span className={carryOver > 8 ? 'text-orange-400 font-semibold' : carryOver > 0 ? 'text-yellow-500' : 'text-gray-500'}>
-                            {carryOver > 0 ? `+${carryOver} starting pressure` : 'None — clean approach'}
+                            {carryOver > 0 ? `+${carryOver} starting pressure` : 'None — a mercifully quiet populace'}
                         </span>
                     </div>
                     <div className="flex justify-between text-xs">

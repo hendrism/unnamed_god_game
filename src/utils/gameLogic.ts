@@ -125,11 +125,11 @@ export const calculateStrainLevel = (current: number, max: number): StrainLevel 
 
 export const pickEncounterTemplateId = (
     weights: Record<string, number>,
-    avoidTemplateId?: string
+    avoidTemplateIds?: string[]
 ): string => {
     const candidateTemplates = ENCOUNTER_TEMPLATES.filter(
         (template) =>
-            ENCOUNTER_TEMPLATES.length === 1 || template.id !== avoidTemplateId
+            ENCOUNTER_TEMPLATES.length === 1 || !avoidTemplateIds?.includes(template.id)
     );
 
     const totalWeight = candidateTemplates.reduce(
@@ -156,7 +156,7 @@ export const buildEncounterQueue = (
     let previousTemplateId: string | undefined;
 
     for (let i = 0; i < encountersTarget; i += 1) {
-        const templateId = pickEncounterTemplateId(weights, previousTemplateId);
+        const templateId = pickEncounterTemplateId(weights, previousTemplateId ? [previousTemplateId] : undefined);
         queue.push(templateId);
         previousTemplateId = templateId;
     }
