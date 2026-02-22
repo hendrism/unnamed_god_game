@@ -192,17 +192,29 @@ export const GameView = () => {
                                         {ability.baseConsequence > 0 ? '+' : ''}{ability.baseConsequence}c
                                     </span>
                                     <span className="text-blue-400">{ability.baseStrainCost}s</span>
+                                    <span className="text-mythic-gold">+{ability.baseEssence}e</span>
                                 </span>
                             </span>
                         ))}
                     </div>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 items-baseline border-t border-gray-800 pt-2">
                         <span className="text-[10px] uppercase tracking-widest text-gray-500 shrink-0 w-16">Forecast</span>
-                        {runForecast.map((entry) => (
-                            <span key={entry.templateId} className="text-xs text-gray-400">
-                                {entry.title} <span className="text-gray-600">×{entry.count}</span>
-                            </span>
-                        ))}
+                        {runForecast.map((entry) => {
+                            const notes: Record<string, string> = {
+                                shrine: 'best essence',
+                                storm: 'balanced',
+                                prayers: 'avg pressure',
+                                rebellion: 'high conseq',
+                                blight: 'high pressure',
+                            };
+                            const note = notes[entry.templateId];
+                            return (
+                                <span key={entry.templateId} className="text-xs text-gray-400">
+                                    {entry.title} <span className="text-gray-600">×{entry.count}</span>
+                                    {note && <span className="text-gray-600 italic"> · {note}</span>}
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
 
