@@ -138,12 +138,20 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                 );
             })()}
 
-            <button
-                onClick={onConfirm}
-                className="w-full py-4 bg-mythic-gold text-black font-display font-bold text-xl rounded hover:bg-yellow-400 transition-all shadow-lg hover:shadow-mythic-gold/20"
-            >
-                {debugMode ? 'USE ABILITY' : 'CONFIRM INTERVENTION'}
-            </button>
+            <div className="grid grid-cols-2 gap-3">
+                <button
+                    onClick={onCancel}
+                    className="w-full py-4 bg-gray-800 text-gray-300 font-display font-bold text-lg rounded hover:bg-gray-700 transition-colors"
+                >
+                    CANCEL
+                </button>
+                <button
+                    onClick={onConfirm}
+                    className="w-full py-4 bg-mythic-gold text-black font-display font-bold text-lg rounded hover:bg-yellow-400 transition-all shadow-lg hover:shadow-mythic-gold/20"
+                >
+                    {debugMode ? 'USE' : 'CONFIRM'}
+                </button>
+            </div>
         </div>
     );
 };

@@ -1,13 +1,14 @@
-import { useState } from 'react';
 import type { ActiveEncounter } from '../types';
 
 export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncounter, resolved?: boolean }) => {
-    const [showDetails, setShowDetails] = useState(false);
-    const urgencyClass = encounter.urgency === 'urgent' ? 'text-strain-red border-strain-red' : 'text-gray-400 border-gray-700';
+    const pressurePercent = Math.min(100, Math.max(0, (encounter.pressureRemaining / encounter.startingPressure) * 100));
+
+    const consequenceMax = Math.max(encounter.consequenceThreshold * 1.25, encounter.consequenceMeter, 10);
+    const consequencePercent = Math.min(100, Math.max(0, (encounter.consequenceMeter / consequenceMax) * 100));
+    const thresholdPercent = (encounter.consequenceThreshold / consequenceMax) * 100;
 
     return (
-        <div className="w-full max-w-md mx-auto bg-gray-900 border-2 border-gray-700 rounded-lg p-4 sm:p-6 shadow-2xl relative overflow-hidden">
-            {/* Resolved Overlay */}
+        <div className="w-full max-w-2xl mx-auto bg-gray-900 border-2 border-gray-700 rounded-lg p-4 shadow-2xl relative overflow-hidden">
             {resolved && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
                     <h2 className="text-4xl font-display text-mythic-gold tracking-[0.2em] animate-pulse drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
@@ -16,70 +17,93 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                 </div>
             )}
 
-            <div className="flex justify-between items-start mb-4 gap-2">
-                <div className="flex-1 min-w-0">
-                    <h2 className="text-lg sm:text-xl font-display text-white mb-1 break-words">{encounter.title}</h2>
-                    <div className="flex gap-2 items-center flex-wrap">
-                        <span className={`text-[10px] sm:text-xs bg-gray-800 px-2 py-1 rounded uppercase tracking-wider border ${urgencyClass}`}>
-                            {encounter.urgency === 'urgent' ? 'Urgent' : 'Steady'}
-                        </span>
-                        <span className="text-[10px] sm:text-xs bg-gray-800 px-2 py-1 rounded text-gray-400 uppercase tracking-wider truncate max-w-[150px] sm:max-w-none">
-                            {encounter.modifierName}
-                        </span>
-                    </div>
+            {/* Header */}
+            <div className="flex justify-between items-start mb-3 border-b border-gray-800 pb-2">
+                <div className="flex-1 pr-4">
+                    <h2 className="text-lg font-display text-white leading-tight">{encounter.title}</h2>
+                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{encounter.description}</p>
                 </div>
-                <button
-                    onClick={() => setShowDetails(!showDetails)}
-                    className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-2 rounded transition-colors flex-shrink-0 min-h-[44px] flex items-center"
-                >
-                    <span className="hidden sm:inline">{showDetails ? 'Hide ▲' : 'Show ▼'}</span>
-                    <span className="sm:hidden">{showDetails ? '▲' : '▼'}</span>
-                </button>
+                <div className="flex flex-col items-end shrink-0">
+                    <span className="text-[10px] bg-void-purple/20 text-void-purple px-2 py-0.5 rounded border border-void-purple/30 uppercase tracking-wider mb-1 font-bold">
+                        {encounter.modifierName}
+                    </span>
+                    <span className="text-[10px] text-gray-500 max-w-[150px] text-right leading-tight">
+                        {encounter.modifierDescription}
+                    </span>
+                </div>
             </div>
 
-            {showDetails && (
-                <div className="mb-4 pb-4 border-b border-gray-800">
-                    <p className="text-gray-400 italic mb-3 border-l-2 border-void-purple pl-4">
-                        {encounter.description}
-                    </p>
-                    <p className="text-xs text-gray-500 mb-2">{encounter.modifierDescription}</p>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-                    <div className="space-y-2 mt-3">
-                        <div className="bg-black/40 p-2 rounded border border-gray-800">
-                            <span className="text-xs text-red-500 uppercase tracking-wider block mb-1">Pressure</span>
-                            <p className="text-xs text-gray-300">{encounter.pressureText}</p>
-                        </div>
-                        <div className="bg-black/40 p-2 rounded border border-gray-800">
-                            <span className="text-xs text-mythic-gold uppercase tracking-wider block mb-1">Reward</span>
-                            <p className="text-xs text-gray-300">{encounter.rewardText}</p>
-                        </div>
-                        <div className="bg-black/40 p-2 rounded border border-gray-800">
-                            <span className="text-xs text-void-purple uppercase tracking-wider block mb-1">Consequence</span>
-                            <p className="text-xs text-gray-300">{encounter.consequenceText}</p>
-                        </div>
+                {/* Pressure */}
+                <div className="bg-black/30 p-2 rounded border border-gray-800/50">
+                    <div className="flex justify-between items-end mb-1">
+                        <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Pressure</span>
+                        <span className="text-sm font-mono text-white leading-none">
+                            {encounter.pressureRemaining} <span className="text-gray-600 text-[10px]">/ {encounter.startingPressure}</span>
+                        </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden relative mb-1">
+                        <div
+                            className="h-full bg-gradient-to-r from-red-900 to-red-600 transition-all duration-500 ease-out"
+                            style={{ width: `${pressurePercent}%` }}
+                        />
+                    </div>
+                    <p className="text-[10px] text-gray-500 italic truncate">{encounter.pressureText}</p>
+                </div>
+
+                {/* Consequence */}
+                <div className="bg-black/30 p-2 rounded border border-gray-800/50 relative">
+                    <div className="flex justify-between items-end mb-1">
+                        <span className={`text-xs uppercase tracking-wider font-semibold ${encounter.thresholdExceeded ? 'text-strain-red' : 'text-gray-400'}`}>
+                            Consequence
+                        </span>
+                        <span className={`text-sm font-mono leading-none ${encounter.thresholdExceeded ? 'text-strain-red animate-pulse' : 'text-white'}`}>
+                            {encounter.consequenceMeter}
+                        </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden relative mb-1">
+                        <div
+                            className={`h-full transition-all duration-500 ease-out ${encounter.thresholdExceeded ? 'bg-strain-red' : 'bg-void-purple'}`}
+                            style={{ width: `${consequencePercent}%` }}
+                        />
+                        {!encounter.thresholdExceeded && (
+                            <div
+                                className="absolute top-0 bottom-0 w-0.5 bg-yellow-500/70 z-10 shadow-[0_0_4px_rgba(234,179,8,0.5)]"
+                                style={{ left: `${thresholdPercent}%` }}
+                            />
+                        )}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-500 leading-tight">
+                        <span className="italic truncate max-w-[60%]">{encounter.consequenceText}</span>
+                        <span className={encounter.thresholdExceeded ? 'text-strain-red font-bold' : 'text-yellow-600/80'}>
+                            Threshold: {encounter.consequenceThreshold}
+                        </span>
                     </div>
                 </div>
-            )}
 
-            {/* Compact Summary - Always visible */}
-            <div className="bg-black/40 p-2 sm:p-3 rounded border border-gray-800">
-                <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-xs">
-                    <div>
-                        <span className="text-gray-500 uppercase tracking-wider text-[9px] sm:text-[10px]">Essence/Turn</span>
-                        <p className="text-mythic-gold font-bold text-sm sm:text-base">+{encounter.rewardPerTurn}</p>
+                {/* Turn & Reward */}
+                <div className="col-span-1 md:col-span-2 flex justify-between items-center bg-black/30 p-2 rounded border border-gray-800/50">
+                    <div className="flex items-center space-x-6">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Turns</span>
+                            <span className="text-sm font-mono text-white leading-none">
+                                {encounter.turn} <span className="text-gray-600">/ {encounter.turnLimit}</span>
+                            </span>
+                        </div>
+                        <div className="h-6 w-px bg-gray-800" />
+                        <div className="flex flex-col">
+                            <span className="text-[10px] text-mythic-gold uppercase tracking-wider font-bold">Reward</span>
+                            <span className="text-sm text-white leading-none">
+                                +{encounter.rewardPerTurn} <span className="text-[10px] text-gray-500">Essence/turn</span>
+                            </span>
+                        </div>
                     </div>
-                    <div>
-                        <span className="text-gray-500 uppercase tracking-wider text-[9px] sm:text-[10px] block truncate">Impact</span>
-                        <p className="text-gray-400 font-mono text-[10px] sm:text-xs">
-                            <span className="inline-block">S:{encounter.consequenceByCategory.smite}</span>{' '}
-                            <span className="inline-block">M:{encounter.consequenceByCategory.manifest}</span>{' '}
-                            <span className="inline-block">T:{encounter.consequenceByCategory.twist}</span>
-                        </p>
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] text-gray-600 italic">{encounter.rewardText}</p>
                     </div>
                 </div>
-                {encounter.thresholdExceeded && (
-                    <p className="text-[10px] sm:text-xs text-strain-red mt-2 animate-pulse">⚠ Threshold exceeded</p>
-                )}
             </div>
         </div>
     );

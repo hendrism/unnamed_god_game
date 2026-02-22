@@ -466,7 +466,7 @@ export const buildAbilityPreview = (
         strainRelief += 2;
         pressureDelta += 2;
         synergyLabel = 'Twist -> Manifest';
-        notes.push('Synergy: Manifest Presence after Twist Fate reduces Strain by 2 and gains +2 Pressure.');
+        notes.push('Synergy: Twist → Manifest: costs 2 less Strain and reduces the encounter\'s Pressure by 2 more.');
     }
 
     if (ability.id === 'twist' && lastAbilityId === 'smite') {

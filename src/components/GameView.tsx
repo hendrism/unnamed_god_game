@@ -39,7 +39,6 @@ export const GameView = () => {
         petitionOptions,
         synergyStreak,
         lastSynergy,
-        debugMode,
         startRun,
         castAbility,
         selectUpgrade,
@@ -53,7 +52,6 @@ export const GameView = () => {
         encounterResolved,
         castsThisEncounter,
         nextEncounter,
-        toggleDebugMode,
         resetProgress,
         getAbilityPreview,
     } = useGameStore();
@@ -113,11 +111,9 @@ export const GameView = () => {
 
     const headerControls = (
         <HeaderControls
-            debugMode={debugMode}
             resetConfirming={resetConfirming}
             setResetConfirming={setResetConfirming}
             onResetConfirm={resetProgress}
-            onToggleDebug={toggleDebugMode}
             onShowHelp={() => setShowHelp(true)}
         />
     );
@@ -350,10 +346,13 @@ export const GameView = () => {
                                 {ability.name}
                             </h3>
                             <p className="text-sm text-gray-300 mb-4">{ability.description}</p>
-                            <div className="grid grid-cols-3 gap-2 text-xs text-gray-400 mt-auto">
-                                <span>Pressure {ability.basePressure}</span>
-                                <span>Strain {ability.baseStrainCost}</span>
-                                <span>Essence +{ability.baseEssence}</span>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-400 mt-auto">
+                                <span>Pressure <span className="text-red-400">-{ability.basePressure}</span></span>
+                                <span>Strain <span className="text-blue-400">{ability.baseStrainCost}</span></span>
+                                <span>Essence <span className="text-mythic-gold">+{ability.baseEssence}</span></span>
+                                <span>Consequence <span className={ability.baseConsequence > 0 ? 'text-void-purple' : ability.baseConsequence < 0 ? 'text-green-400' : 'text-gray-300'}>
+                                    {ability.baseConsequence > 0 ? '+' : ''}{ability.baseConsequence}
+                                </span></span>
                             </div>
                         </button>
                     ))}
@@ -400,9 +399,15 @@ export const GameView = () => {
                                 <h3 className="font-display text-2xl text-gray-100 mb-2">
                                     {template.title}
                                 </h3>
-                                <p className="text-sm text-gray-300 mb-6 flex-1">
+                                <p className="text-sm text-gray-300 mb-4 flex-1">
                                     {template.description}
                                 </p>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-400 mb-4 bg-black/30 rounded p-2 border border-gray-800">
+                                    <span>Pressure <span className="text-red-400">{template.basePressure}</span></span>
+                                    <span>Essence <span className="text-mythic-gold">+{template.baseRewardPerTurn}/turn</span></span>
+                                    <span>Consequence limit <span className="text-void-purple">{template.consequenceThreshold}</span></span>
+                                    <span>Consequence cost <span className={template.baseConsequence > 0 ? 'text-red-400' : 'text-green-400'}>{template.baseConsequence > 0 ? '+' : ''}{template.baseConsequence}</span></span>
+                                </div>
                                 <button
                                     onClick={() => selectPetition(template.id)}
                                     className="w-full px-4 py-2 bg-void-purple text-white rounded hover:bg-void-purple-dark transition-all font-semibold"

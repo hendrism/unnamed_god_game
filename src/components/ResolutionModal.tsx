@@ -9,8 +9,8 @@ interface ResolutionModalProps {
 }
 
 export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersCompleted, encountersTarget }: ResolutionModalProps) => {
-    const isLastEncounter = encountersCompleted + 1 >= encountersTarget;
-    const nextEncounterNum = encountersCompleted + 2;
+    const isLastEncounter = encountersCompleted >= encountersTarget;
+    const nextEncounterNum = encountersCompleted + 1;
 
     const getOutcomeClass = () => {
         switch (resolution.outcome) {
@@ -44,11 +44,12 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
+            className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm animate-fade-in"
             onClick={onContinue}
         >
+            <div className="flex min-h-full items-center justify-center p-4">
             <div
-                className="w-full max-w-md mx-4 bg-gray-900 border-2 border-gray-700 rounded-lg p-6 shadow-2xl"
+                className="w-full max-w-md bg-gray-900 border-2 border-gray-700 rounded-lg p-6 shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <h2 className={`text-2xl font-display ${getOutcomeClass()} mb-4 text-center`}>
@@ -141,6 +142,7 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                 >
                     {isLastEncounter ? 'Conclude the Session' : `Proceed to Intervention ${nextEncounterNum}`}
                 </button>
+            </div>
             </div>
         </div>
     );
