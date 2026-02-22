@@ -243,15 +243,6 @@ export const createEncounter = (
 
 // ─── Upgrade Selection ───────────────────────────────────────────────────────
 
-const getAvailableUpgradeByCategory = (
-    upgrades: Upgrade[],
-    ownedUpgradeIds: string[]
-): Upgrade | null => {
-    const available = upgrades.filter((upgrade) => !ownedUpgradeIds.includes(upgrade.id));
-    if (available.length === 0) return null;
-    return randomFrom(available);
-};
-
 export const buildUpgradeChoices = (ownedUpgradeIds: string[]) => {
     const ALL_UPGRADES = [...STRENGTH_UPGRADES, ...WORLD_UPGRADES, ...T2_UPGRADES, ...T3_UPGRADES];
     const unowned = ALL_UPGRADES.filter((u) => !ownedUpgradeIds.includes(u.id));
