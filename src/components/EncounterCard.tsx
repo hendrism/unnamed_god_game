@@ -1,5 +1,27 @@
 import type { ActiveEncounter } from '../types';
 
+function formatModifierEffects(effects: ActiveEncounter['modifierEffects']): string {
+    const lines: string[] = [];
+
+    const global: string[] = [];
+    if (effects.strainCostDelta) global.push(`${effects.strainCostDelta > 0 ? '+' : ''}${effects.strainCostDelta} strain`);
+    if (effects.pressureDelta) global.push(`${effects.pressureDelta > 0 ? '+' : ''}${effects.pressureDelta} press`);
+    if (effects.consequenceDelta) global.push(`${effects.consequenceDelta > 0 ? '+' : ''}${effects.consequenceDelta} conseq`);
+    if (effects.essenceDelta) global.push(`${effects.essenceDelta > 0 ? '+' : ''}${effects.essenceDelta} ess`);
+    if (global.length) lines.push(global.join(' · '));
+
+    for (const ae of effects.abilityEffects ?? []) {
+        const fx: string[] = [];
+        if (ae.strainCostDelta) fx.push(`${ae.strainCostDelta > 0 ? '+' : ''}${ae.strainCostDelta} strain`);
+        if (ae.pressureDelta) fx.push(`${ae.pressureDelta > 0 ? '+' : ''}${ae.pressureDelta} press`);
+        if (ae.consequenceDelta) fx.push(`${ae.consequenceDelta > 0 ? '+' : ''}${ae.consequenceDelta} conseq`);
+        if (ae.essenceDelta) fx.push(`${ae.essenceDelta > 0 ? '+' : ''}${ae.essenceDelta} ess`);
+        lines.push(`${ae.abilityId}: ${fx.join(' ')}`);
+    }
+
+    return lines.join('\n');
+}
+
 export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncounter, resolved?: boolean }) => {
     const pressurePercent = Math.min(100, Math.max(0, (encounter.pressureRemaining / encounter.startingPressure) * 100));
 
@@ -27,7 +49,10 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                     <span className="text-[10px] bg-void-purple/20 text-void-purple px-2 py-0.5 rounded border border-void-purple/30 uppercase tracking-wider mb-1 font-bold">
                         {encounter.modifierName}
                     </span>
-                    <span className="text-[10px] text-gray-500 max-w-[150px] text-right leading-tight">
+                    <span className="text-[10px] text-gray-300 max-w-[150px] text-right leading-snug whitespace-pre-line mb-0.5">
+                        {formatModifierEffects(encounter.modifierEffects)}
+                    </span>
+                    <span className="text-[10px] text-gray-600 max-w-[150px] text-right leading-tight italic">
                         {encounter.modifierDescription}
                     </span>
                 </div>
