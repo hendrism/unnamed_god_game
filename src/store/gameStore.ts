@@ -395,7 +395,7 @@ export const useGameStore = create<GameState>()(
                         : 0;
 
                     if (thresholdRuptureTriggered) {
-                        lastResolution += ' Threshold rupture grants your next cast for free.';
+                        lastResolution += ' Something gave way. Next cast is free.';
                     }
 
                     if (encounterEndsNow) {
@@ -439,7 +439,7 @@ export const useGameStore = create<GameState>()(
 
                     if (thresholdExceededNow && !encounterEndsNow) {
                         lastResolution +=
-                            ' Consequence threshold breached. Reality has lodged a formal objection.';
+                            ' The threshold is now a matter of record. Reality has lodged a formal objection.';
                     }
 
                     if (!encounterEndsNow && castsThisEncounter % CASTS_PER_BOON === 0) {
@@ -448,7 +448,7 @@ export const useGameStore = create<GameState>()(
                             phase = 'boon';
                             boonOptions = choices;
                             boonPrompt = thresholdRuptureTriggered
-                                ? 'Reality tears open. Claim one fragment before it seals.'
+                                ? 'The rupture opened a window. Claim one fragment.'
                                 : 'A forgotten fragment surfaces. Choose one power.';
                         }
                     }

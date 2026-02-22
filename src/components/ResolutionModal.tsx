@@ -19,7 +19,7 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
             case 'partial':
                 return 'text-blue-400';
             case 'minimal':
-                return 'text-yellow-400';
+                return 'text-yellow-500';
             case 'catastrophic':
                 return 'text-strain-red';
             default:
@@ -30,13 +30,13 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
     const getOutcomeTitle = () => {
         switch (resolution.outcome) {
             case 'perfect':
-                return 'Perfect Intervention';
+                return 'Flawless, As Expected';
             case 'partial':
-                return 'Partial Success';
+                return 'Acceptable Outcome';
             case 'minimal':
-                return 'Minimal Success';
+                return 'Technically Successful';
             case 'catastrophic':
-                return 'Catastrophic Outcome';
+                return 'Significant Feedback Received';
             default:
                 return 'Intervention Complete';
         }
@@ -88,15 +88,15 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                 {/* Goal Achievement Feedback */}
                 {resolution.pressureRemaining === 0 && (
                     <div className="mb-4 p-3 bg-green-900/20 border border-green-600/50 rounded">
-                        <p className="text-sm text-green-300 font-semibold">🎯 Goal 1 Achieved: Pressure Eliminated</p>
-                        <p className="text-xs text-green-400 mt-1">Next encounter starts with lower pressure and grants bonus essence.</p>
+                        <p className="text-sm text-green-300 font-semibold">✓ Pressure eliminated. The situation accepted your intervention.</p>
+                        <p className="text-xs text-green-400 mt-1">Efficiency noted. The next matter is already in queue.</p>
                     </div>
                 )}
 
                 {resolution.thresholdExceeded && (
                     <div className="mb-4 p-3 bg-red-900/30 border border-red-600/50 rounded">
-                        <p className="text-sm text-red-300 font-semibold">⚠ Goal 2 Failed: Consequences Breached</p>
-                        <p className="text-xs text-red-400 mt-1">Next encounter starts with higher pressure from added instability.</p>
+                        <p className="text-sm text-red-300 font-semibold">Threshold exceeded. The cosmos has registered a concern.</p>
+                        <p className="text-xs text-red-400 mt-1">The instability will be someone else's problem. Soon.</p>
                     </div>
                 )}
 

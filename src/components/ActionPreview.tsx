@@ -81,7 +81,7 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                         {currentEncounter && (
                             <div className="text-xs text-gray-500">
                                 {currentEncounter.consequenceMeter} → <span className={`font-semibold ${preview.willExceedThreshold ? 'text-strain-red' : 'text-white'}`}>{preview.projectedConsequenceMeter}</span>
-                                {preview.willExceedThreshold && <span className="text-strain-red ml-2">⚠ BREACHED</span>}
+                                {preview.willExceedThreshold && <span className="text-strain-red ml-2">⚠ exceeded</span>}
                             </div>
                         )}
                     </div>

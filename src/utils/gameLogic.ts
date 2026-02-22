@@ -459,46 +459,46 @@ export const buildAbilityPreview = (
     if (ability.id === 'smite' && lastAbilityId === 'manifest') {
         consequenceDelta = Math.min(0, consequenceDelta);
         synergyLabel = 'Manifest -> Smite';
-        notes.push('Synergy: Smite after Manifest Presence causes 0 Consequence (immunity).');
+        notes.push('Synergy: Smite after Manifest Presence. No Consequence. Apparently you meant it.');
     }
 
     if (ability.id === 'manifest' && lastAbilityId === 'twist') {
         strainRelief += 2;
         pressureDelta += 2;
         synergyLabel = 'Twist -> Manifest';
-        notes.push('Synergy: Twist → Manifest: costs 2 less Strain and reduces the encounter\'s Pressure by 2 more.');
+        notes.push('Synergy: Twist → Manifest. The distortion helped. -2 Strain cost, -2 more Pressure.');
     }
 
     if (ability.id === 'twist' && lastAbilityId === 'smite') {
         willGrantFreeCast = true;
         synergyLabel = 'Smite -> Twist';
-        notes.push('Synergy: next ability will cost 0 Strain and cause 0 Consequence.');
+        notes.push('Synergy: Smite → Twist. A door opened. Next ability costs 0 Strain and 0 Consequence.');
     }
 
     if (ability.id === 'condemn' && lastAbilityId === 'witness') {
         pressureDelta += 2;
         synergyLabel = synergyLabel ?? 'Witness -> Condemn';
-        notes.push('Synergy: Condemn after Witness gains +2 Pressure.');
+        notes.push('Synergy: observation followed by judgment. Efficiency noted. +2 Pressure.');
     }
 
     if (ability.id === 'absolve' && lastAbilityId === 'condemn') {
         consequenceDelta -= 4;
         essenceDelta += 1;
         synergyLabel = synergyLabel ?? 'Condemn -> Absolve';
-        notes.push('Synergy: Absolve after Condemn reduces Consequence by an extra 4 and grants +1 Essence.');
+        notes.push('Synergy: condemn then forgive. The cycle is productive. -4 Consequence, +1 Essence.');
     }
 
     if ((ability.id === 'stifle' || ability.id === 'supplicate') && lastAbilityId === 'manifest') {
         strainRelief += 1;
         synergyLabel = synergyLabel ?? 'Manifest -> Compliance';
-        notes.push('Synergy: Presence into compliance relieves 1 Strain.');
+        notes.push('Synergy: the crowd\'s cooperation is restorative. -1 Strain.');
     }
 
     if (ability.id === 'rift' && lastAbilityId === 'twist') {
         pressureDelta += 1;
         consequenceDelta += 1;
         synergyLabel = synergyLabel ?? 'Twist -> Rift';
-        notes.push('Synergy: Open Rift after Twist Fate adds +1 Pressure and +1 Consequence.');
+        notes.push('Synergy: fate distorted, then torn. The results are enthusiastic. +1 Pressure, +1 Consequence.');
     }
 
     if (ability.id === 'ordain' && lastAbilityId === 'manifest') {
@@ -511,13 +511,13 @@ export const buildAbilityPreview = (
         pressureDelta += 1;
         consequenceDelta -= 2;
         synergyLabel = synergyLabel ?? 'Witness -> Invoke';
-        notes.push('Synergy: Invoke after Witness converts observation into +1 Pressure and -2 Consequence.');
+        notes.push('Synergy: they watched, now they act. +1 Pressure, -2 Consequence.');
     }
 
     if (ability.id === 'unravel' && lastAbilityId === 'smite') {
         consequenceDelta -= 3;
         synergyLabel = synergyLabel ?? 'Smite -> Unravel';
-        notes.push('Synergy: Unravel after Smite revises the aftermath. -3 Consequence.');
+        notes.push('Synergy: Smite first, revise later. The records have been updated. -3 Consequence.');
     }
 
     if (ability.id === 'coerce' && lastAbilityId === 'ordain') {
@@ -529,7 +529,7 @@ export const buildAbilityPreview = (
     if (state.doctrine?.id === 'revelation' && ability.baseEssence > 0) {
         pressureDelta += 1;
         essenceDelta += 1;
-        notes.push('Revelation passive: presence compounds into pressure and tribute.');
+        notes.push('Doctrine of Revelation: the crowd cannot stop paying attention. +1 Pressure, +1 Essence.');
     }
 
     if (state.nextCastFree) {
@@ -570,10 +570,10 @@ export const buildAbilityPreview = (
         essenceDelta -= THRESHOLD_PENALTY_ESSENCE;
         if (willTriggerThresholdRupture) {
             essenceDelta += THRESHOLD_RUPTURE_ESSENCE;
-            notes.push('Threshold ruptured: something gave way. Take the bonus and the free cast.');
+            notes.push('Something gave way productively. Next cast costs nothing.');
         }
         notes.push(
-            `Threshold breached: +${THRESHOLD_PENALTY_STRAIN} Strain and -${THRESHOLD_PENALTY_ESSENCE} Essence.`
+            `The threshold is now historical. +${THRESHOLD_PENALTY_STRAIN} Strain, -${THRESHOLD_PENALTY_ESSENCE} Essence.`
         );
     }
 
@@ -582,16 +582,16 @@ export const buildAbilityPreview = (
     // STRAIN PENALTY: Higher strain = sloppier interventions = more consequences
     if (projectedStrainLevel === 'Medium') {
         consequenceDelta += 5;
-        notes.push('Strain (Medium): the intervention grows sloppy. +5 Consequence.');
+        notes.push('Strain (Medium): the intervention is becoming imprecise. The mortals can tell. +5 Consequence.');
     } else if (projectedStrainLevel === 'High') {
         consequenceDelta += 8;
         essenceDelta -= 1;
-        notes.push('Strain (High): divine overreach. The execution suffers. +8 Consequence, -1 Essence.');
+        notes.push('Strain (High): you are trying visibly hard. This is suboptimal. +8 Consequence, -1 Essence.');
     } else if (projectedStrainLevel === 'Critical') {
         consequenceDelta += 12;
         essenceDelta -= 1;
         pressureDelta = Math.max(0, pressureDelta - 5);
-        notes.push('Strain (Critical): the god is pushing too hard. Reality is resisting. +12 Consequence, -1 Essence, -5 Pressure.');
+        notes.push('Strain (Critical): operating well outside your own guidelines. +12 Consequence, -1 Essence, -5 Pressure.');
     }
 
     pressureDelta = Math.max(0, pressureDelta);
@@ -602,7 +602,7 @@ export const buildAbilityPreview = (
 
     if (willExceedThreshold && !encounter.thresholdExceeded) {
         notes.push(
-            'Warning: this will exceed the consequence threshold. The cosmos will file a complaint.'
+            'This will exceed the consequence threshold. The cosmos will file a complaint.'
         );
     }
 
