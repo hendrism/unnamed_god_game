@@ -127,12 +127,20 @@ export const ActionPreview = ({ ability, preview, onConfirm, onCancel }: ActionP
                     <div className="mb-4 p-3 bg-blue-900/20 border border-blue-700/50 rounded-lg">
                         <p className="text-xs text-blue-300 uppercase tracking-wide mb-2 font-semibold">Active Modifiers</p>
                         <div className="space-y-1.5">
-                            {otherNotes.map((note, idx) => (
-                                <div key={idx} className="flex items-start gap-2">
-                                    <span className="text-blue-400 mt-0.5 flex-shrink-0">•</span>
-                                    <p className="text-sm text-blue-100 leading-snug">{note}</p>
-                                </div>
-                            ))}
+                            {otherNotes.map((note, idx) => {
+                                const sepIdx = note.indexOf(' — ');
+                                const stat = sepIdx >= 0 ? note.slice(0, sepIdx) : note;
+                                const flavor = sepIdx >= 0 ? note.slice(sepIdx + 3) : null;
+                                return (
+                                    <div key={idx} className="flex items-start gap-2">
+                                        <span className="text-blue-400 mt-0.5 flex-shrink-0">•</span>
+                                        <p className="text-sm leading-snug">
+                                            <span className="text-white font-semibold">{stat}</span>
+                                            {flavor && <span className="text-blue-400/70 italic"> — {flavor}</span>}
+                                        </p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 );
