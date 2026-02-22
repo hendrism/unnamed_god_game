@@ -208,6 +208,10 @@ export const GameView = () => {
                                 prayers: 'avg pressure',
                                 rebellion: 'high conseq',
                                 blight: 'high pressure',
+                                drought: 'low reward',
+                                miracles: 'low pressure',
+                                heresy: 'high conseq',
+                                volcano: 'extreme pressure',
                             };
                             const note = notes[entry.templateId];
                             return (
