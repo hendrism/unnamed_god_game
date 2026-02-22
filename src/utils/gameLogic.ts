@@ -399,7 +399,7 @@ export const buildAbilityPreview = (
 
     if (state.nextCastFree) {
         strainCost = 0;
-        notes.push('Rupture in effect: this cast is free. The cosmos is being cooperative.');
+        notes.push('Free cast — Rupture: the cosmos is being cooperative.');
     }
 
     if (
@@ -412,7 +412,7 @@ export const buildAbilityPreview = (
             strainCost - state.strengthBonuses.firstCastStrainReduction
         );
         notes.push(
-            `Upgrade bonus: first cast costs ${state.strengthBonuses.firstCastStrainReduction} less Strain.`
+            `-${state.strengthBonuses.firstCastStrainReduction} strain — Upgrade: first cast discounted.`
         );
     }
 
@@ -436,23 +436,28 @@ export const buildAbilityPreview = (
 
     if (state.doctrine?.id === 'dominion' && ability.basePressure > 0 && strainCost > 0) {
         strainCost = Math.max(0, strainCost - 1);
-        notes.push('Dominion passive: force is discounted. This is correct and expected.');
+        notes.push('-1 strain — Dominion passive: force is discounted.');
     }
     strainCost = Math.max(0, strainCost);
 
     if (repeatedPowerBonus > 0) {
         notes.push(
-            `Repetition: ${ability.name} has grown accustomed to being deployed. +${repeatedPowerBonus} Pressure.`
+            `+${repeatedPowerBonus} press — Repetition: ${ability.name} has grown accustomed to being deployed.`
         );
     }
     if (abilityModifier) {
-        notes.push(`${encounter.modifierName}: local conditions affect ${ability.name}.`);
+        const modParts: string[] = [];
+        if (abilityModifier.strainCostDelta) modParts.push(`${abilityModifier.strainCostDelta > 0 ? '+' : ''}${abilityModifier.strainCostDelta} strain`);
+        if (abilityModifier.pressureDelta) modParts.push(`${abilityModifier.pressureDelta > 0 ? '+' : ''}${abilityModifier.pressureDelta} press`);
+        if (abilityModifier.consequenceDelta) modParts.push(`${abilityModifier.consequenceDelta > 0 ? '+' : ''}${abilityModifier.consequenceDelta} conseq`);
+        if (abilityModifier.essenceDelta) modParts.push(`${abilityModifier.essenceDelta > 0 ? '+' : ''}${abilityModifier.essenceDelta} ess`);
+        notes.push(`${modParts.join(' ')} — ${encounter.modifierName}: affects ${ability.name}.`);
     }
 
     if (firstCastThisEncounter && state.strengthBonuses.firstCastEssenceBonus > 0) {
         essenceDelta += state.strengthBonuses.firstCastEssenceBonus;
         notes.push(
-            `Upgrade bonus: first cast grants +${state.strengthBonuses.firstCastEssenceBonus} Essence.`
+            `+${state.strengthBonuses.firstCastEssenceBonus} ess — Upgrade: first cast essence bonus.`
         );
     }
 
@@ -529,7 +534,7 @@ export const buildAbilityPreview = (
     if (state.doctrine?.id === 'revelation' && ability.baseEssence > 0) {
         pressureDelta += 1;
         essenceDelta += 1;
-        notes.push('Doctrine of Revelation: the crowd cannot stop paying attention. +1 Pressure, +1 Essence.');
+        notes.push('+1 press +1 ess — Doctrine of Revelation: the crowd cannot stop paying attention.');
     }
 
     if (state.nextCastFree) {
@@ -539,20 +544,20 @@ export const buildAbilityPreview = (
     if (consequenceDelta > 0) {
         if (ability.category === 'smite') {
             consequenceDelta += 1;
-            notes.push('Smite consequence: the fear has spread further than planned. You had a plan.');
+            notes.push('+1 conseq — Smite: fear has spread further than planned.');
         } else if (ability.category === 'manifest') {
             consequenceDelta += 1;
             essenceDelta += 1;
-            notes.push('Manifest consequence: the devout have become demanding. Their faith is excessive.');
+            notes.push('+1 conseq +1 ess — Manifest: the devout have become demanding.');
         } else if (ability.category === 'twist') {
             consequenceDelta += 1;
             const fractureHitsPressure = encounter.turn % 2 === 1;
             if (fractureHitsPressure) {
                 pressureDelta += 1;
-                notes.push('Twist consequence: reality fractures. Additional pressure surfaces, unannounced.');
+                notes.push('+1 conseq +1 press — Twist: reality fractures.');
             } else {
                 essenceDelta += 1;
-                notes.push('Twist consequence: reality fractures. Power escapes through the gap.');
+                notes.push('+1 conseq +1 ess — Twist: reality fractures, power escapes.');
             }
         }
     }
@@ -570,10 +575,10 @@ export const buildAbilityPreview = (
         essenceDelta -= THRESHOLD_PENALTY_ESSENCE;
         if (willTriggerThresholdRupture) {
             essenceDelta += THRESHOLD_RUPTURE_ESSENCE;
-            notes.push('Something gave way productively. Next cast costs nothing.');
+            notes.push(`+${THRESHOLD_RUPTURE_ESSENCE} ess, next free — Rupture: something gave way productively.`);
         }
         notes.push(
-            `The threshold is now historical. +${THRESHOLD_PENALTY_STRAIN} Strain, -${THRESHOLD_PENALTY_ESSENCE} Essence.`
+            `+${THRESHOLD_PENALTY_STRAIN} strain -${THRESHOLD_PENALTY_ESSENCE} ess — Threshold exceeded.`
         );
     }
 
@@ -582,16 +587,16 @@ export const buildAbilityPreview = (
     // STRAIN PENALTY: Higher strain = sloppier interventions = more consequences
     if (projectedStrainLevel === 'Medium') {
         consequenceDelta += 5;
-        notes.push('Strain (Medium): the intervention is becoming imprecise. The mortals can tell. +5 Consequence.');
+        notes.push('+5 conseq — Strain (Medium): the intervention is becoming imprecise.');
     } else if (projectedStrainLevel === 'High') {
         consequenceDelta += 8;
         essenceDelta -= 1;
-        notes.push('Strain (High): you are trying visibly hard. This is suboptimal. +8 Consequence, -1 Essence.');
+        notes.push('+8 conseq -1 ess — Strain (High): you are trying visibly hard.');
     } else if (projectedStrainLevel === 'Critical') {
         consequenceDelta += 12;
         essenceDelta -= 1;
         pressureDelta = Math.max(0, pressureDelta - 5);
-        notes.push('Strain (Critical): operating well outside your own guidelines. +12 Consequence, -1 Essence, -5 Pressure.');
+        notes.push('+12 conseq -1 ess -5 press — Strain (Critical): operating outside guidelines.');
     }
 
     pressureDelta = Math.max(0, pressureDelta);
@@ -601,9 +606,7 @@ export const buildAbilityPreview = (
     const willExceedThreshold = projectedConsequenceMeter > encounter.consequenceThreshold;
 
     if (willExceedThreshold && !encounter.thresholdExceeded) {
-        notes.push(
-            'This will exceed the consequence threshold. The cosmos will file a complaint.'
-        );
+        notes.push('⚠ Consequence threshold will be exceeded.');
     }
 
     return {
