@@ -1,4 +1,5 @@
 import type { EncounterResolution } from '../types';
+import { getAbilityCategoryLabel } from '../utils/categoryLabels';
 
 interface ResolutionModalProps {
     resolution: EncounterResolution;
@@ -79,7 +80,7 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-500">Dominant Consequence:</span>
                             <span className="text-gray-200 uppercase">
-                                {resolution.dominantConsequenceCategory}
+                                {getAbilityCategoryLabel(resolution.dominantConsequenceCategory)}
                             </span>
                         </div>
                     )}

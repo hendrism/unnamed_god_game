@@ -1,5 +1,6 @@
 import type { Ability, AbilityId } from '../types';
 import { useGameStore } from '../store/gameStore';
+import { getAbilityCategoryLabel } from '../utils/categoryLabels';
 
 interface AbilityBarProps {
     abilities: Ability[];
@@ -40,7 +41,7 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
                                     {ability.name}
                                 </span>
                                 <span className="text-[9px] uppercase tracking-widest text-gray-500 truncate block">
-                                    {ability.category}
+                                    {getAbilityCategoryLabel(ability.category)}
                                 </span>
                             </div>
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Ability, AbilityId } from '../types';
 import { DOCTRINES } from '../data/doctrines';
 import { useGameStore } from '../store/gameStore';
+import { getAbilityCategoryLabel } from '../utils/categoryLabels';
 import { AbilityBar } from './AbilityBar';
 import { ActionLog } from './ActionLog';
 import { ActionPreview } from './ActionPreview';
@@ -253,7 +254,7 @@ export const GameView = () => {
                             </span>
                             <p className="text-sm text-gray-400 mb-4">{ability.description}</p>
                             <p className="text-xs text-gray-500 uppercase mb-4">
-                                Category: {ability.category}
+                                Category: {getAbilityCategoryLabel(ability.category)}
                             </p>
 
                             <div className="w-full space-y-1 mb-4 text-xs text-gray-500">
@@ -339,7 +340,7 @@ export const GameView = () => {
                             className="group flex flex-col p-5 bg-gray-900 border border-gray-700 rounded-lg hover:border-mythic-gold hover:bg-gray-800 transition-all text-left"
                         >
                             <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">
-                                {ability.category}
+                                {getAbilityCategoryLabel(ability.category)}
                             </p>
                             <h3 className="font-display text-2xl text-gray-100 group-hover:text-mythic-gold mb-2">
                                 {ability.name}
