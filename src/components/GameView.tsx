@@ -300,13 +300,17 @@ export const GameView = () => {
                                     </div>
                                     <div className="flex justify-between">
                                         <span>Cons</span>
-                                        <span className={ability.baseConsequence > 0 ? 'text-void-purple' : 'text-green-400'}>
+                                        <span className={ability.baseConsequence > 0 ? 'text-void-purple' : ability.baseConsequence < 0 ? 'text-green-400' : 'text-gray-600'}>
                                             {ability.baseConsequence > 0 ? '+' : ''}{ability.baseConsequence}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span>Strain</span>
                                         <span className="text-blue-400">{ability.baseStrainCost}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>Ess</span>
+                                        <span className="text-mythic-gold">+{ability.baseEssence}</span>
                                     </div>
                                 </div>
                             </div>

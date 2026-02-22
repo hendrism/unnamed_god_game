@@ -54,32 +54,32 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
                                         <span className="text-red-400 font-bold flex-shrink-0">-{preview.pressureDelta}</span>
                                     </div>
                                     {/* 2. Consequence (matches Goal 2) */}
-                                    {preview.consequenceDelta !== 0 && (
-                                        <div className="flex justify-between items-center gap-2">
-                                            <span className="text-gray-400 truncate">Consequence</span>
-                                            <span className={`font-bold flex-shrink-0 ${
-                                                preview.consequenceDelta > 0
-                                                    ? preview.willExceedThreshold
-                                                        ? 'text-strain-red animate-pulse'
-                                                        : 'text-void-purple'
-                                                    : 'text-green-400'
-                                            }`}>
-                                                {preview.consequenceDelta > 0 ? '+' : ''}{preview.consequenceDelta}
-                                            </span>
-                                        </div>
-                                    )}
+                                    <div className="flex justify-between items-center gap-2">
+                                        <span className="text-gray-400 truncate">Consequence</span>
+                                        <span className={`font-bold flex-shrink-0 ${
+                                            preview.consequenceDelta > 0
+                                                ? preview.willExceedThreshold
+                                                    ? 'text-strain-red animate-pulse'
+                                                    : 'text-void-purple'
+                                                : preview.consequenceDelta < 0
+                                                    ? 'text-green-400'
+                                                    : 'text-gray-600'
+                                        }`}>
+                                            {preview.consequenceDelta > 0 ? '+' : ''}{preview.consequenceDelta}
+                                        </span>
+                                    </div>
                                     {/* 3. Strain (cost to use) */}
                                     <div className="flex justify-between items-center gap-2">
                                         <span className="text-gray-400 truncate">Strain</span>
                                         <span className="text-blue-400 font-bold flex-shrink-0">+{preview.strainCost}</span>
                                     </div>
                                     {/* 4. Essence (reward) */}
-                                    {preview.essenceDelta > 0 && (
-                                        <div className="flex justify-between items-center gap-2">
-                                            <span className="text-gray-400 truncate">Essence</span>
-                                            <span className="text-mythic-gold font-bold flex-shrink-0">+{preview.essenceDelta}</span>
-                                        </div>
-                                    )}
+                                    <div className="flex justify-between items-center gap-2">
+                                        <span className="text-gray-400 truncate">Essence</span>
+                                        <span className={`font-bold flex-shrink-0 ${preview.essenceDelta > 0 ? 'text-mythic-gold' : 'text-gray-600'}`}>
+                                            +{preview.essenceDelta}
+                                        </span>
+                                    </div>
                                 </div>
                             )}
 
