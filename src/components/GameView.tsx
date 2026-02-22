@@ -179,66 +179,30 @@ export const GameView = () => {
                     One fragment must be reclaimed before the first crisis.
                 </p>
 
-                {/* Starting Abilities - Now with Stats! */}
-                <div className="w-full max-w-xl bg-gray-900 border border-gray-700 rounded-lg p-4 mb-2">
-                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Starting Arsenal</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Compact Reference Strip */}
+                <div className="w-full max-w-xl bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 space-y-2">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 items-baseline">
+                        <span className="text-[10px] uppercase tracking-widest text-gray-500 shrink-0 w-16">Arsenal</span>
                         {abilities.map((ability) => (
-                            <div
-                                key={ability.id}
-                                className="bg-black/40 border border-gray-800 rounded p-3"
-                            >
-                                <p className="text-sm text-gray-200 font-semibold mb-1">{ability.name}</p>
-                                <div className="space-y-0.5 text-[10px] text-gray-500">
-                                    <div className="flex justify-between">
-                                        <span>Pressure</span>
-                                        <span className="text-red-400">-{ability.basePressure}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Consequence</span>
-                                        <span className={ability.baseConsequence > 0 ? 'text-void-purple' : 'text-green-400'}>
-                                            {ability.baseConsequence > 0 ? '+' : ''}{ability.baseConsequence}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Strain</span>
-                                        <span className="text-blue-400">{ability.baseStrainCost}</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <span key={ability.id} className="text-xs">
+                                <span className="text-gray-300">{ability.name}</span>
+                                <span className="text-[10px] ml-1.5 space-x-1">
+                                    <span className="text-red-400">−{ability.basePressure}p</span>
+                                    <span className={ability.baseConsequence > 0 ? 'text-void-purple' : ability.baseConsequence < 0 ? 'text-green-400' : 'text-gray-600'}>
+                                        {ability.baseConsequence > 0 ? '+' : ''}{ability.baseConsequence}c
+                                    </span>
+                                    <span className="text-blue-400">{ability.baseStrainCost}s</span>
+                                </span>
+                            </span>
                         ))}
                     </div>
-                </div>
-
-                <div className="w-full max-w-xl bg-gray-900 border border-gray-700 rounded-lg p-4">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                        Foresight: Encounter Mix This Run
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {runForecast.map((entry) => {
-                            // Encounter difficulty info to help choose fragments
-                            const encounterInfo: Record<string, { difficulty: string; note: string }> = {
-                                shrine: { difficulty: 'Easy', note: 'Best essence rewards' },
-                                storm: { difficulty: 'Medium', note: 'Balanced challenge' },
-                                prayers: { difficulty: 'Medium', note: 'Average pressure' },
-                                rebellion: { difficulty: 'Hard', note: 'High consequences' },
-                                blight: { difficulty: 'Very Hard', note: 'Highest pressure' },
-                            };
-                            const info = encounterInfo[entry.templateId] || { difficulty: '?', note: '' };
-
-                            return (
-                                <div
-                                    key={entry.templateId}
-                                    className="bg-black/40 border border-gray-800 rounded p-2"
-                                >
-                                    <p className="text-sm text-gray-200">{entry.title}</p>
-                                    <div className="flex justify-between items-center mt-1">
-                                        <p className="text-xs text-gray-500">{entry.count} projected</p>
-                                        <p className="text-[10px] text-gray-400 italic">{info.note}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 items-baseline border-t border-gray-800 pt-2">
+                        <span className="text-[10px] uppercase tracking-widest text-gray-500 shrink-0 w-16">Forecast</span>
+                        {runForecast.map((entry) => (
+                            <span key={entry.templateId} className="text-xs text-gray-400">
+                                {entry.title} <span className="text-gray-600">×{entry.count}</span>
+                            </span>
+                        ))}
                     </div>
                 </div>
 
