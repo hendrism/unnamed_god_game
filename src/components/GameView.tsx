@@ -47,8 +47,6 @@ export const GameView = () => {
         selectDraftAbility,
         selectBoonAbility,
         selectPetition,
-        markTutorialSeen,
-        hasSeenTutorial,
         endRun,
         encounterResolved,
         castsThisEncounter,
@@ -60,12 +58,6 @@ export const GameView = () => {
     const [selectedAbilityId, setSelectedAbilityId] = useState<AbilityId | null>(null);
     const [showHelp, setShowHelp] = useState(false);
     const [resetConfirming, setResetConfirming] = useState(false);
-
-    useEffect(() => {
-        if (!hasSeenTutorial && phase === 'draft' && !showHelp) {
-            setShowHelp(true);
-        }
-    }, [hasSeenTutorial, phase, showHelp]);
 
     useEffect(() => {
         if (phase !== 'encounter') {
@@ -82,9 +74,6 @@ export const GameView = () => {
     );
 
     const handleCloseHelp = () => {
-        if (!hasSeenTutorial && phase !== 'menu') {
-            markTutorialSeen();
-        }
         setShowHelp(false);
     };
 

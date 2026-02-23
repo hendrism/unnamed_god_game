@@ -33,13 +33,14 @@ import {
 
 // Apply world-shaping strength bonuses to a freshly created encounter (mutates in place)
 const applyWorldBonuses = (enc: ActiveEncounter, bonuses: StrengthBonuses) => {
-    if (bonuses.conseqThresholdBonus > 0) {
-        enc.consequenceThreshold += bonuses.conseqThresholdBonus;
+    if (bonuses.conseqThresholdBonus !== 0) {
+        enc.consequenceThreshold = Math.max(5, enc.consequenceThreshold + bonuses.conseqThresholdBonus);
     }
     if (bonuses.turnLimitBonus > 0) {
         enc.turnLimit += bonuses.turnLimitBonus;
     }
-    if (bonuses.pressureStartReduction > 0) {
+    if (bonuses.pressureStartReduction !== 0) {
+        // Positive = reduce starting pressure; negative = increase it (Covenant of Pressure tradeoff)
         enc.startingPressure = Math.max(1, enc.startingPressure - bonuses.pressureStartReduction);
         enc.pressureRemaining = enc.startingPressure;
     }

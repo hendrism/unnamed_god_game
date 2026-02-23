@@ -131,6 +131,17 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                                 +{encounter.rewardPerTurn} <span className="text-[10px] text-gray-500">Essence/turn</span>
                             </span>
                         </div>
+                        {encounter.strainPerTurn > 0 && (
+                            <>
+                                <div className="h-6 w-px bg-gray-800" />
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] text-red-400 uppercase tracking-wider font-bold">Hazard</span>
+                                    <span className="text-sm font-mono text-red-300 leading-none">
+                                        +{encounter.strainPerTurn} <span className="text-[10px] text-red-500">Strain/cast</span>
+                                    </span>
+                                </div>
+                            </>
+                        )}
                     </div>
                     <div className="text-right hidden sm:block">
                         <p className="text-[10px] text-gray-600 italic">{encounter.rewardText}</p>

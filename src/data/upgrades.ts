@@ -56,7 +56,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'storm-calling',
         name: 'Storm Calling',
-        description: 'Storm encounters appear more often. (Moderate challenge, 1 essence/turn)',
+        description: 'Storm encounters appear more often. Hazard: +1 Strain per cast — every action costs more. Pair with high max-Strain upgrades.',
         category: 'world',
         tier: 1,
         cost: T1_COST,
@@ -68,7 +68,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'shrine-claim',
         name: 'Shrine Claim',
-        description: 'Shrine encounters appear more often. (Easiest encounters, 2 essence/turn)',
+        description: 'Shrine encounters appear more often. Easiest encounter type — low pressure, clean consequence threshold, 2 ess/turn. Good for recovering between difficult crises.',
         category: 'world',
         tier: 1,
         cost: T1_COST,
@@ -80,7 +80,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'zeal-incitement',
         name: 'Zeal Incitement',
-        description: 'Rebellion encounters appear more often. (Harder + risky, but 2 essence/turn)',
+        description: 'Rebellion encounters appear more often. Pressure regenerates at +6/cast — it fights back. High risk, 2 ess/turn. Rewards casting efficiently.',
         category: 'world',
         tier: 1,
         cost: T1_COST,
@@ -92,7 +92,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'drought-dominion',
         name: 'Drought Dominion',
-        description: 'Sanctioned Drought encounters appear more often. (Lower essence but builds consequence slowly)',
+        description: 'Sanctioned Drought encounters appear more often. Pressure builds slowly; moderate consequence risk. Reliable but low-yield at 1 ess/turn.',
         category: 'world',
         tier: 1,
         cost: T1_COST,
@@ -104,7 +104,7 @@ export const WORLD_UPGRADES: Upgrade[] = [
     {
         id: 'miracle-watch',
         name: 'Miracle Watch',
-        description: 'Surplus of Miracles encounters appear more often. (Fast rewards, tight consequence threshold)',
+        description: 'Surplus of Miracles encounters appear more often. Tight consequence threshold (35) but low starting pressure. 2 ess/turn if you stay clean. Punishes sloppy casts.',
         category: 'world',
         tier: 1,
         cost: T1_COST,
@@ -114,9 +114,21 @@ export const WORLD_UPGRADES: Upgrade[] = [
         },
     },
     {
+        id: 'resentment-harvest',
+        name: 'Resentment Harvest',
+        description: 'Unanswered Prayers encounters appear more often. Consequence trap — starts at 15 with a threshold of 40. 2 ess/turn but zero margin for reckless casts.',
+        category: 'world',
+        tier: 1,
+        cost: T1_COST,
+        encounterWeightDelta: {
+            encounterId: 'prayers',
+            amount: 2,
+        },
+    },
+    {
         id: 'philosopher-silence',
         name: "Philosopher's Silence",
-        description: 'Reasonable Philosopher encounters appear more often. (Lower reward, manageable if handled cleanly)',
+        description: 'Reasonable Philosopher encounters appear more often. Pressure regenerates at +3/cast — ideas spread. 2 ess/turn. Moderate difficulty.',
         category: 'world',
         tier: 1,
         cost: T1_COST,
@@ -126,9 +138,21 @@ export const WORLD_UPGRADES: Upgrade[] = [
         },
     },
     {
+        id: 'blight-dominion',
+        name: 'Blight Dominion',
+        description: 'Harvest Blight encounters appear more often. Highest base pressure (60) but generous threshold (70). High consequence floor, high reward. 2 ess/turn.',
+        category: 'world',
+        tier: 1,
+        cost: T1_COST,
+        encounterWeightDelta: {
+            encounterId: 'blight',
+            amount: 2,
+        },
+    },
+    {
         id: 'mountain-accord',
         name: 'Mountain Accord',
-        description: 'Geological Opinion encounters appear more often. (Hardest encounters, 2 essence/turn)',
+        description: 'Geological Opinion encounters appear more often. Hardest encounter — pressure regenerates at +12/cast. Very high numbers. 2 ess/turn if you can handle it.',
         category: 'world',
         tier: 1,
         cost: T1_COST,
@@ -167,6 +191,16 @@ export const T2_UPGRADES: Upgrade[] = [
         tier: 2,
         cost: T2_COST,
         perfectClearEssenceBonus: 3,
+    },
+    {
+        id: 'covenant-of-pressure',
+        name: 'Covenant of Pressure',
+        description: 'Each encounter begins with 8 more pressure. First ability each encounter grants +3 Essence. Front-load the benefit, deal with the consequences.',
+        category: 'strength',
+        tier: 2,
+        cost: T2_COST,
+        pressureStartReduction: -8,
+        firstCastEssenceBonus: 3,
     },
     // World T2
     {

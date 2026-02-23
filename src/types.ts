@@ -44,6 +44,7 @@ export interface EncounterTemplate {
     baseConsequence: number;
     consequenceThreshold: number;
     pressureRegen?: number;
+    strainPerTurn?: number;
 }
 
 export interface EncounterModifierAbilityEffect {
@@ -91,6 +92,7 @@ export interface ActiveEncounter {
     turn: number;
     turnLimit: number;
     pressureRegen: number;
+    strainPerTurn: number;
 }
 
 export interface Doctrine {

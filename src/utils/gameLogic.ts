@@ -239,6 +239,7 @@ export const createEncounter = (
         turn: 1,
         turnLimit: isUrgent ? randomInt(2, 3) : randomInt(3, 4),
         pressureRegen: template.pressureRegen ?? 0,
+        strainPerTurn: template.strainPerTurn ?? 0,
     };
 };
 
@@ -581,6 +582,12 @@ export const buildAbilityPreview = (
         notes.push(
             `+${THRESHOLD_PENALTY_STRAIN} strain -${THRESHOLD_PENALTY_ESSENCE} ess — Threshold exceeded.`
         );
+    }
+
+    // Per-encounter strain hazard: some encounters extract additional strain per cast
+    if (encounter.strainPerTurn > 0) {
+        projectedStrain += encounter.strainPerTurn;
+        notes.push(`+${encounter.strainPerTurn} strain — Encounter hazard: conditions exact a toll regardless of what you do.`);
     }
 
     const projectedStrainLevel = calculateStrainLevel(projectedStrain, state.maxStrain);
