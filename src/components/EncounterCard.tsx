@@ -64,7 +64,14 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                 {/* Pressure */}
                 <div className="bg-black/30 p-2 rounded border border-gray-800/50">
                     <div className="flex justify-between items-end mb-1">
-                        <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Pressure</span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Pressure</span>
+                            {encounter.pressureRegen > 0 && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-orange-950/50 text-orange-400 border border-orange-800/40 font-bold">
+                                    +{encounter.pressureRegen}/cast
+                                </span>
+                            )}
+                        </div>
                         <span className="text-sm font-mono text-white leading-none">
                             {encounter.pressureRemaining} <span className="text-gray-600 text-[10px]">/ {encounter.startingPressure}</span>
                         </span>

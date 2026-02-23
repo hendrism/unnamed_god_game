@@ -314,10 +314,10 @@ export const useGameStore = create<GameState>()(
                         synergyStreak: 0,
                         lastSynergy: '',
                         lastEncounterResolution: null,
-                        ...(state.strengthBonuses.resetStrainOnEncounterStart && {
-                            currentStrain: 0,
-                            strainLevel: 'Low' as const,
-                        }),
+                        ...(state.strengthBonuses.resetStrainOnEncounterStart && (() => {
+                            const halved = Math.floor(state.currentStrain / 2);
+                            return { currentStrain: halved, strainLevel: calculateStrainLevel(halved, state.maxStrain) };
+                        })()),
                     });
                 },
 
@@ -351,10 +351,10 @@ export const useGameStore = create<GameState>()(
                         lastSynergy: '',
                         lastEncounterResolution: null,
                         lastResolution: 'The petition has been heard. Begin the intervention.',
-                        ...(state.strengthBonuses.resetStrainOnEncounterStart && {
-                            currentStrain: 0,
-                            strainLevel: 'Low' as const,
-                        }),
+                        ...(state.strengthBonuses.resetStrainOnEncounterStart && (() => {
+                            const halved = Math.floor(state.currentStrain / 2);
+                            return { currentStrain: halved, strainLevel: calculateStrainLevel(halved, state.maxStrain) };
+                        })()),
                     });
                 },
 
@@ -380,10 +380,19 @@ export const useGameStore = create<GameState>()(
                         [abilityId]: (state.abilityUsage[abilityId] ?? 0) + 1,
                     };
 
-                    const updatedPressure = Math.max(
+                    const pressureAfterCast = Math.max(
                         0,
                         state.currentEncounter.pressureRemaining - preview.pressureDelta
                     );
+                    // Pressure regen applies after the cast (if pressure wasn't eliminated this cast).
+                    // Represents the situation worsening while you act — eruptions keep coming, uprisings keep spreading.
+                    const pressureEliminated = pressureAfterCast <= 0;
+                    const updatedPressure = pressureEliminated
+                        ? 0
+                        : Math.min(
+                              state.currentEncounter.startingPressure,
+                              pressureAfterCast + state.currentEncounter.pressureRegen
+                          );
                     const updatedConsequence = Math.max(
                         0,
                         state.currentEncounter.consequenceMeter + preview.consequenceDelta
@@ -394,7 +403,6 @@ export const useGameStore = create<GameState>()(
                     const thresholdRuptureTriggered =
                         thresholdExceededNow && !state.currentEncounter.thresholdRuptureUsed;
                     const nextTurn = state.currentEncounter.turn + 1;
-                    const pressureEliminated = updatedPressure <= 0;
                     const turnLimitReached = nextTurn > state.currentEncounter.turnLimit;
                     const encounterEndsNow = pressureEliminated || turnLimitReached;
 
@@ -427,7 +435,10 @@ export const useGameStore = create<GameState>()(
                     const castsThisEncounter = state.castsThisEncounter + 1;
                     let nextCastFree = preview.willGrantFreeCast || thresholdRuptureTriggered;
                     let strainAfterAction = preview.projectedStrain;
-                    let lastResolution = `${ability.name}: -${preview.pressureDelta} Pressure, +${preview.essenceDelta} Essence, ${preview.consequenceDelta >= 0 ? '+' : ''}${preview.consequenceDelta} Consequence.`;
+                    const regenNote = (!pressureEliminated && state.currentEncounter.pressureRegen > 0)
+                        ? ` +${state.currentEncounter.pressureRegen} Pressure (regen).`
+                        : '';
+                    let lastResolution = `${ability.name}: -${preview.pressureDelta} Pressure, +${preview.essenceDelta} Essence, ${preview.consequenceDelta >= 0 ? '+' : ''}${preview.consequenceDelta} Consequence.${regenNote}`;
                     const upgradeOptions = state.upgradeOptions;
                     let lastEncounterResolution = null;
                     let encounterResolved = false;

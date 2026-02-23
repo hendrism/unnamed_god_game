@@ -238,6 +238,7 @@ export const createEncounter = (
         thresholdRuptureUsed: false,
         turn: 1,
         turnLimit: isUrgent ? randomInt(2, 3) : randomInt(3, 4),
+        pressureRegen: template.pressureRegen ?? 0,
     };
 };
 
@@ -595,8 +596,7 @@ export const buildAbilityPreview = (
     } else if (projectedStrainLevel === 'Critical') {
         consequenceDelta += 12;
         essenceDelta -= 1;
-        pressureDelta = Math.max(0, pressureDelta - 5);
-        notes.push('+12 conseq -1 ess -5 press — Strain (Critical): operating outside guidelines.');
+        notes.push('+12 conseq -1 ess — Strain (Critical): operating well outside guidelines.');
     }
 
     pressureDelta = Math.max(0, pressureDelta);

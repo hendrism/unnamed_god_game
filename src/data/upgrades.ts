@@ -194,7 +194,7 @@ export const T3_UPGRADES: Upgrade[] = [
     {
         id: 'sovereign-composure',
         name: 'Sovereign Composure',
-        description: 'Begin every encounter with 0 Strain. Whatever happened before is no longer relevant.',
+        description: 'Begin every encounter with half your accumulated Strain. Whatever happened before is still somewhat relevant.',
         category: 'strength',
         tier: 3,
         cost: T3_COST,

@@ -43,6 +43,7 @@ export interface EncounterTemplate {
     baseRewardPerTurn: number;
     baseConsequence: number;
     consequenceThreshold: number;
+    pressureRegen?: number;
 }
 
 export interface EncounterModifierAbilityEffect {
@@ -89,6 +90,7 @@ export interface ActiveEncounter {
     thresholdRuptureUsed: boolean;
     turn: number;
     turnLimit: number;
+    pressureRegen: number;
 }
 
 export interface Doctrine {
