@@ -45,6 +45,9 @@ const applyWorldBonuses = (enc: ActiveEncounter, bonuses: StrengthBonuses) => {
     }
 };
 
+// God handles the first N encounters directly. Pim's petitions start after this.
+const GOD_ENCOUNTER_COUNT = 2;
+
 const INITIAL_STATE: Omit<
     GameState,
     | 'startRun'
@@ -88,6 +91,7 @@ const INITIAL_STATE: Omit<
     petitionOptions: [],
     pimPetitionTemplateId: null,
     lastPetitionWasPim: false,
+    pimEncountersChosen: 0,
     synergyStreak: 0,
     lastSynergy: '',
     ownedUpgrades: [],
@@ -149,6 +153,8 @@ export const useGameStore = create<GameState>()(
                         draftOptions,
                         encounterResolved: false,
                         lastEncounterResolution: null,
+                        pimEncountersChosen: 0,
+                        lastPetitionWasPim: false,
                         lastResolution: `${doctrine.name} chosen. Select one fragment before the first intervention.`,
                     });
                 },
@@ -243,29 +249,33 @@ export const useGameStore = create<GameState>()(
                         return;
                     }
 
-                    // Show petition when there are 2+ encounters remaining
-                    if (state.encountersCompleted + 1 < state.encountersTarget) {
-                        const templateIdA =
-                            state.runEncounterQueue[state.encountersCompleted] ??
-                            pickEncounterTemplateId(state.worldWeights);
+                    // Pim's petitions begin after the god's own encounters are handled.
+                    // Short runs (3 encounters) stay fully under the god's control.
+                    const isPimTerritory =
+                        state.encountersCompleted >= GOD_ENCOUNTER_COUNT &&
+                        state.encountersCompleted + 1 < state.encountersTarget;
+
+                    if (isPimTerritory) {
+                        // All three options are Pim's picks — he surfaced them uninvited.
+                        const templateIdA = pickEncounterTemplateId(state.worldWeights);
                         const templateIdB = pickEncounterTemplateId(
                             state.worldWeights,
                             [templateIdA]
                         );
-                        const templateIdPim = pickEncounterTemplateId(
+                        const templateIdC = pickEncounterTemplateId(
                             state.worldWeights,
                             [templateIdA, templateIdB]
                         );
                         const petitionOptions = [
                             getEncounterTemplateById(templateIdA),
                             getEncounterTemplateById(templateIdB),
-                            getEncounterTemplateById(templateIdPim),
+                            getEncounterTemplateById(templateIdC),
                         ];
 
                         set({
                             phase: 'petition',
                             petitionOptions,
-                            pimPetitionTemplateId: templateIdPim,
+                            pimPetitionTemplateId: null,
                             currentEncounter: null,
                             encounterResolved: false,
                             castsThisEncounter: 0,
@@ -295,6 +305,7 @@ export const useGameStore = create<GameState>()(
                         encounterAbilityIds: buildEncounterAbilityPool(state.abilities),
                         upgradeOptions: [],
                         petitionOptions: [],
+                        lastPetitionWasPim: false,
                         encounterResolved: false,
                         castsThisEncounter: 0,
                         nextCastFree: false,
@@ -314,7 +325,7 @@ export const useGameStore = create<GameState>()(
                     const state = get();
                     if (state.phase !== 'petition') return;
 
-                    const wasPim = templateId === state.pimPetitionTemplateId;
+                    // All petition encounters are Pim's — he surfaced every option.
                     const adjustedCarryover = Math.max(
                         0,
                         state.carryOverInstability - state.strengthBonuses.carryoverDecayBonus
@@ -328,7 +339,8 @@ export const useGameStore = create<GameState>()(
                         encounterAbilityIds: buildEncounterAbilityPool(state.abilities),
                         petitionOptions: [],
                         pimPetitionTemplateId: null,
-                        lastPetitionWasPim: wasPim,
+                        lastPetitionWasPim: true,
+                        pimEncountersChosen: state.pimEncountersChosen + 1,
                         upgradeOptions: [],
                         encounterResolved: false,
                         castsThisEncounter: 0,
@@ -638,7 +650,7 @@ export const useGameStore = create<GameState>()(
             }),
             {
                 name: 'fallen-god-storage',
-                version: 5,
+                version: 6,
                 migrate: (persistedState: unknown, _version: number) => {
                     const s = (persistedState ?? {}) as Partial<Record<string, unknown>>;
                     return {

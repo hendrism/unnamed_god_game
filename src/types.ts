@@ -216,6 +216,7 @@ export interface GameState {
     petitionOptions: EncounterTemplate[];
     pimPetitionTemplateId: string | null;
     lastPetitionWasPim: boolean;
+    pimEncountersChosen: number;
     synergyStreak: number;
     lastSynergy: string;
     ownedUpgrades: string[];

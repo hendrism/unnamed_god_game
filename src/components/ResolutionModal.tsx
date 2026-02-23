@@ -1,4 +1,4 @@
-import type { EncounterResolution } from '../types';
+import type { EncounterResolution, ResolutionOutcome } from '../types';
 import { getAbilityCategoryLabel } from '../utils/categoryLabels';
 
 interface ResolutionModalProps {
@@ -8,6 +8,65 @@ interface ResolutionModalProps {
     encountersCompleted: number;
     encountersTarget: number;
     petitionWasPim?: boolean;
+}
+
+// Pim is earnest, eager, and slightly oblivious to how much he's being blamed.
+const PIM_QUOTES: Record<ResolutionOutcome, string[]> = {
+    perfect: [
+        '"A triumph, my lord. I had a feeling about this one." — Pim, who did not have a feeling about this one',
+        '"Exactly as I predicted, my lord." — Pim, who predicted nothing',
+        '"My instincts were sound on this occasion." — Pim, filing this away for future self-promotion',
+        '"I believe my briefing was a contributing factor." — Pim, whose briefing was approximate at best',
+    ],
+    partial: [
+        '"A solid outcome, my lord. Largely as hoped." — Pim, who had not hoped',
+        '"Better than my estimates suggested." — Pim, who made no estimates',
+        '"I feel this reflects well on the preparation." — Pim, who prepared nothing',
+    ],
+    minimal: [
+        '"In hindsight, some of my figures may have been approximate." — Pim, who used no figures',
+        '"I accept partial responsibility, my lord. The partial that is not mine." — Pim',
+        '"I believe the situation was more nuanced than I communicated." — Pim, who communicated nothing',
+        '"The intelligence I had was also incomplete." — Pim, who gathered no intelligence',
+    ],
+    catastrophic: [
+        '"My lord, I can explain. Several of the explanations are quite good." — Pim',
+        '"I may have misjudged the severity. I accept full responsibility." — Pim, who will not',
+        '"In my defense, the information I had was also wrong." — Pim',
+        '"I take comfort in knowing this was not entirely foreseeable." — Pim, it was entirely foreseeable',
+    ],
+};
+
+// The god never accepts blame regardless of source. Good outcome = genius. Bad outcome = Pim's fault somehow.
+const GOD_QUOTES: Record<ResolutionOutcome, string[]> = {
+    perfect: [
+        'Precisely as expected. Pim, note this for the record.',
+        'The outcome reflects the quality of the intervention. Which was mine.',
+        'A flawless result. One of many.',
+        'My instincts continue to be correct. This is unsurprising.',
+    ],
+    partial: [
+        'Acceptable. The situation was more cooperative than Pim\'s briefing suggested.',
+        'We\'ve seen worse. Not often. But we have seen worse.',
+        'Adequate. The cosmos will understand in time.',
+        'Not my finest work. Pim\'s briefing was, again, optimistic.',
+    ],
+    minimal: [
+        'The result is satisfactory, given the inadequacy of the preparation.',
+        'We succeeded. Questions about the method are premature.',
+        'A narrower margin than anticipated. Pim had something to do with that.',
+        'Sufficient. The bar was admittedly low. We cleared it.',
+    ],
+    catastrophic: [
+        'I don\'t blame you, Pim. (I do blame you, Pim.)',
+        'Pim\'s briefing was, characteristically, optimistic.',
+        'This is not a reflection of the intervention. It is a reflection of the briefing.',
+        'The situation was misrepresented to me. Pim will hear about this.',
+    ],
+};
+
+function pickQuote(quotes: string[], seed: number): string {
+    return quotes[Math.abs(seed) % quotes.length];
 }
 
 export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersCompleted, encountersTarget, petitionWasPim }: ResolutionModalProps) => {
@@ -102,15 +161,20 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                     </div>
                 )}
 
-                {petitionWasPim && (
-                    <div className="mb-4 p-3 bg-amber-950/30 border border-amber-700/40 rounded">
-                        <p className="text-xs text-amber-400 italic">
-                            {resolution.outcome === 'perfect' || resolution.outcome === 'partial'
-                                ? '"An excellent outcome, my lord." — Pim, taking no credit whatsoever'
-                                : '"I may have misjudged the severity, my lord. I accept full responsibility." — Pim'}
-                        </p>
-                    </div>
-                )}
+                {(() => {
+                    const seed = resolution.finalConsequence + resolution.essenceGained;
+                    const quote = petitionWasPim
+                        ? pickQuote(PIM_QUOTES[resolution.outcome], seed)
+                        : pickQuote(GOD_QUOTES[resolution.outcome], seed);
+                    const isPimQuote = !!petitionWasPim;
+                    return (
+                        <div className={`mb-4 p-3 rounded border ${isPimQuote ? 'bg-amber-950/30 border-amber-700/40' : 'bg-gray-800/60 border-gray-700'}`}>
+                            <p className={`text-xs italic ${isPimQuote ? 'text-amber-400' : 'text-gray-400'}`}>
+                                {quote}
+                            </p>
+                        </div>
+                    );
+                })()}
 
                 <div className="space-y-2 mb-6 p-4 bg-black/40 rounded border border-gray-800">
                     <div className="flex justify-between">
