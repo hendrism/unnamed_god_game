@@ -509,8 +509,8 @@ export const useGameStore = create<GameState>()(
                             phase = 'boon';
                             boonOptions = choices;
                             boonPrompt = thresholdRuptureTriggered
-                                ? 'The rupture opened a window. Claim one fragment.'
-                                : 'A forgotten fragment surfaces. Choose one power.';
+                                ? 'The rupture opened a gap. Pim has identified a fragment worth considering.'
+                                : 'A fragment has surfaced between matters. Pim has pulled two options.';
                         }
                     }
 

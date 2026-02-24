@@ -11,15 +11,15 @@ export const HelpModal = ({ onClose }: { onClose: () => void }) => {
                     </button>
 
                     <h2 className="text-xl font-display text-mythic-gold mb-3 text-center">
-                        Divine Guidance
+                        Pim's Briefing Notes
                     </h2>
 
                     <div className="space-y-4 text-gray-300 text-sm">
                         <section>
-                            <h3 className="text-void-purple font-bold uppercase tracking-wider mb-2">The Goal</h3>
+                            <h3 className="text-void-purple font-bold uppercase tracking-wider mb-2">The Situation</h3>
                             <p>
-                                You must survive a series of <span className="text-gray-200 font-bold">Encounters</span> (3-5 per run).
-                                Survive long enough to gather <span className="text-mythic-gold">Essence</span> and grow stronger.
+                                A series of <span className="text-gray-200 font-bold">Matters</span> require intervention (3–5 per session).
+                                Each resolved matter yields <span className="text-mythic-gold">Essence</span>, which funds improvements.
                             </p>
                         </section>
 
@@ -27,30 +27,30 @@ export const HelpModal = ({ onClose }: { onClose: () => void }) => {
                             <h3 className="text-void-purple font-bold uppercase tracking-wider mb-2">The Meters</h3>
                             <ul className="space-y-2">
                                 <li>
-                                    <span className="text-red-400 font-bold">Pressure:</span> The immediate threat.
-                                    Reduce this to 0 to flawlessly solve the encounter. Unresolved Pressure becomes Consequence.
+                                    <span className="text-red-400 font-bold">Pressure:</span> The immediate crisis level.
+                                    Reduce to 0 for a clean resolution. Unresolved Pressure contributes to Consequence.
                                 </li>
                                 <li>
-                                    <span className="text-blue-400 font-bold">Strain:</span> Your divine limit.
-                                    Using abilities adds Strain. If Strain gets too high, you suffer <span className="text-orange-400">Backlash</span> (negative side effects).
+                                    <span className="text-blue-400 font-bold">Herald's Strain:</span> The operational limit.
+                                    Each cast adds Strain. High Strain increases <span className="text-orange-400">Consequence</span> per cast significantly.
                                 </li>
                                 <li>
-                                    <span className="text-void-purple font-bold">Consequence:</span> Long-term damage to the world.
-                                    Avoid this. It carries over between encounters.
+                                    <span className="text-void-purple font-bold">Consequence:</span> Long-term instability.
+                                    Pim notes this carefully. It carries over between encounters.
                                 </li>
                             </ul>
                         </section>
 
                         <section>
-                            <h3 className="text-void-purple font-bold uppercase tracking-wider mb-2">How to Act</h3>
+                            <h3 className="text-void-purple font-bold uppercase tracking-wider mb-2">How Interventions Work</h3>
                             <p>
-                                1. <span className="text-gray-200 font-bold">Select</span> an ability from your hand to see its prediction.
+                                1. <span className="text-gray-200 font-bold">Select</span> an ability to see the projected outcome.
                             </p>
                             <p>
-                                2. <span className="text-gray-200 font-bold">Confirm</span> to cast it.
+                                2. <span className="text-gray-200 font-bold">Confirm</span> to execute it.
                             </p>
                             <p className="italic text-xs mt-2 text-gray-500">
-                                Tip: Look for specific Synergies (e.g., "Use X after Y") to maximize efficiency.
+                                Pim's note: Specific Synergies (e.g., "Use X after Y") improve efficiency considerably. He has flagged these in the previews.
                             </p>
                         </section>
                     </div>
@@ -60,7 +60,7 @@ export const HelpModal = ({ onClose }: { onClose: () => void }) => {
                             onClick={onClose}
                             className="w-full py-2.5 bg-void-purple text-white font-bold rounded hover:bg-void-purple-dark transition-all"
                         >
-                            I UNDERSTAND
+                            Understood
                         </button>
                     </div>
                 </div>

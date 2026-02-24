@@ -599,7 +599,7 @@ export const buildAbilityPreview = (
     } else if (projectedStrainLevel === 'High') {
         consequenceDelta += 8;
         essenceDelta -= 1;
-        notes.push('+8 conseq -1 ess — Strain (High): you are trying visibly hard.');
+        notes.push('+8 conseq -1 ess — Strain (High): Pim notes the margin is compressing.');
     } else if (projectedStrainLevel === 'Critical') {
         consequenceDelta += 12;
         essenceDelta -= 1;

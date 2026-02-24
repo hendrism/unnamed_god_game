@@ -264,15 +264,15 @@ export const GameView = () => {
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
                 <h2 className="text-3xl font-display text-mythic-gold text-center">
-                    Fragment Choice
+                    A Fragment Surfaces
                 </h2>
                 <p className="text-gray-300 text-center max-w-xl">
-                    {boonPrompt || 'A fragment of your former power is available.'}
+                    {boonPrompt || 'A fragment has surfaced. Pim has prepared two options.'}
                 </p>
 
                 {/* Current Abilities - Now with Stats! */}
                 <div className="w-full bg-gray-900 border border-gray-700 rounded-lg p-4">
-                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Your Current Arsenal</p>
+                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">What's in the Bag</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {abilities.map((ability) => (
                             <div
@@ -509,7 +509,7 @@ export const GameView = () => {
                     <span className="hidden sm:block text-xs text-gray-500 mt-1">{doctrine?.passiveDescription}</span>
                 </div>
                 <div className="flex flex-col items-center flex-shrink-0">
-                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">Run Progress</span>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">Session Progress</span>
                     <span className="text-base sm:text-lg font-bold text-white">
                         {Math.min(encountersCompleted + 1, encountersTarget)} / {encountersTarget}
                     </span>
