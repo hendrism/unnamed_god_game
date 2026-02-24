@@ -9,15 +9,15 @@ export const StrainMeter = () => {
     if (strainLevel === 'High') colorClass = 'bg-orange-500';
     if (strainLevel === 'Critical') colorClass = 'bg-strain-red animate-pulse';
 
-    let effectText = 'Stable: no backlash effects.';
-    if (strainLevel === 'Medium') effectText = 'Distortion: each cast adds +5 Consequence.';
-    if (strainLevel === 'High') effectText = 'Backlash: each cast adds +8 Consequence and -1 Essence.';
-    if (strainLevel === 'Critical') effectText = 'Critical Backlash: +12 Consequence, -1 Essence, -5 Pressure.';
+    let effectText = 'Stable. No complications noted.';
+    if (strainLevel === 'Medium') effectText = 'Complications emerging. Each intervention adds +5 Consequence.';
+    if (strainLevel === 'High') effectText = 'Precision is declining. Each intervention adds +8 Consequence, -1 Essence.';
+    if (strainLevel === 'Critical') effectText = 'Operating at limit. Pim notes this in the record. +12 Consequence, -1 Essence.';
 
     return (
         <div className="w-full max-w-md mx-auto mb-6">
             <div className="flex justify-between text-sm uppercase tracking-widest text-gray-400 mb-1">
-                <span>Divine Instability</span>
+                <span>Herald's Strain</span>
                 <span className={strainLevel === 'Critical' ? 'text-strain-red' : ''}>{strainLevel}</span>
             </div>
             <div className="h-4 bg-gray-900 border border-gray-700 rounded-full overflow-hidden relative">

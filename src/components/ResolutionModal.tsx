@@ -7,38 +7,39 @@ interface ResolutionModalProps {
     carryOver: number;
     encountersCompleted: number;
     encountersTarget: number;
-    petitionWasPim?: boolean;
 }
 
-// Pim is earnest, eager, and slightly oblivious to how much he's being blamed.
-const PIM_QUOTES: Record<ResolutionOutcome, string[]> = {
+// Pim's filed notes: earnest, professional, genuinely believes he's contributing.
+// He records what happened. He means every word.
+const PIM_NOTES: Record<ResolutionOutcome, string[]> = {
     perfect: [
-        '"A triumph, my lord. I had a feeling about this one." — Pim, who did not have a feeling about this one',
-        '"Exactly as I predicted, my lord." — Pim, who predicted nothing',
-        '"My instincts were sound on this occasion." — Pim, filing this away for future self-promotion',
-        '"I believe my briefing was a contributing factor." — Pim, whose briefing was approximate at best',
+        'Notes filed. A strong session, my lord. The preparation held up throughout.',
+        'Session complete. Everything proceeded as coordinated. Pim notes the bag was well-chosen.',
+        'Recorded. The god\'s approach was decisive. Pim\'s groundwork appears to have supported the outcome.',
+        'Filed. This one went well. Pim considers the briefing adequate to the occasion.',
     ],
     partial: [
-        '"A solid outcome, my lord. Largely as hoped." — Pim, who had not hoped',
-        '"Better than my estimates suggested." — Pim, who made no estimates',
-        '"I feel this reflects well on the preparation." — Pim, who prepared nothing',
+        'Session logged. A good result, overall. A few items will carry forward.',
+        'Filed. The god handled it, which was always the expectation. Some residuals noted.',
+        'Notes updated. The outcome was within the range Pim had hoped for.',
+        'Recorded. The intervention held. Pim will note the variables that ran a little hot.',
     ],
     minimal: [
-        '"In hindsight, some of my figures may have been approximate." — Pim, who used no figures',
-        '"I accept partial responsibility, my lord. The partial that is not mine." — Pim',
-        '"I believe the situation was more nuanced than I communicated." — Pim, who communicated nothing',
-        '"The intelligence I had was also incomplete." — Pim, who gathered no intelligence',
+        'Filed. The situation was managed. Pim will review a few of the preparation notes before next session.',
+        'Session logged. The intervention held. It was close in places, but it held.',
+        'Recorded. There are some residuals. Pim takes this as useful information.',
+        'Notes submitted. Technically complete. Pim has added a clarifying note to the official account.',
     ],
     catastrophic: [
-        '"My lord, I can explain. Several of the explanations are quite good." — Pim',
-        '"I may have misjudged the severity. I accept full responsibility." — Pim, who will not',
-        '"In my defense, the information I had was also wrong." — Pim',
-        '"I take comfort in knowing this was not entirely foreseeable." — Pim, it was entirely foreseeable',
+        'Filed. A difficult session, my lord. Pim is making notes.',
+        'Session logged under complications. Pim notes that several of his assumptions may need revisiting.',
+        'Recorded. The outcome was not what Pim had anticipated. He is looking into this.',
+        'Filed. Pim has submitted the official account. He will have the supplementary notes ready shortly.',
     ],
 };
 
-// The god never accepts blame regardless of source. Good outcome = genius. Bad outcome = Pim's fault somehow.
-const GOD_QUOTES: Record<ResolutionOutcome, string[]> = {
+// The god's decree: never accepts blame. Good outcome = genius. Bad outcome = Pim's fault, somehow.
+const GOD_DECREES: Record<ResolutionOutcome, string[]> = {
     perfect: [
         'Precisely as expected. Pim, note this for the record.',
         'The outcome reflects the quality of the intervention. Which was mine.',
@@ -69,7 +70,7 @@ function pickQuote(quotes: string[], seed: number): string {
     return quotes[Math.abs(seed) % quotes.length];
 }
 
-export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersCompleted, encountersTarget, petitionWasPim }: ResolutionModalProps) => {
+export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersCompleted, encountersTarget }: ResolutionModalProps) => {
     const isLastEncounter = encountersCompleted >= encountersTarget;
     const nextEncounterNum = encountersCompleted + 1;
 
@@ -149,29 +150,32 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                 {/* Goal Achievement Feedback */}
                 {resolution.pressureRemaining === 0 && (
                     <div className="mb-4 p-3 bg-green-900/20 border border-green-600/50 rounded">
-                        <p className="text-sm text-green-300 font-semibold">✓ Pressure eliminated. The situation accepted your intervention.</p>
-                        <p className="text-xs text-green-400 mt-1">Efficiency noted. The next matter is already in queue.</p>
+                        <p className="text-sm text-green-300 font-semibold">✓ Pressure fully resolved. Pim has noted this in the record.</p>
+                        <p className="text-xs text-green-400 mt-1">The next matter is already in the queue.</p>
                     </div>
                 )}
 
                 {resolution.thresholdExceeded && (
                     <div className="mb-4 p-3 bg-red-900/30 border border-red-600/50 rounded">
-                        <p className="text-sm text-red-300 font-semibold">Threshold exceeded. The cosmos has registered a concern.</p>
-                        <p className="text-xs text-red-400 mt-1">The instability will be someone else's problem. Soon.</p>
+                        <p className="text-sm text-red-300 font-semibold">Consequence threshold exceeded. Pim has filed a note.</p>
+                        <p className="text-xs text-red-400 mt-1">The instability carries forward. Pim is aware of this.</p>
                     </div>
                 )}
 
                 {(() => {
                     const seed = resolution.finalConsequence + resolution.essenceGained;
-                    const quote = petitionWasPim
-                        ? pickQuote(PIM_QUOTES[resolution.outcome], seed)
-                        : pickQuote(GOD_QUOTES[resolution.outcome], seed);
-                    const isPimQuote = !!petitionWasPim;
+                    const pimNote = pickQuote(PIM_NOTES[resolution.outcome], seed);
+                    const godDecree = pickQuote(GOD_DECREES[resolution.outcome], seed + 1);
                     return (
-                        <div className={`mb-4 p-3 rounded border ${isPimQuote ? 'bg-amber-950/30 border-amber-700/40' : 'bg-gray-800/60 border-gray-700'}`}>
-                            <p className={`text-xs italic ${isPimQuote ? 'text-amber-400' : 'text-gray-400'}`}>
-                                {quote}
-                            </p>
+                        <div className="space-y-2 mb-4">
+                            <div className="p-3 rounded border bg-amber-950/30 border-amber-700/40">
+                                <p className="text-[10px] uppercase tracking-widest text-amber-600 mb-1">Pim's Filed Notes</p>
+                                <p className="text-xs text-amber-300">{pimNote}</p>
+                            </div>
+                            <div className="p-3 rounded border bg-gray-800/60 border-gray-700">
+                                <p className="text-[10px] uppercase tracking-widest text-gray-600 mb-1">Official Decree</p>
+                                <p className="text-xs italic text-gray-400">"{godDecree}"</p>
+                            </div>
                         </div>
                     );
                 })()}
@@ -198,7 +202,7 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                 {/* Carry-forward preview */}
                 <div className="mb-6 p-3 bg-gray-800/60 border border-gray-700 rounded space-y-1">
                     <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                        {isLastEncounter ? 'Run Complete' : `Proceeding to Intervention ${nextEncounterNum} of ${encountersTarget}`}
+                        {isLastEncounter ? 'Session Complete' : `Next: Matter ${nextEncounterNum} of ${encountersTarget}`}
                     </p>
                     <div className="flex justify-between text-xs">
                         <span className="text-gray-500">Mortal Grievances:</span>
@@ -216,7 +220,7 @@ export const ResolutionModal = ({ resolution, onContinue, carryOver, encountersC
                     onClick={onContinue}
                     className="w-full py-3 bg-void-purple text-white font-semibold rounded hover:bg-void-purple-dark transition-all"
                 >
-                    {isLastEncounter ? 'Conclude the Session' : `Proceed to Intervention ${nextEncounterNum}`}
+                    {isLastEncounter ? 'File the Session' : `On to Matter ${nextEncounterNum}`}
                 </button>
             </div>
             </div>

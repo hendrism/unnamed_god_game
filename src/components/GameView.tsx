@@ -37,7 +37,6 @@ export const GameView = () => {
         boonOptions,
         boonPrompt,
         petitionOptions,
-        lastPetitionWasPim,
         synergyStreak,
         lastSynergy,
         startRun,
@@ -116,14 +115,14 @@ export const GameView = () => {
 
                 <h1 className="text-5xl font-display text-mythic-gold">FALLEN GOD</h1>
                 <p className="text-gray-400 italic max-w-xl text-center">
-                    You are a fallen god making obviously correct decisions that, for some reason, keep causing problems.
+                    You are Pim, Herald to His Fallen Divinity. You take the briefings seriously. You always have.
                 </p>
 
                 <div className="w-full max-w-xl bg-gray-900 border border-gray-700 rounded-lg p-4 text-left">
-                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Essence Bank</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Pim's Preparations</p>
                     <p className="text-3xl font-bold text-mythic-gold">{essence}</p>
                     <p className="text-xs text-gray-500 mt-2">
-                        Purchased upgrades: {ownedUpgrades.length}
+                        Improvements secured: {ownedUpgrades.length}
                     </p>
                 </div>
 
@@ -163,10 +162,10 @@ export const GameView = () => {
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
                 <h2 className="text-3xl font-display text-mythic-gold text-center">
-                    A Fragment of Power Resurfaces
+                    Pim Is Preparing the Bag
                 </h2>
                 <p className="text-gray-400 italic text-center max-w-xl">
-                    One fragment must be reclaimed before the first crisis.
+                    A divine fragment has surfaced. One goes in before the first session begins.
                 </p>
 
                 {/* Compact Reference Strip */}
@@ -410,14 +409,20 @@ export const GameView = () => {
                 {headerControls}
                 {showHelp && <HelpModal onClose={handleCloseHelp} />}
 
-                <h2 className="text-3xl font-display text-mythic-gold">Intervention Complete</h2>
-                <p className="text-gray-400 text-center max-w-xl">
-                    Essence gathered this run:{' '}
-                    <span className="text-mythic-gold font-bold">{runEssenceGained}</span>
+                <h2 className="text-3xl font-display text-mythic-gold">Session Filed</h2>
+                <p className="text-gray-400 text-center max-w-xl italic">
+                    The god attributes the results to his natural authority. Pim has been reviewing what's available.
                 </p>
-                <p className="text-gray-400 text-center">
-                    Essence available: <span className="text-white font-bold">{essence}</span>
-                </p>
+                <div className="flex gap-8 text-center">
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-widest">Essence This Session</p>
+                        <p className="text-2xl font-bold text-mythic-gold">{runEssenceGained}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-widest">Total Available</p>
+                        <p className="text-2xl font-bold text-white">{essence}</p>
+                    </div>
+                </div>
 
                 {upgradeOptions.length > 0 ? (
                     <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -449,7 +454,7 @@ export const GameView = () => {
                                                 ? 'bg-blue-900/50 text-blue-300 border border-blue-700/30'
                                                 : 'bg-purple-900/50 text-purple-300 border border-purple-700/30'
                                         }`}>
-                                            {isStrength ? '⚔️ Power' : '🌍 World'}
+                                            {isStrength ? "Pim's Kit" : 'World Conditions'}
                                         </div>
                                         <div className={`inline-block px-2 py-1 rounded text-[10px] uppercase tracking-widest font-bold ${tierBadgeClass}`}>
                                             {tierLabel}
@@ -472,7 +477,7 @@ export const GameView = () => {
                                                 : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                                         }`}
                                     >
-                                        {canAfford ? 'Purchase Upgrade' : 'Insufficient Essence'}
+                                        {canAfford ? 'Acquire' : 'Insufficient Essence'}
                                     </button>
                                 </div>
                             );
@@ -486,7 +491,7 @@ export const GameView = () => {
                     onClick={skipUpgrade}
                     className="px-5 py-2 bg-gray-800 text-gray-200 border border-gray-600 rounded hover:bg-gray-700"
                 >
-                    Skip and Return to Void
+                    Nothing for now. Back to the chambers.
                 </button>
             </div>
         );
@@ -603,7 +608,6 @@ export const GameView = () => {
                     carryOver={carryOverInstability}
                     encountersCompleted={encountersCompleted}
                     encountersTarget={encountersTarget}
-                    petitionWasPim={lastPetitionWasPim}
                 />
             )}
         </div>
