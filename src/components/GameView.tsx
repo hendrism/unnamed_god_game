@@ -57,6 +57,7 @@ export const GameView = () => {
     const [selectedAbilityId, setSelectedAbilityId] = useState<AbilityId | null>(null);
     const [showHelp, setShowHelp] = useState(false);
     const [resetConfirming, setResetConfirming] = useState(false);
+    const [showLog, setShowLog] = useState(false);
 
     useEffect(() => {
         if (phase !== 'encounter') {
@@ -522,39 +523,32 @@ export const GameView = () => {
                 </div>
             </div>
 
-            {/* Action Log */}
-            <div className="w-full">
-                <ActionLog log={actionLog} />
-            </div>
-
-            {/* Secondary Stats — unique values only (encounter# and run essence are already in header) */}
-            <div className="w-full grid grid-cols-2 gap-2 mb-4 text-center">
-                <div className="bg-gray-900 border border-gray-800 rounded p-2">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Mortal Grievances</p>
-                    <p className="text-sm text-gray-200">{carryOverInstability}</p>
-                </div>
-                <div className="bg-gray-900 border border-gray-800 rounded p-2">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Pim's Briefing</p>
-                    <p className="text-sm text-gray-200">
-                        {encounterAbilityIds.length} / {abilities.length}
-                    </p>
-                </div>
-            </div>
-
             <StrainMeter />
 
             {synergyStreak > 0 && (
-                <div className="w-full bg-amber-950/40 border border-mythic-gold rounded p-2 mb-3 sm:mb-4 text-center animate-pulse">
-                    <p className="text-[10px] sm:text-xs uppercase tracking-widest text-amber-200">Synergy Chain</p>
-                    <p className="text-xs sm:text-sm text-mythic-gold truncate">{lastSynergy}</p>
+                <div className="w-full bg-amber-950/40 border border-mythic-gold rounded p-2 mb-3 text-center animate-pulse">
+                    <p className="text-[10px] uppercase tracking-widest text-amber-200">Synergy Chain</p>
+                    <p className="text-xs text-mythic-gold truncate">{lastSynergy}</p>
                 </div>
             )}
 
-            {/* Latest Decree */}
-            <div className="w-full bg-gray-900 border border-gray-800 rounded p-3 mb-6">
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Latest Decree</p>
-                <p className="text-sm text-gray-300">{lastResolution}</p>
+            {/* Compact meta strip */}
+            <div className="w-full flex justify-between items-center my-3 text-[10px] text-gray-600 px-1">
+                <span>Carryover <span className="text-gray-400">{carryOverInstability}</span></span>
+                <button
+                    onClick={() => setShowLog(v => !v)}
+                    className="hover:text-gray-400 transition-colors"
+                >
+                    📜 {showLog ? 'hide log' : `log (${actionLog.length})`}
+                </button>
+                <span>Hand <span className="text-gray-400">{encounterAbilityIds.length}/{abilities.length}</span></span>
             </div>
+
+            {showLog && (
+                <div className="w-full mb-3">
+                    <ActionLog log={actionLog} />
+                </div>
+            )}
 
             <div className="flex-1 w-full flex flex-col items-center justify-center py-4 relative">
                 {selectedAbility && selectedPreview ? (

@@ -76,13 +76,12 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                             {encounter.pressureRemaining} <span className="text-gray-600 text-[10px]">/ {encounter.startingPressure}</span>
                         </span>
                     </div>
-                    <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden relative mb-1">
+                    <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden relative">
                         <div
                             className="h-full bg-gradient-to-r from-red-900 to-red-600 transition-all duration-500 ease-out"
                             style={{ width: `${pressurePercent}%` }}
                         />
                     </div>
-                    <p className="text-[10px] text-gray-500 italic leading-snug">{encounter.pressureText}</p>
                 </div>
 
                 {/* Consequence */}
@@ -107,8 +106,7 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                             />
                         )}
                     </div>
-                    <div className="flex justify-between text-[10px] text-gray-500 leading-tight">
-                        <span className="italic leading-snug">{encounter.consequenceText}</span>
+                    <div className="text-right text-[10px] mt-0.5">
                         <span className={encounter.thresholdExceeded ? 'text-strain-red font-bold' : 'text-yellow-600/80'}>
                             Threshold: {encounter.consequenceThreshold}
                         </span>
@@ -116,7 +114,7 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                 </div>
 
                 {/* Turn & Reward */}
-                <div className="col-span-1 md:col-span-2 flex justify-between items-center bg-black/30 p-2 rounded border border-gray-800/50">
+                <div className="col-span-1 md:col-span-2 flex items-center bg-black/30 p-2 rounded border border-gray-800/50">
                     <div className="flex items-center space-x-6">
                         <div className="flex flex-col">
                             <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Turns</span>
@@ -142,9 +140,6 @@ export const EncounterCard = ({ encounter, resolved }: { encounter: ActiveEncoun
                                 </div>
                             </>
                         )}
-                    </div>
-                    <div className="text-right hidden sm:block">
-                        <p className="text-[10px] text-gray-600 italic">{encounter.rewardText}</p>
                     </div>
                 </div>
             </div>

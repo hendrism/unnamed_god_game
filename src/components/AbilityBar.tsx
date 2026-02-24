@@ -24,7 +24,7 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
                             onClick={() => onChoose(ability.id)}
                             disabled={!preview}
                             className={`
-                                relative flex flex-col p-3 sm:p-4 rounded-lg border-2 transition-all text-left min-h-[100px] sm:min-h-0
+                                relative flex flex-col p-3 rounded-lg border-2 transition-all text-left
                                 ${isSelected
                                     ? 'bg-gray-800 border-mythic-gold shadow-[0_0_15px_rgba(251,191,36,0.2)]'
                                     : 'bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600'
@@ -32,61 +32,36 @@ export const AbilityBar = ({ abilities, selectedId, onChoose }: AbilityBarProps)
                                 ${!preview ? 'opacity-50 cursor-not-allowed' : ''}
                             `}
                         >
-                            {/* Ability name */}
-                            <div className="mb-2 sm:mb-3">
-                                <span className={`
-                                    font-display text-base sm:text-lg leading-tight block break-words
-                                    ${isSelected ? 'text-mythic-gold' : 'text-gray-200'}
-                                `}>
-                                    {ability.name}
-                                </span>
-                                <span className="text-[9px] uppercase tracking-widest text-gray-500 truncate block">
-                                    {getAbilityCategoryLabel(ability.category)}
-                                </span>
-                            </div>
+                            {/* Ability name + category */}
+                            <span className={`font-display text-base leading-tight block break-words mb-1 ${isSelected ? 'text-mythic-gold' : 'text-gray-200'}`}>
+                                {ability.name}
+                            </span>
+                            <span className="text-[9px] uppercase tracking-widest text-gray-500 block mb-2">
+                                {getAbilityCategoryLabel(ability.category)}
+                            </span>
 
-                            {/* Clear Stats - Ordered to match Goals */}
+                            {/* Compact stats: −Xp  +Yc  +Zs  +We */}
                             {preview && (
-                                <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm">
-                                    {/* 1. Pressure (matches Goal 1) */}
-                                    <div className="flex justify-between items-center gap-2">
-                                        <span className="text-gray-400 truncate">Pressure</span>
-                                        <span className="text-red-400 font-bold flex-shrink-0">-{preview.pressureDelta}</span>
-                                    </div>
-                                    {/* 2. Consequence (matches Goal 2) */}
-                                    <div className="flex justify-between items-center gap-2">
-                                        <span className="text-gray-400 truncate">Consequence</span>
-                                        <span className={`font-bold flex-shrink-0 ${
-                                            preview.consequenceDelta > 0
-                                                ? preview.willExceedThreshold
-                                                    ? 'text-strain-red animate-pulse'
-                                                    : 'text-void-purple'
-                                                : preview.consequenceDelta < 0
-                                                    ? 'text-green-400'
-                                                    : 'text-gray-600'
-                                        }`}>
-                                            {preview.consequenceDelta > 0 ? '+' : ''}{preview.consequenceDelta}
-                                        </span>
-                                    </div>
-                                    {/* 3. Strain (cost to use) */}
-                                    <div className="flex justify-between items-center gap-2">
-                                        <span className="text-gray-400 truncate">Strain</span>
-                                        <span className="text-blue-400 font-bold flex-shrink-0">+{preview.strainCost}</span>
-                                    </div>
-                                    {/* 4. Essence (reward) */}
-                                    <div className="flex justify-between items-center gap-2">
-                                        <span className="text-gray-400 truncate">Essence</span>
-                                        <span className={`font-bold flex-shrink-0 ${preview.essenceDelta > 0 ? 'text-mythic-gold' : 'text-gray-600'}`}>
-                                            +{preview.essenceDelta}
-                                        </span>
-                                    </div>
+                                <div className="flex flex-wrap gap-x-2 gap-y-0 text-xs font-mono">
+                                    <span className="text-red-400">−{preview.pressureDelta}p</span>
+                                    <span className={
+                                        preview.consequenceDelta > 0
+                                            ? preview.willExceedThreshold ? 'text-strain-red' : 'text-void-purple'
+                                            : preview.consequenceDelta < 0 ? 'text-green-400' : 'text-gray-600'
+                                    }>
+                                        {preview.consequenceDelta > 0 ? '+' : ''}{preview.consequenceDelta}c
+                                    </span>
+                                    <span className="text-blue-400">+{preview.strainCost}s</span>
+                                    <span className={preview.essenceDelta > 0 ? 'text-mythic-gold' : 'text-gray-600'}>
+                                        +{preview.essenceDelta}e
+                                    </span>
                                 </div>
                             )}
 
                             {/* Synergy indicator */}
                             {preview?.synergyLabel && (
-                                <div className="mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-gray-700">
-                                    <span className="text-[9px] sm:text-[10px] text-amber-400 uppercase tracking-wider truncate block">
+                                <div className="mt-1.5 pt-1.5 border-t border-gray-700">
+                                    <span className="text-[9px] text-amber-400 uppercase tracking-wider truncate block">
                                         ⚡ {preview.synergyLabel}
                                     </span>
                                 </div>
